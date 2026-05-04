@@ -374,13 +374,19 @@ Freemium model. **During development, all users get full access** — gating is 
 
 ### Design Direction
 
-Modern, minimal, developer-focused. References: **Notion**, **Linear**, **Raycast**.
+Modern, minimal, developer-focused. References: **Notion** (https://notion.com), **Linear** (https://linear.app), **Raycast** (https://raycast.com).
 
 - Dark mode by default; light mode optional
 - Clean typography, generous whitespace
 - Subtle borders and shadows
 - Syntax highlighting for code blocks
 - Smooth transitions, hover states, toast notifications, loading skeletons
+
+### Screenshots
+Refer to the screennshots below as a base for the dashboard UI. It is does not have to be axact. Use it as reference only:
+- @context/screenshots/dasboard-ui-main.png
+- @context/screenshots/dasboard-ui-drawer.png
+
 
 ### Layout
 
