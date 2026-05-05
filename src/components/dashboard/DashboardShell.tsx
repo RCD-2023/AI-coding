@@ -7,11 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Menu, PanelLeft, Plus, Search } from "lucide-react";
 import SidebarContent from "./SidebarContent";
+import type { SidebarData } from "@/lib/db/sidebar";
 
 export default function DashboardShell({
   children,
+  sidebarData,
 }: {
   children: React.ReactNode;
+  sidebarData: SidebarData | null;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -78,14 +81,14 @@ export default function DashboardShell({
             sidebarOpen ? "w-60" : "w-0 overflow-hidden border-r-0"
           )}
         >
-          <SidebarContent />
+          <SidebarContent sidebarData={sidebarData} />
         </aside>
 
         {/* Mobile sheet */}
         <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
           <SheetContent side="left" className="w-60 bg-card p-0">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
-            <SidebarContent />
+            <SidebarContent sidebarData={sidebarData} />
           </SheetContent>
         </Sheet>
 

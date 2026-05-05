@@ -57,7 +57,7 @@ async function seedDemoUser() {
 async function seedCollections(userId: string, typeMap: Record<string, string>) {
   // ── React Patterns ──────────────────────────────────────────────────────────
   const reactPatterns = await prisma.collection.create({
-    data: { name: "React Patterns", description: "Reusable React patterns and hooks", userId },
+    data: { name: "React Patterns", description: "Reusable React patterns and hooks", userId, isFavorite: true },
   });
 
   const reactItems = await prisma.item.createManyAndReturn({
@@ -175,7 +175,7 @@ export function pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pi
 
   // ── AI Workflows ─────────────────────────────────────────────────────────────
   const aiWorkflows = await prisma.collection.create({
-    data: { name: "AI Workflows", description: "AI prompts and workflow automations", userId },
+    data: { name: "AI Workflows", description: "AI prompts and workflow automations", userId, isFavorite: true },
   });
 
   const aiItems = await prisma.item.createManyAndReturn({
