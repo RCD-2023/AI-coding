@@ -119,6 +119,7 @@ Powerful search across **content**, **tags**, **titles**, and **types**.
 
 > ⚠️ **Draft schema — not final.** Relations and constraints will be refined during implementation. All schema changes go through **Prisma migrations** (never `db push`).
 
+### 4.1 Prisma Schema
 ```prisma
 // schema.prisma — ROUGH DRAFT
 
