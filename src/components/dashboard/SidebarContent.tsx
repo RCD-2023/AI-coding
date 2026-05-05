@@ -5,12 +5,6 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  mockCollections,
-  mockItemTypes,
-  mockTypeCounts,
-  mockUser,
-} from "@/lib/mock-data";
-import {
   ChevronDown,
   Code,
   File,
@@ -23,6 +17,7 @@ import {
   Terminal,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { SidebarData } from "@/lib/db/sidebar";
 
 const iconMap: Record<string, LucideIcon> = {
   Code,
@@ -34,10 +29,16 @@ const iconMap: Record<string, LucideIcon> = {
   Link: LinkIcon,
 };
 
-export default function SidebarContent() {
+export default function SidebarContent({
+  sidebarData,
+}: {
+  sidebarData: SidebarData | null;
+}) {
   const [collectionsOpen, setCollectionsOpen] = useState(true);
-  const favoriteCollections = mockCollections.filter((c) => c.isFavorite);
-  const allCollections = mockCollections.filter((c) => !c.isFavorite);
+
+  const itemTypes = sidebarData?.itemTypes ?? [];
+  const favorites = sidebarData?.favorites ?? [];
+  const recents = sidebarData?.recents ?? [];
 
   return (
     <div className="flex h-full flex-col">
@@ -48,9 +49,8 @@ export default function SidebarContent() {
             Types
           </p>
           <nav className="space-y-0.5">
-            {mockItemTypes.map((type) => {
+            {itemTypes.map((type) => {
               const Icon = iconMap[type.icon];
-              const count = mockTypeCounts[type.id] ?? 0;
               const href = `/items/${type.name.toLowerCase()}s`;
               return (
                 <Link
@@ -67,7 +67,7 @@ export default function SidebarContent() {
                     )}
                     {type.name}
                   </span>
-                  <span className="text-xs">{count}</span>
+                  <span className="text-xs">{type.count}</span>
                 </Link>
               );
             })}
@@ -92,45 +92,65 @@ export default function SidebarContent() {
           {collectionsOpen && (
             <>
               {/* Favorites */}
-              {favoriteCollections.length > 0 && (
+              {favorites.length > 0 && (
                 <div className="mb-3">
                   <p className="mb-1 px-2 text-xs text-muted-foreground">
                     Favorites
                   </p>
                   <nav className="space-y-0.5">
-                    {favoriteCollections.map((col) => (
+                    {favorites.map((col) => (
                       <Link
                         key={col.id}
                         href={`/collections/${col.id}`}
-                        className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                       >
-                        <span className="truncate">{col.name}</span>
-                        <Star className="h-3 w-3 shrink-0 fill-yellow-400 text-yellow-400" />
+                        <Star
+                          className="h-3 w-3 shrink-0"
+                          style={{ color: col.dominantColor, fill: col.dominantColor }}
+                        />
+                        <span className="flex-1 truncate">{col.name}</span>
+                        <span className="text-xs">{col.itemCount}</span>
                       </Link>
                     ))}
                   </nav>
                 </div>
               )}
 
-              {/* All Collections */}
-              {allCollections.length > 0 && (
-                <div>
+              {/* Recents */}
+              {recents.length > 0 && (
+                <div className="mb-2">
                   <p className="mb-1 px-2 text-xs text-muted-foreground">
-                    All Collections
+                    Recents
                   </p>
                   <nav className="space-y-0.5">
-                    {allCollections.map((col) => (
+                    {recents.map((col) => (
                       <Link
                         key={col.id}
                         href={`/collections/${col.id}`}
-                        className="flex items-center rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                       >
-                        <span className="truncate">{col.name}</span>
+                        <span
+                          className="h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: col.dominantColor }}
+                        />
+                        <span className="flex-1 truncate">{col.name}</span>
+                        <span className="text-xs">{col.itemCount}</span>
                       </Link>
                     ))}
                   </nav>
                 </div>
               )}
+
+              {/* View all button */}
+              <Link href="/collections" className="mt-2 block">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs"
+                >
+                  View All Collections
+                </Button>
+              </Link>
             </>
           )}
         </div>
@@ -140,14 +160,14 @@ export default function SidebarContent() {
       <div className="border-t border-border p-3">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-            {mockUser.name.charAt(0)}
+            D
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-foreground">
-              {mockUser.name}
+              Demo User
             </p>
             <p className="truncate text-xs text-muted-foreground">
-              {mockUser.email}
+              demo@devstash.io
             </p>
           </div>
           <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0">
