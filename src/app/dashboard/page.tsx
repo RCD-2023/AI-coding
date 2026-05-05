@@ -1,33 +1,26 @@
 import Link from "next/link";
 import { Bookmark, FolderOpen, Layers, Pin, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { mockCollections, mockItems, mockTypeCounts } from "@/lib/mock-data";
+import { mockItems } from "@/lib/mock-data";
+import { getDashboardData } from "@/lib/db/collections";
 import CollectionCard from "@/components/dashboard/CollectionCard";
 import ItemCard from "@/components/dashboard/ItemCard";
 
-const totalItems = Object.values(mockTypeCounts).reduce((a, b) => a + b, 0);
-const totalCollections = mockCollections.length;
-const favoriteItemsCount = mockItems.filter((i) => i.isFavorite).length;
-const favoriteCollectionsCount = mockCollections.filter((c) => c.isFavorite).length;
-
-const stats = [
-  { label: "Total Items", value: totalItems, icon: Layers },
-  { label: "Collections", value: totalCollections, icon: FolderOpen },
-  { label: "Favorite Items", value: favoriteItemsCount, icon: Star },
-  { label: "Favorite Collections", value: favoriteCollectionsCount, icon: Bookmark },
-];
-
-const recentCollections = [...mockCollections].sort(
-  (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-);
-
 const pinnedItems = mockItems.filter((i) => i.isPinned);
-
 const recentItems = [...mockItems]
   .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   .slice(0, 10);
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const data = await getDashboardData();
+
+  const stats = [
+    { label: "Total Items",          value: data?.stats.totalItems         ?? 0, icon: Layers },
+    { label: "Collections",          value: data?.stats.totalCollections   ?? 0, icon: FolderOpen },
+    { label: "Favorite Items",       value: data?.stats.favoriteItems      ?? 0, icon: Star },
+    { label: "Favorite Collections", value: data?.stats.favoriteCollections ?? 0, icon: Bookmark },
+  ];
+
   return (
     <div className="space-y-8 p-6">
       {/* Header */}
@@ -66,11 +59,15 @@ export default function DashboardPage() {
             View all
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {recentCollections.map((col) => (
-            <CollectionCard key={col.id} collection={col} />
-          ))}
-        </div>
+        {data?.collections.length ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {data.collections.map((col) => (
+              <CollectionCard key={col.id} collection={col} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No collections yet.</p>
+        )}
       </section>
 
       {/* Pinned items */}

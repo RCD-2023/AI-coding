@@ -1,4 +1,4 @@
-import { mockItemTypes } from "@/lib/mock-data";
+import type { CollectionForCard } from "@/lib/db/collections";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Code,
@@ -22,29 +22,15 @@ const iconMap: Record<string, LucideIcon> = {
   Link: LinkIcon,
 };
 
-type Collection = {
-  id: string;
-  name: string;
-  description: string;
-  isFavorite: boolean;
-  itemCount: number;
-  itemTypeIds: string[];
-};
-
 export default function CollectionCard({
   collection,
 }: {
-  collection: Collection;
+  collection: CollectionForCard;
 }) {
-  const dominantType = mockItemTypes.find(
-    (t) => t.id === collection.itemTypeIds[0]
-  );
-  const accentColor = dominantType?.color ?? "#6b7280";
-
   return (
     <Card
-      className="border-l-[3px] transition-colors hover:bg-accent/5 cursor-pointer"
-      style={{ borderLeftColor: accentColor }}
+      className="cursor-pointer border-l-[3px] transition-colors hover:bg-accent/5"
+      style={{ borderLeftColor: collection.dominantColor }}
     >
       <CardContent className="p-4">
         <div className="mb-1 flex items-start justify-between gap-2">
@@ -60,13 +46,11 @@ export default function CollectionCard({
         </p>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            {collection.itemTypeIds.slice(0, 4).map((typeId) => {
-              const type = mockItemTypes.find((t) => t.id === typeId);
-              if (!type) return null;
+            {collection.types.slice(0, 4).map((type) => {
               const Icon = iconMap[type.icon];
               return Icon ? (
                 <Icon
-                  key={typeId}
+                  key={type.name}
                   className="h-3.5 w-3.5"
                   style={{ color: type.color }}
                 />
