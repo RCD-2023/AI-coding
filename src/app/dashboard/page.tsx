@@ -1,24 +1,22 @@
 import Link from "next/link";
 import { Bookmark, FolderOpen, Layers, Pin, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { mockItems } from "@/lib/mock-data";
 import { getDashboardData } from "@/lib/db/collections";
+import { getDashboardItems } from "@/lib/db/items";
 import CollectionCard from "@/components/dashboard/CollectionCard";
 import ItemCard from "@/components/dashboard/ItemCard";
 
-const pinnedItems = mockItems.filter((i) => i.isPinned);
-const recentItems = [...mockItems]
-  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  .slice(0, 10);
-
 export default async function DashboardPage() {
-  const data = await getDashboardData();
+  const [collections, items] = await Promise.all([
+    getDashboardData(),
+    getDashboardItems(),
+  ]);
 
   const stats = [
-    { label: "Total Items",          value: data?.stats.totalItems         ?? 0, icon: Layers },
-    { label: "Collections",          value: data?.stats.totalCollections   ?? 0, icon: FolderOpen },
-    { label: "Favorite Items",       value: data?.stats.favoriteItems      ?? 0, icon: Star },
-    { label: "Favorite Collections", value: data?.stats.favoriteCollections ?? 0, icon: Bookmark },
+    { label: "Total Items",          value: collections?.stats.totalItems         ?? 0, icon: Layers },
+    { label: "Collections",          value: collections?.stats.totalCollections   ?? 0, icon: FolderOpen },
+    { label: "Favorite Items",       value: collections?.stats.favoriteItems      ?? 0, icon: Star },
+    { label: "Favorite Collections", value: collections?.stats.favoriteCollections ?? 0, icon: Bookmark },
   ];
 
   return (
@@ -59,9 +57,9 @@ export default async function DashboardPage() {
             View all
           </Link>
         </div>
-        {data?.collections.length ? (
+        {collections?.collections.length ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {data.collections.map((col) => (
+            {collections.collections.map((col) => (
               <CollectionCard key={col.id} collection={col} />
             ))}
           </div>
@@ -71,31 +69,33 @@ export default async function DashboardPage() {
       </section>
 
       {/* Pinned items */}
-      {pinnedItems.length > 0 && (
+      {items?.pinned.length ? (
         <section>
           <div className="mb-3 flex items-center gap-2">
             <Pin className="h-4 w-4 text-muted-foreground" />
             <h2 className="text-lg font-semibold text-foreground">Pinned</h2>
           </div>
           <div className="space-y-3">
-            {pinnedItems.map((item) => (
+            {items.pinned.map((item) => (
               <ItemCard key={item.id} item={item} />
             ))}
           </div>
         </section>
-      )}
+      ) : null}
 
       {/* Recent items */}
-      <section>
-        <h2 className="mb-3 text-lg font-semibold text-foreground">
-          Recent Items
-        </h2>
-        <div className="space-y-3">
-          {recentItems.map((item) => (
-            <ItemCard key={item.id} item={item} />
-          ))}
-        </div>
-      </section>
+      {items?.recent.length ? (
+        <section>
+          <h2 className="mb-3 text-lg font-semibold text-foreground">
+            Recent Items
+          </h2>
+          <div className="space-y-3">
+            {items.recent.map((item) => (
+              <ItemCard key={item.id} item={item} />
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

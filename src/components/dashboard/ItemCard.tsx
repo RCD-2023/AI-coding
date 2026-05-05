@@ -1,4 +1,4 @@
-import { mockItemTypes } from "@/lib/mock-data";
+import type { ItemForCard } from "@/lib/db/items";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -23,35 +23,23 @@ const iconMap: Record<string, LucideIcon> = {
   Link: LinkIcon,
 };
 
-type Item = {
-  id: string;
-  title: string;
-  description?: string | null;
-  itemTypeId: string;
-  isFavorite: boolean;
-  tags: string[];
-  createdAt: string;
-};
-
-export default function ItemCard({ item }: { item: Item }) {
-  const type = mockItemTypes.find((t) => t.id === item.itemTypeId);
-  const Icon = type ? iconMap[type.icon] : null;
+export default function ItemCard({ item }: { item: ItemForCard }) {
+  const Icon = iconMap[item.itemType.icon] ?? null;
+  const { color } = item.itemType;
   const date = new Date(item.createdAt).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
 
   return (
-    <Card className="transition-colors hover:bg-accent/5 cursor-pointer">
+    <Card className="cursor-pointer transition-colors hover:bg-accent/5">
       <CardContent className="flex items-start gap-3 p-4">
         {/* Type icon */}
         <div
           className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
-          style={{ backgroundColor: `${type?.color ?? "#6b7280"}20` }}
+          style={{ backgroundColor: `${color}20` }}
         >
-          {Icon && (
-            <Icon className="h-4 w-4" style={{ color: type?.color }} />
-          )}
+          {Icon && <Icon className="h-4 w-4" style={{ color }} />}
         </div>
 
         {/* Content */}
@@ -67,19 +55,24 @@ export default function ItemCard({ item }: { item: Item }) {
               {item.description}
             </p>
           )}
-          {item.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {item.tags.slice(0, 4).map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className="px-1.5 py-0 text-xs"
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-1">
+            <Badge
+              variant="secondary"
+              className="px-1.5 py-0 text-xs"
+              style={{ color }}
+            >
+              {item.itemType.name}
+            </Badge>
+            {item.tags.slice(0, 3).map((tag) => (
+              <Badge
+                key={tag}
+                variant="secondary"
+                className="px-1.5 py-0 text-xs"
+              >
+                {tag}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         {/* Date */}
