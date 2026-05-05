@@ -2,19 +2,29 @@
 
 <!-- Feature Name -->
 
+## Seed Sample Data
+
 ## Status
 
 <!-- Not Started|In Progress|Completed -->
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Goals & requirements -->
+- [x] Add `password` field to User schema (nullable, for credentials auth)
+- [x] Run migration for schema change
+- [x] Overwrite `prisma/seed.ts` with full sample data:
+  - [x] System ItemTypes (7 built-in types)
+  - [x] Demo user: demo@devstash.io / 12345678 (bcryptjs, 12 rounds)
+  - [x] 5 collections with items: React Patterns, AI Workflows, DevOps, Terminal Commands, Design Resources
+- [ ] Build passes
 
 ## Notes
 
-<!-- Any extra notes -->
+- Seed is destructive for the demo user — deletes and recreates on each run
+- System ItemTypes use upsert (idempotent, safe to re-run)
+- bcryptjs used for password hashing (not bcrypt — no native bindings needed)
 
 ## History
 
