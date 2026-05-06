@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { DEMO_USER_EMAIL } from "@/lib/constants";
 
 export type SidebarItemType = {
   id: string;
@@ -22,6 +23,9 @@ export type SidebarData = {
   recents: SidebarCollection[];
 };
 
+const PRO_TYPES = new Set(["file", "image"]);
+const SIDEBAR_RECENT_LIMIT = 5;
+
 async function getItemTypesForSidebar(userId: string): Promise<SidebarItemType[]> {
   const types = await prisma.itemType.findMany({
     where: { isSystem: true },
@@ -32,8 +36,6 @@ async function getItemTypesForSidebar(userId: string): Promise<SidebarItemType[]
       },
     },
   });
-
-  const PRO_TYPES = new Set(["file", "image"]);
 
   return types.map((t) => ({
     id: t.id,
@@ -81,7 +83,7 @@ async function getCollectionsForSidebar(userId: string) {
 
     if (col.isFavorite) {
       favorites.push(entry);
-    } else {
+    } else if (recents.length < SIDEBAR_RECENT_LIMIT) {
       recents.push(entry);
     }
   }
@@ -92,7 +94,7 @@ async function getCollectionsForSidebar(userId: string) {
 // Temporary: uses demo user until auth (NextAuth session) is wired up
 export async function getSidebarData(): Promise<SidebarData | null> {
   const user = await prisma.user.findUnique({
-    where: { email: "demo@devstash.io" },
+    where: { email: DEMO_USER_EMAIL },
     select: { id: true },
   });
 

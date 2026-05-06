@@ -113,6 +113,9 @@ model Item {
 
   @@index([userId])
   @@index([itemTypeId])
+  @@index([userId, isFavorite])
+  @@index([userId, isPinned])
+  @@index([userId, createdAt])
 }
 
 model Collection {
@@ -128,6 +131,8 @@ model Collection {
   updatedAt     DateTime         @updatedAt
 
   @@index([userId])
+  @@index([userId, isFavorite])
+  @@index([userId, updatedAt])
 }
 
 model ItemCollection {

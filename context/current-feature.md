@@ -1,18 +1,29 @@
 # Current Feature
 
-<!-- Feature Name -->
+Code Audit Quick Wins
 
 ## Status
 
-<!-- Not Started|In Progress|Completed -->
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+Address the low-risk, no-schema-change findings from the full code audit:
+
+1. **Delete `src/lib/mock-data.ts`** — entirely unused dead code, no imports anywhere in `src/`
+2. **Extract shared `iconMap`** — the same 7-icon map is copy-pasted verbatim in `SidebarContent.tsx`, `CollectionCard.tsx`, and `ItemCard.tsx`; extract to `src/lib/icon-map.ts` and import from there
+3. **Centralize `DEMO_USER_EMAIL`** — `"demo@devstash.io"` is hardcoded in `collections.ts`, `items.ts`, and `sidebar.ts`; move to a single constant so the auth swap is a one-line change
+4. **Move `PRO_TYPES` to module scope** — defined inside `getItemTypesForSidebar()` on every call; move to a module-level constant in `sidebar.ts`
+5. **Cap sidebar recents** — non-favorite collections are pushed with no limit; add `SIDEBAR_RECENT_LIMIT = 5` and slice before returning
+6. **Exclude pinned items from recent items query** — `fetchItems` for `recent` has no `isPinned: false` filter, so pinned items appear in both "Pinned" and "Recent Items" sections
+7. **Add `DATABASE_URL` startup guard in `prisma.ts`** — replace the `!` non-null assertion with an explicit check that throws a clear error message if the var is missing
 
 ## Notes
 
-<!-- Add notes here -->
+- No schema changes, no new dependencies, no architectural changes
+- Items 1–4 are pure refactors with zero behavior change
+- Items 5–6 are small query/data fixes
+- Item 7 is a dev-experience improvement only
 
 ## History
 
