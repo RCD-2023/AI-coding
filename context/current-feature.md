@@ -1,29 +1,18 @@
 # Current Feature
 
-Code Audit Quick Wins
+<!-- Feature Name -->
 
 ## Status
 
-In Progress
+<!-- Not Started|In Progress|Completed -->
 
 ## Goals
 
-Address the low-risk, no-schema-change findings from the full code audit:
-
-1. **Delete `src/lib/mock-data.ts`** — entirely unused dead code, no imports anywhere in `src/`
-2. **Extract shared `iconMap`** — the same 7-icon map is copy-pasted verbatim in `SidebarContent.tsx`, `CollectionCard.tsx`, and `ItemCard.tsx`; extract to `src/lib/icon-map.ts` and import from there
-3. **Centralize `DEMO_USER_EMAIL`** — `"demo@devstash.io"` is hardcoded in `collections.ts`, `items.ts`, and `sidebar.ts`; move to a single constant so the auth swap is a one-line change
-4. **Move `PRO_TYPES` to module scope** — defined inside `getItemTypesForSidebar()` on every call; move to a module-level constant in `sidebar.ts`
-5. **Cap sidebar recents** — non-favorite collections are pushed with no limit; add `SIDEBAR_RECENT_LIMIT = 5` and slice before returning
-6. **Exclude pinned items from recent items query** — `fetchItems` for `recent` has no `isPinned: false` filter, so pinned items appear in both "Pinned" and "Recent Items" sections
-7. **Add `DATABASE_URL` startup guard in `prisma.ts`** — replace the `!` non-null assertion with an explicit check that throws a clear error message if the var is missing
+<!-- Add goals here -->
 
 ## Notes
 
-- No schema changes, no new dependencies, no architectural changes
-- Items 1–4 are pure refactors with zero behavior change
-- Items 5–6 are small query/data fixes
-- Item 7 is a dev-experience improvement only
+<!-- Add notes here -->
 
 ## History
 
@@ -40,3 +29,4 @@ Address the low-risk, no-schema-change findings from the full code audit:
 - Dashboard Items -- Real Data: replaced mock pinned and recent items with Neon DB data, created src/lib/db/items.ts (fetchItems, getDashboardItems), ItemCard updated to use pre-resolved itemType (name, icon, color), type badge added, no mock-data dependency remaining in dashboard
 - Stats & Sidebar -- Real Data: created src/lib/db/sidebar.ts (getSidebarData, item types with counts, favorites and recents with dominant color and item count), dashboard layout fetches and passes sidebar data as props, SidebarContent fully replaced mock data with real DB data -- item types with icons/counts, favorites with colored star + count, recents with colored dot + count, "View All Collections" button linking to /collections, seed updated with isFavorite=true on React Patterns and AI Workflows
 - Add Pro Badge to Sidebar: added ShadCN outline Badge to File and Image item type links in the sidebar, isPro flag derived in the data layer (sidebar.ts) via a Set of pro type names, badge is subtle with muted foreground color
+- Code Audit Quick Wins: extracted shared iconMap to src/lib/icon-map.ts, centralized DEMO_USER_EMAIL to src/lib/constants.ts, moved PRO_TYPES and SIDEBAR_RECENT_LIMIT to module scope, capped sidebar recents at 5, excluded pinned items from recent query, added DATABASE_URL startup guard, added 5 composite DB indexes (userId+isFavorite/isPinned/createdAt on Item, userId+isFavorite/updatedAt on Collection)
