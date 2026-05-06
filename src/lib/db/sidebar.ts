@@ -6,6 +6,7 @@ export type SidebarItemType = {
   icon: string;
   color: string;
   count: number;
+  isPro: boolean;
 };
 
 export type SidebarCollection = {
@@ -32,12 +33,15 @@ async function getItemTypesForSidebar(userId: string): Promise<SidebarItemType[]
     },
   });
 
+  const PRO_TYPES = new Set(["file", "image"]);
+
   return types.map((t) => ({
     id: t.id,
     name: t.name,
     icon: t.icon,
     color: t.color,
     count: t.items.length,
+    isPro: PRO_TYPES.has(t.name),
   }));
 }
 

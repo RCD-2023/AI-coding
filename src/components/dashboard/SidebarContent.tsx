@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ChevronDown,
@@ -66,6 +67,14 @@ export default function SidebarContent({
                       />
                     )}
                     {type.name}
+                    {type.isPro && (
+                      <Badge
+                        variant="outline"
+                        className="h-4 px-1 text-[10px] font-medium leading-none text-muted-foreground"
+                      >
+                        Pro
+                      </Badge>
+                    )}
                   </span>
                   <span className="text-xs">{type.count}</span>
                 </Link>
