@@ -7,28 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ChevronDown,
-  Code,
-  File,
-  Image,
-  Link as LinkIcon,
   Settings,
-  Sparkles,
   Star,
-  StickyNote,
-  Terminal,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import type { SidebarData } from "@/lib/db/sidebar";
-
-const iconMap: Record<string, LucideIcon> = {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File,
-  Image,
-  Link: LinkIcon,
-};
+import { iconMap } from "@/lib/icon-map";
 
 export default function SidebarContent({
   sidebarData,

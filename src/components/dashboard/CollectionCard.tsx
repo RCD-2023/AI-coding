@@ -1,26 +1,7 @@
 import type { CollectionForCard } from "@/lib/db/collections";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Code,
-  File,
-  Image,
-  Link as LinkIcon,
-  Sparkles,
-  Star,
-  StickyNote,
-  Terminal,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-
-const iconMap: Record<string, LucideIcon> = {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File,
-  Image,
-  Link: LinkIcon,
-};
+import { Star } from "lucide-react";
+import { iconMap } from "@/lib/icon-map";
 
 export default function CollectionCard({
   collection,

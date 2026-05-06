@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { DEMO_USER_EMAIL } from "@/lib/constants";
 
 export type ItemForCard = {
   id: string;
@@ -45,7 +46,7 @@ async function fetchItems(
 // Temporary: uses demo user until auth (NextAuth session) is wired up
 export async function getDashboardItems() {
   const user = await prisma.user.findUnique({
-    where: { email: "demo@devstash.io" },
+    where: { email: DEMO_USER_EMAIL },
     select: { id: true },
   });
 
@@ -53,7 +54,7 @@ export async function getDashboardItems() {
 
   const [pinned, recent] = await Promise.all([
     fetchItems(user.id, { isPinned: true }),
-    fetchItems(user.id, { limit: 10 }),
+    fetchItems(user.id, { isPinned: false, limit: 10 }),
   ]);
 
   return { pinned, recent };
