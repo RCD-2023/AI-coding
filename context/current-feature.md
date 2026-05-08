@@ -1,25 +1,16 @@
-# Current Feature: Email Verification on Register
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- After a user registers, send a verification email via Resend using `onboarding@resend.dev` as the from address
-- The email contains a unique verification link the user must click to verify their account
-- Unverified users are blocked from accessing protected routes until they verify
-- Clicking the link marks the user as verified in the database
-- Provide appropriate UI feedback: prompt to check email after register, error if token is invalid/expired, success message after verification
+<!-- Add goals here -->
 
 ## Notes
 
-- Use Resend SDK (RESEND_API_KEY already in .env)
-- From email: `onboarding@resend.dev`
-- Need to add `emailVerified` and a verification token + expiry to the User model (or a separate VerificationToken table — NextAuth already has one we can reuse)
-- Token should expire (e.g., 1 hour)
-- Protect /dashboard/* so unverified users are redirected to a "check your email" page
-- GitHub OAuth users can be considered auto-verified (they already have a verified email)
+<!-- Add notes here -->
 
 ## History
 
@@ -40,3 +31,4 @@ In Progress
 - Auth Setup: NextAuth v5 with GitHub OAuth provider, split config pattern for edge compatibility (auth.config.ts + auth.ts), Prisma adapter, JWT strategy, proxy-based route protection for /dashboard/*, NextAuth models wired to DB via migration, environment variables AUTH_SECRET/AUTH_GITHUB_ID/AUTH_GITHUB_SECRET
 - Auth Credentials: Credentials provider (email/password) added alongside GitHub OAuth using split config pattern, POST /api/auth/register endpoint with field validation, duplicate email check, bcrypt hashing, and user creation
 - Auth UI: custom /sign-in page (credentials + GitHub OAuth, useActionState error handling), custom /register page (all fields, success toast via Sonner), server actions for sign-in/sign-out, reusable UserAvatar component (GitHub image or initials), sidebar user area replaced with real session data and sign-out dropdown, getSidebarData accepts userId (demo user hardcode removed)
+- Auth Email Verification: Resend email sent on register (onboarding@resend.dev), VerificationToken table used for 1-hour expiry tokens, GET /api/auth/verify-email validates and marks emailVerified, credentials sign-in blocked for unverified users with specific error, /check-email and /verify-email UI pages, scripts/purge-test-users.ts utility
