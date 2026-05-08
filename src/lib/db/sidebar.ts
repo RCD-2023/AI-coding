@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { DEMO_USER_EMAIL } from "@/lib/constants";
 
 export type SidebarItemType = {
   id: string;
@@ -91,18 +90,10 @@ async function getCollectionsForSidebar(userId: string) {
   return { favorites, recents };
 }
 
-// Temporary: uses demo user until auth (NextAuth session) is wired up
-export async function getSidebarData(): Promise<SidebarData | null> {
-  const user = await prisma.user.findUnique({
-    where: { email: DEMO_USER_EMAIL },
-    select: { id: true },
-  });
-
-  if (!user) return null;
-
+export async function getSidebarData(userId: string): Promise<SidebarData | null> {
   const [itemTypes, { favorites, recents }] = await Promise.all([
-    getItemTypesForSidebar(user.id),
-    getCollectionsForSidebar(user.id),
+    getItemTypesForSidebar(userId),
+    getCollectionsForSidebar(userId),
   ]);
 
   return { itemTypes, favorites, recents };
