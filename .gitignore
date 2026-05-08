@@ -42,3 +42,8 @@ next-env.d.ts
 
 # prisma generated client
 /src/generated/
+
+# local MCP config (may contain API keys)
+.mcp.json
+.claude/settings.local.json
+.playwright-mcp/

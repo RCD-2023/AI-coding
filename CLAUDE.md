@@ -25,3 +25,8 @@ npm run build    # production build
 npm run start    # start production server
 npm run lint     # run ESLint
 ```
+## Neon MCP
+
+- Project: `rcd-devstash` (ID: `delicate-glade-93791280`)
+- **Always use the `development` branch** (ID: `br-purple-voice-alm1xda0`) for all Neon MCP operations
+- **NEVER read from or write to the `production` branch** unless the user explicitly says so
