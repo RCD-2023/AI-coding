@@ -1,16 +1,25 @@
-# Current Feature
+# Current Feature: Email Verification on Register
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- After a user registers, send a verification email via Resend using `onboarding@resend.dev` as the from address
+- The email contains a unique verification link the user must click to verify their account
+- Unverified users are blocked from accessing protected routes until they verify
+- Clicking the link marks the user as verified in the database
+- Provide appropriate UI feedback: prompt to check email after register, error if token is invalid/expired, success message after verification
 
 ## Notes
 
-<!-- Add notes here -->
+- Use Resend SDK (RESEND_API_KEY already in .env)
+- From email: `onboarding@resend.dev`
+- Need to add `emailVerified` and a verification token + expiry to the User model (or a separate VerificationToken table — NextAuth already has one we can reuse)
+- Token should expire (e.g., 1 hour)
+- Protect /dashboard/* so unverified users are redirected to a "check your email" page
+- GitHub OAuth users can be considered auto-verified (they already have a verified email)
 
 ## History
 

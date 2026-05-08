@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
+import { createVerificationToken } from "@/lib/db/verification-token"
+import { sendVerificationEmail } from "@/lib/email"
 
 export async function POST(req: Request) {
   const { name, email, password, confirmPassword } = await req.json()
@@ -22,6 +24,10 @@ export async function POST(req: Request) {
   await prisma.user.create({
     data: { name, email, password: hashed },
   })
+
+  const token = await createVerificationToken(email)
+  const baseUrl = new URL(req.url).origin
+  await sendVerificationEmail(email, token, baseUrl)
 
   return NextResponse.json({ message: "User created successfully" }, { status: 201 })
 }

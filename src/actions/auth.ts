@@ -1,7 +1,7 @@
 "use server"
 
 import { signIn, signOut } from "@/auth"
-import { AuthError } from "next-auth"
+import { AuthError, CredentialsSignin } from "next-auth"
 
 export type SignInState = { error: string } | undefined
 
@@ -17,6 +17,9 @@ export async function credentialsSignInAction(
     })
   } catch (err) {
     if (err instanceof AuthError) {
+      if (err instanceof CredentialsSignin && err.code === "email_not_verified") {
+        return { error: "Please verify your email before signing in" }
+      }
       return { error: "Invalid email or password" }
     }
     throw err
