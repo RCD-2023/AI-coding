@@ -1,24 +1,16 @@
-# Current Feature: Auth UI - Sign In, Register & Sign Out
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Custom `/sign-in` page with email/password fields, GitHub OAuth button, link to register, and form validation/error display
-- Custom `/register` page with name, email, password, confirm password fields, validation (passwords match, email format), POST to `/api/auth/register`, redirect to sign-in on success
-- Sidebar bottom area shows real user avatar (GitHub image or initials fallback), user name, and a dropdown with "Sign out" on avatar click
-- Clicking avatar icon navigates to `/profile`
-- Reusable avatar component that handles GitHub image vs. initials fallback ("Brad Traversy" → "BT")
+<!-- Add goals here -->
 
 ## Notes
 
-- NextAuth default pages replaced by custom UI; must set `pages` option in auth config to point to `/sign-in`
-- Avatar logic: use `session.user.image` if available (GitHub OAuth), otherwise derive initials from `session.user.name`
-- Register form submits to existing `/api/auth/register` endpoint
-- Redirect to sign-in after successful registration
-- The sidebar user area currently shows a placeholder — replace with real session data
+<!-- Add notes here -->
 
 ## History
 
@@ -38,3 +30,4 @@ In Progress
 - Code Audit Quick Wins: extracted shared iconMap to src/lib/icon-map.ts, centralized DEMO_USER_EMAIL to src/lib/constants.ts, moved PRO_TYPES and SIDEBAR_RECENT_LIMIT to module scope, capped sidebar recents at 5, excluded pinned items from recent query, added DATABASE_URL startup guard, added 5 composite DB indexes (userId+isFavorite/isPinned/createdAt on Item, userId+isFavorite/updatedAt on Collection)
 - Auth Setup: NextAuth v5 with GitHub OAuth provider, split config pattern for edge compatibility (auth.config.ts + auth.ts), Prisma adapter, JWT strategy, proxy-based route protection for /dashboard/*, NextAuth models wired to DB via migration, environment variables AUTH_SECRET/AUTH_GITHUB_ID/AUTH_GITHUB_SECRET
 - Auth Credentials: Credentials provider (email/password) added alongside GitHub OAuth using split config pattern, POST /api/auth/register endpoint with field validation, duplicate email check, bcrypt hashing, and user creation
+- Auth UI: custom /sign-in page (credentials + GitHub OAuth, useActionState error handling), custom /register page (all fields, success toast via Sonner), server actions for sign-in/sign-out, reusable UserAvatar component (GitHub image or initials), sidebar user area replaced with real session data and sign-out dropdown, getSidebarData accepts userId (demo user hardcode removed)
