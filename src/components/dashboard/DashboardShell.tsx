@@ -9,12 +9,21 @@ import { Menu, PanelLeft, Plus, Search } from "lucide-react";
 import SidebarContent from "./SidebarContent";
 import type { SidebarData } from "@/lib/db/sidebar";
 
+export type SessionUser = {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+};
+
 export default function DashboardShell({
   children,
   sidebarData,
+  user,
 }: {
   children: React.ReactNode;
   sidebarData: SidebarData | null;
+  user: SessionUser | null;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -81,14 +90,14 @@ export default function DashboardShell({
             sidebarOpen ? "w-60" : "w-0 overflow-hidden border-r-0"
           )}
         >
-          <SidebarContent sidebarData={sidebarData} />
+          <SidebarContent sidebarData={sidebarData} user={user} />
         </aside>
 
         {/* Mobile sheet */}
         <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
           <SheetContent side="left" className="w-60 bg-card p-0">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
-            <SidebarContent sidebarData={sidebarData} />
+            <SidebarContent sidebarData={sidebarData} user={user} />
           </SheetContent>
         </Sheet>
 
