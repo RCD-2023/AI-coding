@@ -1,23 +1,16 @@
-# Current Feature: Email Verification Toggle Flag
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Add a flag (env variable) that controls whether email verification is required on register
-- When disabled, users can register and sign in without verifying their email
-- When enabled, the existing verification flow remains intact (Resend email sent, sign-in blocked until verified)
-- The flag should be easy to flip without code changes (env var or similar)
-- No breaking changes to the existing verification logic — just bypass it when the flag is off
+<!-- Add goals here -->
 
 ## Notes
 
-- Currently only the Resend account email (onboarding@resend.dev) can receive verification emails since no custom domain is linked
-- Use `SKIP_EMAIL_VERIFICATION` env variable (`"true"` to skip, absent/any other value to enforce)
-- Affected areas: POST /api/auth/register (skip sending token/email), credentials sign-in check (skip emailVerified guard), possibly /check-email redirect after register
-- Default should be unset/absent (verification enforced) — set to `"true"` in .env.local to disable
+<!-- Add notes here -->
 
 ## History
 
@@ -39,3 +32,4 @@ In Progress
 - Auth Credentials: Credentials provider (email/password) added alongside GitHub OAuth using split config pattern, POST /api/auth/register endpoint with field validation, duplicate email check, bcrypt hashing, and user creation
 - Auth UI: custom /sign-in page (credentials + GitHub OAuth, useActionState error handling), custom /register page (all fields, success toast via Sonner), server actions for sign-in/sign-out, reusable UserAvatar component (GitHub image or initials), sidebar user area replaced with real session data and sign-out dropdown, getSidebarData accepts userId (demo user hardcode removed)
 - Auth Email Verification: Resend email sent on register (onboarding@resend.dev), VerificationToken table used for 1-hour expiry tokens, GET /api/auth/verify-email validates and marks emailVerified, credentials sign-in blocked for unverified users with specific error, /check-email and /verify-email UI pages, scripts/purge-test-users.ts utility
+- Email Verification Toggle: SKIP_EMAIL_VERIFICATION env var (set to "true" to bypass), register route skips token/email and returns skipVerification flag, RegisterForm redirects to /sign-in instead of /check-email when skipped, credentials sign-in skips emailVerified guard when flag is set
