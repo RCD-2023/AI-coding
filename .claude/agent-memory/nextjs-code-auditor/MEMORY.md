@@ -1,0 +1,1 @@
+- [Auth Architecture Patterns](project_auth_patterns.md) — Split auth.config.ts/auth.ts pattern, shared VerificationToken table, known HIGH issues from 2026-05-11 audit
