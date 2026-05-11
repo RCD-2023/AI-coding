@@ -1,16 +1,23 @@
-# Current Feature
+# Current Feature: Email Verification Toggle Flag
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Add a flag (env variable) that controls whether email verification is required on register
+- When disabled, users can register and sign in without verifying their email
+- When enabled, the existing verification flow remains intact (Resend email sent, sign-in blocked until verified)
+- The flag should be easy to flip without code changes (env var or similar)
+- No breaking changes to the existing verification logic — just bypass it when the flag is off
 
 ## Notes
 
-<!-- Add notes here -->
+- Currently only the Resend account email (onboarding@resend.dev) can receive verification emails since no custom domain is linked
+- Use `SKIP_EMAIL_VERIFICATION` env variable (`"true"` to skip, absent/any other value to enforce)
+- Affected areas: POST /api/auth/register (skip sending token/email), credentials sign-in check (skip emailVerified guard), possibly /check-email redirect after register
+- Default should be unset/absent (verification enforced) — set to `"true"` in .env.local to disable
 
 ## History
 

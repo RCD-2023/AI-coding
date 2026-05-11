@@ -25,9 +25,13 @@ export async function POST(req: Request) {
     data: { name, email, password: hashed },
   })
 
+  if (process.env.SKIP_EMAIL_VERIFICATION === "true") {
+    return NextResponse.json({ message: "User created successfully", skipVerification: true }, { status: 201 })
+  }
+
   const token = await createVerificationToken(email)
   const baseUrl = new URL(req.url).origin
   await sendVerificationEmail(email, token, baseUrl)
 
-  return NextResponse.json({ message: "User created successfully" }, { status: 201 })
+  return NextResponse.json({ message: "User created successfully", skipVerification: false }, { status: 201 })
 }

@@ -43,8 +43,13 @@ export default function RegisterForm() {
         return;
       }
 
-      toast.success("Account created! Please check your email to verify.");
-      router.push(`/check-email?email=${encodeURIComponent(email)}`);
+      if (data.skipVerification) {
+        toast.success("Account created! You can now sign in.");
+        router.push("/sign-in");
+      } else {
+        toast.success("Account created! Please check your email to verify.");
+        router.push(`/check-email?email=${encodeURIComponent(email)}`);
+      }
     } finally {
       setPending(false);
     }
