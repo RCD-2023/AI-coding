@@ -1,16 +1,27 @@
-# Current Feature
+# Current Feature: Forgot Password
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Add a "Forgot password?" link on the /sign-in page
+- Create a /forgot-password page with an email input form that sends a reset link
+- Generate a password reset token using the existing VerificationToken model (1-hour expiry)
+- Send a password reset email via Resend with a link to /reset-password?token=...
+- Create a /reset-password page that validates the token and allows the user to set a new password
+- Hash the new password with bcrypt and update the user record
+- Invalidate (delete) the token after successful use
+- Show clear success/error feedback at each step (invalid token, expired token, mismatched passwords)
 
 ## Notes
 
-<!-- Add notes here -->
+- Reuse the existing VerificationToken model — identifier = email, token = random UUID, expires = now + 1h
+- Follow the same pattern as email verification (scripts, Resend, token lookup, delete-after-use)
+- The reset link format: /reset-password?token=<uuid>
+- No new DB schema changes required
+- SKIP_EMAIL_VERIFICATION flag is unrelated — password reset always sends email
 
 ## History
 
