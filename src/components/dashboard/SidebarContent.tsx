@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Settings, Star } from "lucide-react";
+import { ChevronDown, Settings, Star, User } from "lucide-react";
 import type { SidebarData } from "@/lib/db/sidebar";
 import type { SessionUser } from "@/components/dashboard/DashboardShell";
 import { iconMap } from "@/lib/icon-map";
@@ -170,6 +170,12 @@ export default function SidebarContent({
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="start" className="w-48">
+              <DropdownMenuItem>
+                <Link href="/profile" className="flex w-full items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOutAction()}>
                 Sign out
