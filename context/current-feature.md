@@ -1,16 +1,21 @@
-# Current Feature
+# Current Feature: Auth Middleware (Route Protection)
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Create `src/middleware.ts` to protect `/dashboard/**` routes
+- Unauthenticated requests to `/dashboard/**` must redirect to `/sign-in`
+- Authenticated requests pass through unchanged
+- Must use the edge-safe `auth.config.ts` split (not `auth.ts` which imports Prisma)
 
 ## Notes
 
-<!-- Add notes here -->
+- The middleware was listed in history ("proxy-based route protection") but the file was never created or was lost
+- Must instantiate a separate `NextAuth(authConfig)` in middleware — cannot import from `@/auth` (Prisma is Node.js-only, middleware runs on Edge)
+- Matcher: `/dashboard/:path*`
 
 ## History
 

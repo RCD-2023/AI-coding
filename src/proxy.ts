@@ -1,5 +1,8 @@
-import { auth } from "@/auth"
+import NextAuth from "next-auth"
+import authConfig from "@/auth.config"
 import { NextResponse } from "next/server"
+
+const { auth } = NextAuth(authConfig)
 
 export const proxy = auth(function proxy(req) {
   if (!req.auth) {
@@ -8,5 +11,5 @@ export const proxy = auth(function proxy(req) {
 })
 
 export const config = {
-  matcher: ["/dashboard", "/dashboard/:path*"],
+  matcher: ["/dashboard/:path*"],
 }
