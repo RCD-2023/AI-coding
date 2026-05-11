@@ -1,27 +1,16 @@
-# Current Feature: Forgot Password
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Add a "Forgot password?" link on the /sign-in page
-- Create a /forgot-password page with an email input form that sends a reset link
-- Generate a password reset token using the existing VerificationToken model (1-hour expiry)
-- Send a password reset email via Resend with a link to /reset-password?token=...
-- Create a /reset-password page that validates the token and allows the user to set a new password
-- Hash the new password with bcrypt and update the user record
-- Invalidate (delete) the token after successful use
-- Show clear success/error feedback at each step (invalid token, expired token, mismatched passwords)
+<!-- Add goals here -->
 
 ## Notes
 
-- Reuse the existing VerificationToken model — identifier = email, token = random UUID, expires = now + 1h
-- Follow the same pattern as email verification (scripts, Resend, token lookup, delete-after-use)
-- The reset link format: /reset-password?token=<uuid>
-- No new DB schema changes required
-- SKIP_EMAIL_VERIFICATION flag is unrelated — password reset always sends email
+<!-- Add notes here -->
 
 ## History
 
@@ -45,3 +34,4 @@ In Progress
 16. Auth Email Verification: Resend email sent on register (onboarding@resend.dev), VerificationToken table used for 1-hour expiry tokens, GET /api/auth/verify-email validates and marks emailVerified, credentials sign-in blocked for unverified users with specific error, /check-email and /verify-email UI pages, scripts/purge-test-users.ts utility
 17. Email Verification Toggle: SKIP_EMAIL_VERIFICATION env var (set to "true" to bypass), register route skips token/email and returns skipVerification flag, RegisterForm redirects to /sign-in instead of /check-email when skipped, credentials sign-in skips emailVerified guard when flag is set
 18. Auth Route Protection Fix: proxy.ts was importing from @/auth (Prisma, Node.js-only) causing silent failure in edge runtime -- fixed to use edge-safe NextAuth(authConfig) split, /dashboard/:path* now correctly redirects unauthenticated users to /sign-in
+19. Forgot Password: "Forgot password?" link on sign-in page, /forgot-password page (email form, sends Resend email), /reset-password page (token + new password form), createPasswordResetToken/usePasswordResetToken in verification-token.ts using reset:{email} identifier prefix to avoid collision with email verification tokens, always returns 200 on forgot-password to prevent email enumeration
