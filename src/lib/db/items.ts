@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { DEMO_USER_EMAIL } from "@/lib/constants";
+
+export type ItemTypeInfo = { name: string; icon: string; color: string };
+
+export type ItemsByTypeResult = {
+  items: ItemForCard[];
+  itemType: ItemTypeInfo;
+};
 
 export type ItemForCard = {
   id: string;
@@ -43,18 +49,49 @@ async function fetchItems(
   }));
 }
 
-// Temporary: uses demo user until auth (NextAuth session) is wired up
-export async function getDashboardItems() {
-  const user = await prisma.user.findUnique({
-    where: { email: DEMO_USER_EMAIL },
-    select: { id: true },
+export async function getItemsByTypeSlug(
+  userId: string,
+  typeSlug: string
+): Promise<ItemsByTypeResult | null> {
+  const allTypes = await prisma.itemType.findMany({ where: { isSystem: true } });
+  const matched = allTypes.find(
+    (t) => t.name.toLowerCase() + "s" === typeSlug.toLowerCase()
+  );
+
+  if (!matched) return null;
+
+  const items = await prisma.item.findMany({
+    where: { userId, itemTypeId: matched.id },
+    orderBy: { createdAt: "desc" },
+    include: { itemType: true, tags: true },
   });
 
-  if (!user) return null;
+  return {
+    items: items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      isFavorite: item.isFavorite,
+      tags: item.tags.map((t) => t.name),
+      createdAt: item.createdAt,
+      itemType: {
+        name: item.itemType.name,
+        icon: item.itemType.icon,
+        color: item.itemType.color,
+      },
+    })),
+    itemType: {
+      name: matched.name,
+      icon: matched.icon,
+      color: matched.color,
+    },
+  };
+}
 
+export async function getDashboardItems(userId: string) {
   const [pinned, recent] = await Promise.all([
-    fetchItems(user.id, { isPinned: true }),
-    fetchItems(user.id, { isPinned: false, limit: 10 }),
+    fetchItems(userId, { isPinned: true }),
+    fetchItems(userId, { isPinned: false, limit: 10 }),
   ]);
 
   return { pinned, recent };

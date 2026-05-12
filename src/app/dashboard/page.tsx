@@ -1,15 +1,19 @@
 import Link from "next/link";
 import { Bookmark, FolderOpen, Layers, Pin, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { auth } from "@/auth";
 import { getDashboardData } from "@/lib/db/collections";
 import { getDashboardItems } from "@/lib/db/items";
 import CollectionCard from "@/components/dashboard/CollectionCard";
 import ItemCard from "@/components/dashboard/ItemCard";
 
 export default async function DashboardPage() {
+  const session = await auth();
+  const userId = session?.user?.id ?? "";
+
   const [collections, items] = await Promise.all([
-    getDashboardData(),
-    getDashboardItems(),
+    userId ? getDashboardData(userId) : null,
+    userId ? getDashboardItems(userId) : null,
   ]);
 
   const stats = [

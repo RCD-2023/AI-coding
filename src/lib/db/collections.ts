@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { DEMO_USER_EMAIL } from "@/lib/constants";
 
 export type CollectionForCard = {
   id: string;
@@ -73,18 +72,10 @@ async function getStatsForUser(userId: string): Promise<DashboardStats> {
   return { totalItems, totalCollections, favoriteItems, favoriteCollections };
 }
 
-// Temporary: uses demo user until auth (NextAuth session) is wired up
-export async function getDashboardData() {
-  const user = await prisma.user.findUnique({
-    where: { email: DEMO_USER_EMAIL },
-    select: { id: true },
-  });
-
-  if (!user) return null;
-
+export async function getDashboardData(userId: string) {
   const [collections, stats] = await Promise.all([
-    getCollectionsForUser(user.id),
-    getStatsForUser(user.id),
+    getCollectionsForUser(userId),
+    getStatsForUser(userId),
   ]);
 
   return { collections, stats };
