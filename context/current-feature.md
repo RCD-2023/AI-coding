@@ -1,23 +1,16 @@
-# Current Feature: Item Delete
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Clicking the Trash2 button in the item drawer opens a ShadCN `AlertDialog` asking the user to confirm deletion
-- On confirm, a `deleteItem` server action is called with the item ID; it verifies session ownership then calls `prisma.item.delete` directly (no separate DB query function needed — it's a one-liner)
-- On success: show a Sonner success toast, close the drawer, and call `router.refresh()` to update the item list
-- On error: show a Sonner error toast; drawer stays open
-- Delete button is disabled while the deletion is in-flight to prevent double-clicks
+<!-- Add goals here -->
 
 ## Notes
 
-- The Delete button already exists in `ItemDrawer.tsx` action bar (line 287–294) — just needs to be wired up
-- Follow the same pattern as `updateItem` / `updateItemInDb` for the server action + DB query
-- `AlertDialog` should live inline in `ItemDrawer.tsx` (no new file needed)
-- Drawer close is handled by calling `onClose()` after successful deletion
+<!-- Add notes here -->
 
 ## History
 
@@ -49,3 +42,4 @@ In Progress
 24. Item List View — 3-Column Layout: updated /items/[type] grid from 2-col to responsive grid-cols-1 → md:grid-cols-2 → lg:grid-cols-3
 25. Item Drawer: right-side Sheet drawer opens on ItemCard click on dashboard and items list pages; fetches full item detail via GET /api/items/[id] with auth check; action bar with Favorite/Pin/Copy/Edit/Delete buttons; loading skeleton; ItemsWithDrawer client wrapper manages state while pages remain server components; getItemDetail query added to lib/db/items.ts
 26. Item Drawer — Edit Mode: Edit button toggles drawer to inline edit mode; editable fields for all types (title, description, tags) plus type-specific (content for snippet/prompt/command/note, language for snippet/command, url for link); updateItem server action with Zod validation and ownership check; updateItemInDb query with full tag disconnect/reconnect; returns updated ItemDetail; router.refresh() keeps card list in sync; toast on success/error
+27. Item Delete: Trash2 button in drawer opens inline ShadCN AlertDialog confirmation; deleteItem server action calls prisma.item.delete with userId ownership check; success closes drawer with Sonner toast and router.refresh(); error shows toast without closing; delete button disabled in-flight; dialog/deleting state reset in useEffect on itemId change; fixed next/server alias in vitest.config.ts unblocking all tests
