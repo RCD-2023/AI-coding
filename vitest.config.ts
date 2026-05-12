@@ -1,8 +1,12 @@
 import { defineConfig } from "vitest/config"
+import path from "path"
 
 export default defineConfig({
   resolve: {
     tsconfigPaths: true,
+    alias: {
+      "next/server": path.resolve("node_modules/next/server.js"),
+    },
   },
   test: {
     environment: "node",

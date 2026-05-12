@@ -12,6 +12,16 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +34,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { iconMap } from "@/lib/icon-map";
-import { updateItem } from "@/actions/items";
+import { updateItem, deleteItem } from "@/actions/items";
 import type { ItemDetail } from "@/lib/db/items";
 
 // Item types that show the Content field
@@ -91,6 +101,8 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [editForm, setEditForm] = useState<EditForm>({
     title: "",
     description: "",
@@ -105,12 +117,15 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
     if (!itemId) {
       setItem(null);
       setIsEditing(false);
+      setDeleteDialogOpen(false);
+      setDeleting(false);
       return;
     }
 
     setLoading(true);
     setItem(null);
     setIsEditing(false);
+    setDeleteDialogOpen(false);
 
     fetch(`/api/items/${itemId}`)
       .then((res) => (res.ok ? res.json() : null))
@@ -155,6 +170,21 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
       if (result.fieldErrors) {
         setFieldErrors(result.fieldErrors);
       }
+      toast.error(result.error);
+    }
+  }
+
+  async function handleDelete() {
+    if (!itemId) return;
+    setDeleting(true);
+    const result = await deleteItem(itemId);
+    setDeleting(false);
+    if (result.success) {
+      toast.success("Item deleted");
+      setDeleteDialogOpen(false);
+      onClose();
+      router.refresh();
+    } else {
       toast.error(result.error);
     }
   }
@@ -288,6 +318,8 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
                     size="icon-sm"
                     title="Delete"
                     className="text-destructive hover:text-destructive"
+                    onClick={() => setDeleteDialogOpen(true)}
+                    disabled={deleting}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -489,6 +521,28 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
           </div>
         ) : null}
       </SheetContent>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete &ldquo;{item?.title}&rdquo;. This
+              action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Sheet>
   );
 }
