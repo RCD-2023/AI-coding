@@ -20,6 +20,9 @@ export async function credentialsSignInAction(
       if (err instanceof CredentialsSignin && err.code === "email_not_verified") {
         return { error: "Please verify your email before signing in" }
       }
+      if (err instanceof CredentialsSignin && err.code === "rate_limit") {
+        return { error: "Too many sign-in attempts. Please try again in 15 minutes." }
+      }
       return { error: "Invalid email or password" }
     }
     throw err
