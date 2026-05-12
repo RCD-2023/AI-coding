@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { updateItemInDb } from "@/lib/db/items";
 import type { ItemDetail } from "@/lib/db/items";
 
@@ -79,4 +80,24 @@ export async function updateItem(
   }
 
   return { success: true, data: updated };
+}
+
+export type DeleteItemResult =
+  | { success: true }
+  | { success: false; error: string };
+
+export async function deleteItem(itemId: string): Promise<DeleteItemResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    await prisma.item.delete({
+      where: { id: itemId, userId: session.user.id },
+    });
+    return { success: true };
+  } catch {
+    return { success: false, error: "Item not found or already deleted" };
+  }
 }

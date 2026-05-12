@@ -1,16 +1,23 @@
-# Current Feature
+# Current Feature: Item Delete
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Clicking the Trash2 button in the item drawer opens a ShadCN `AlertDialog` asking the user to confirm deletion
+- On confirm, a `deleteItem` server action is called with the item ID; it verifies session ownership then calls `prisma.item.delete` directly (no separate DB query function needed — it's a one-liner)
+- On success: show a Sonner success toast, close the drawer, and call `router.refresh()` to update the item list
+- On error: show a Sonner error toast; drawer stays open
+- Delete button is disabled while the deletion is in-flight to prevent double-clicks
 
 ## Notes
 
-<!-- Add notes here -->
+- The Delete button already exists in `ItemDrawer.tsx` action bar (line 287–294) — just needs to be wired up
+- Follow the same pattern as `updateItem` / `updateItemInDb` for the server action + DB query
+- `AlertDialog` should live inline in `ItemDrawer.tsx` (no new file needed)
+- Drawer close is handled by calling `onClose()` after successful deletion
 
 ## History
 
