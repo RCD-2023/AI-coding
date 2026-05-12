@@ -1,6 +1,8 @@
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 export async function sendPasswordResetEmail(
   email: string,
@@ -9,7 +11,7 @@ export async function sendPasswordResetEmail(
 ) {
   const url = `${baseUrl}/reset-password?token=${token}`
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: "onboarding@resend.dev",
     to: email,
     subject: "Reset your DevStash password",
@@ -39,7 +41,7 @@ export async function sendVerificationEmail(
 ) {
   const url = `${baseUrl}/api/auth/verify-email?token=${token}&email=${encodeURIComponent(email)}`
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: "onboarding@resend.dev",
     to: email,
     subject: "Verify your DevStash email",
