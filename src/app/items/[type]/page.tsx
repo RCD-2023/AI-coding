@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getItemsByTypeSlug } from "@/lib/db/items";
 import { iconMap } from "@/lib/icon-map";
-import ItemCard from "@/components/dashboard/ItemCard";
+import ItemsWithDrawer from "@/components/dashboard/ItemsWithDrawer";
 
 export default async function ItemsTypePage({
   params,
@@ -45,11 +45,10 @@ export default async function ItemsTypePage({
 
       {/* Grid */}
       {items.length > 0 ? (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
-            <ItemCard key={item.id} item={item} />
-          ))}
-        </div>
+        <ItemsWithDrawer
+          items={items}
+          className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3"
+        />
       ) : (
         <p className="text-sm text-muted-foreground">
           No {itemType.name.toLowerCase()}s yet.
