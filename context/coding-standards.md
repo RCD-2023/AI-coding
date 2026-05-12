@@ -89,6 +89,15 @@ Example v4 configuration:
 - Return `{ success, data, error }` pattern from actions
 - Display user-friendly error messages via toast
 
+## Testing
+
+- Use Vitest for unit tests (`npm run test:run` / `npm test` for watch mode)
+- Test scope: **server actions** and **utility functions only** — no component tests
+- Test files: `src/__tests__/<path-matching-src>/<file>.test.ts`
+- Mock external dependencies (Prisma, Redis, Resend) — test logic, not infrastructure
+- For Next.js server APIs (`cookies`, `headers`, `redirect`), use `vi.mock('next/...')`
+- Coverage target: `src/actions/**` and `src/lib/**` (excluding `prisma.ts`, `mock-data.ts`)
+
 ## Code Quality
 
 - No commented-out code unless specified
