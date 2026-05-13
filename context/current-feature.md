@@ -1,25 +1,16 @@
-# Current Feature: Code Editor (Monaco)
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Create a `CodeEditor` component using Monaco Editor with a dark theme
-- Replace `Textarea` with `CodeEditor` for snippet and command types only
-- Keep `Textarea` for notes, prompts, and other non-code types
-- Add macOS-style window dots (red/yellow/green) in the editor header
-- Add a quick copy button in the editor header
-- Display the language label in the editor header next to the copy button
-- Support both display (readonly) and edit modes
-- Make editor height fluid with a max of 400px and a scrollbar that matches the dark theme
+<!-- Add goals here -->
 
 ## Notes
 
-- Only snippet and command item types use the code editor; all other types continue using Textarea
-- Component must handle both the drawer (display mode) and the edit form (edit mode)
-- Language comes from the item's `language` field (already stored in the DB)
+<!-- Add notes here -->
 
 ## History
 
@@ -53,3 +44,4 @@ In Progress
 26. Item Drawer — Edit Mode: Edit button toggles drawer to inline edit mode; editable fields for all types (title, description, tags) plus type-specific (content for snippet/prompt/command/note, language for snippet/command, url for link); updateItem server action with Zod validation and ownership check; updateItemInDb query with full tag disconnect/reconnect; returns updated ItemDetail; router.refresh() keeps card list in sync; toast on success/error
 27. Item Delete: Trash2 button in drawer opens inline ShadCN AlertDialog confirmation; deleteItem server action calls prisma.item.delete with userId ownership check; success closes drawer with Sonner toast and router.refresh(); error shows toast without closing; delete button disabled in-flight; dialog/deleting state reset in useEffect on itemId change; fixed next/server alias in vitest.config.ts unblocking all tests
 28. Item Create: "New Item" button in top bar opens a shadcn Dialog; shadcn Select type picker (snippet/prompt/command/note/link); dynamic fields per type (all: title/description/tags, snippet/command: content+language, prompt/note: content, link: URL required); createItem server action with Zod validation and superRefine for link URL requirement; createItemInDb query with tag connectOrCreate; success closes dialog, refreshes list, shows toast
+29. Code Editor (Monaco): CodeEditor component with dark theme, macOS window dots, language label, and copy button; fluid height (120–400px) via onDidContentSizeChange; replaces Textarea in ItemDrawer (view+edit) and CreateItemDialog for snippet/command types; AddItemButton on /items/[type] pages pre-selects type in create dialog; drawer widened to 600px on lg screens
