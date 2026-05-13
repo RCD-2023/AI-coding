@@ -1,32 +1,16 @@
-# Current Feature: Markdown Editor
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- MarkdownEditor component with Write/Preview tabbed interface
-- Replaces Textarea for note and prompt content fields only (CodeEditor stays for snippets/commands)
-- react-markdown + remark-gfm for GitHub Flavored Markdown rendering
-- Matches dark theme: bg-[#1e1e1e] container, bg-[#2d2d2d] header
-- Copy button in header (same style as CodeEditor)
-- Readonly mode: Preview tab only; edit mode: Write tab default with Preview available
-- Fluid height with max 400px
+<!-- Add goals here -->
 
 ## Notes
 
-Styling requirements:
-- Headings with proper sizing/weight, code blocks with dark bg + monospace
-- Inline code with subtle highlight, lists with indentation/bullets
-- Blockquotes with left border accent, links in blue with hover
-- Tables with borders and header background
-- Use `.markdown-preview` custom CSS class for reliable dark mode
-
-Integration points:
-- NewItemDialog: note and prompt content field
-- ItemDrawer (edit mode): note and prompt content field
-- ItemDrawer (view mode): readonly mode for note and prompt content
+<!-- Add notes here -->
 
 ## History
 
@@ -61,3 +45,4 @@ Integration points:
 27. Item Delete: Trash2 button in drawer opens inline ShadCN AlertDialog confirmation; deleteItem server action calls prisma.item.delete with userId ownership check; success closes drawer with Sonner toast and router.refresh(); error shows toast without closing; delete button disabled in-flight; dialog/deleting state reset in useEffect on itemId change; fixed next/server alias in vitest.config.ts unblocking all tests
 28. Item Create: "New Item" button in top bar opens a shadcn Dialog; shadcn Select type picker (snippet/prompt/command/note/link); dynamic fields per type (all: title/description/tags, snippet/command: content+language, prompt/note: content, link: URL required); createItem server action with Zod validation and superRefine for link URL requirement; createItemInDb query with tag connectOrCreate; success closes dialog, refreshes list, shows toast
 29. Code Editor (Monaco): CodeEditor component with dark theme, macOS window dots, language label, and copy button; fluid height (120–400px) via onDidContentSizeChange; replaces Textarea in ItemDrawer (view+edit) and CreateItemDialog for snippet/command types; AddItemButton on /items/[type] pages pre-selects type in create dialog; drawer widened to 600px on lg screens
+30. Markdown Editor: MarkdownEditor component (react-markdown + remark-gfm) with Write/Preview tabs, macOS chrome header, copy button, fluid height (120–400px); replaces Textarea for note/prompt content in ItemDrawer (view+edit) and CreateItemDialog; custom .markdown-preview CSS for dark theme styling; sidebar type labels updated to capitalized plural form
