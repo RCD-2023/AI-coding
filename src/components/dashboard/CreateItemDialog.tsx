@@ -20,6 +20,7 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CodeEditor } from "@/components/ui/code-editor";
 import { createItem } from "@/actions/items";
 
 const ITEM_TYPES = [
@@ -30,7 +31,7 @@ const ITEM_TYPES = [
   { slug: "link", label: "Link", icon: LinkIcon },
 ] as const;
 
-type TypeSlug = (typeof ITEM_TYPES)[number]["slug"];
+export type TypeSlug = (typeof ITEM_TYPES)[number]["slug"];
 
 const CONTENT_TYPES = new Set<TypeSlug>(["snippet", "prompt", "command", "note"]);
 const LANGUAGE_TYPES = new Set<TypeSlug>(["snippet", "command"]);
@@ -69,22 +70,23 @@ function FieldError({ errors }: { errors?: string[] }) {
 interface CreateItemDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultType?: TypeSlug;
 }
 
-export default function CreateItemDialog({ open, onOpenChange }: CreateItemDialogProps) {
+export default function CreateItemDialog({ open, onOpenChange, defaultType }: CreateItemDialogProps) {
   const router = useRouter();
-  const [selectedType, setSelectedType] = useState<TypeSlug>("snippet");
+  const [selectedType, setSelectedType] = useState<TypeSlug>(defaultType ?? "snippet");
   const [form, setForm] = useState<CreateForm>(DEFAULT_FORM);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!open) {
-      setSelectedType("snippet");
+      setSelectedType(defaultType ?? "snippet");
       setForm(DEFAULT_FORM);
       setFieldErrors({});
     }
-  }, [open]);
+  }, [open, defaultType]);
 
   function setField(key: keyof CreateForm, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -183,12 +185,20 @@ export default function CreateItemDialog({ open, onOpenChange }: CreateItemDialo
           {showContent && (
             <div>
               {fieldLabel("Content")}
-              <Textarea
-                value={form.content}
-                onChange={(e) => setField("content", e.target.value)}
-                placeholder="Item content"
-                className="min-h-[100px] resize-y font-mono text-xs"
-              />
+              {showLanguage ? (
+                <CodeEditor
+                  value={form.content}
+                  onChange={(val) => setField("content", val)}
+                  language={form.language || undefined}
+                />
+              ) : (
+                <Textarea
+                  value={form.content}
+                  onChange={(e) => setField("content", e.target.value)}
+                  placeholder="Item content"
+                  className="min-h-[100px] resize-y text-sm"
+                />
+              )}
             </div>
           )}
 
