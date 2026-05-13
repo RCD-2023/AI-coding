@@ -28,7 +28,7 @@ export default function ItemsWithDrawer({ items, className }: ItemsWithDrawerPro
           </button>
         ))}
       </div>
-      <ItemDrawer itemId={selectedId} onClose={() => setSelectedId(null)} />
+      <ItemDrawer itemId={selectedId} onCloseAction={() => setSelectedId(null)} />
     </>
   );
 }

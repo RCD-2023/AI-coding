@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { CodeEditor } from "@/components/ui/code-editor";
 import { iconMap } from "@/lib/icon-map";
 import { updateItem, deleteItem } from "@/actions/items";
 import type { ItemDetail } from "@/lib/db/items";
@@ -44,7 +45,7 @@ const LANGUAGE_TYPES = new Set(["snippet", "command"]);
 
 interface ItemDrawerProps {
   itemId: string | null;
-  onClose: () => void;
+  onCloseAction: () => void;
 }
 
 type EditForm = {
@@ -95,7 +96,7 @@ function DrawerSkeleton() {
   );
 }
 
-export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
+export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
   const router = useRouter();
   const [item, setItem] = useState<ItemDetail | null>(null);
   const [loading, setLoading] = useState(false);
@@ -114,18 +115,14 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
-    if (!itemId) {
-      setItem(null);
-      setIsEditing(false);
-      setDeleteDialogOpen(false);
-      setDeleting(false);
-      return;
-    }
+    if (!itemId) return;
 
+    /* eslint-disable react-hooks/set-state-in-effect */
     setLoading(true);
     setItem(null);
     setIsEditing(false);
     setDeleteDialogOpen(false);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     fetch(`/api/items/${itemId}`)
       .then((res) => (res.ok ? res.json() : null))
@@ -182,7 +179,7 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
     if (result.success) {
       toast.success("Item deleted");
       setDeleteDialogOpen(false);
-      onClose();
+      onCloseAction();
       router.refresh();
     } else {
       toast.error(result.error);
@@ -203,12 +200,12 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
     <Sheet
       open={!!itemId}
       onOpenChange={(open) => {
-        if (!open) onClose();
+        if (!open) onCloseAction();
       }}
     >
       <SheetContent
         side="right"
-        className="flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-md"
+        className="flex w-full flex-col gap-0 overflow-hidden p-0 data-[side=right]:sm:max-w-md data-[side=right]:lg:max-w-[600px]"
         showCloseButton
       >
         {loading || (itemId && !item) ? (
@@ -353,21 +350,37 @@ export default function ItemDrawer({ itemId, onClose }: ItemDrawerProps) {
               {isEditing && showContent ? (
                 <section>
                   {fieldLabel("Content")}
-                  <Textarea
-                    value={editForm.content}
-                    onChange={(e) => setField("content", e.target.value)}
-                    placeholder="Item content"
-                    className="min-h-[120px] resize-y font-mono text-xs"
-                  />
+                  {showLanguage ? (
+                    <CodeEditor
+                      value={editForm.content}
+                      onChange={(val) => setField("content", val)}
+                      language={editForm.language || undefined}
+                    />
+                  ) : (
+                    <Textarea
+                      value={editForm.content}
+                      onChange={(e) => setField("content", e.target.value)}
+                      placeholder="Item content"
+                      className="min-h-[120px] resize-y text-sm"
+                    />
+                  )}
                 </section>
               ) : (
                 !isEditing &&
                 item.content && (
                   <section>
                     {fieldLabel("Content")}
-                    <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-md bg-muted p-3 text-xs text-foreground">
-                      {item.content}
-                    </pre>
+                    {showLanguage ? (
+                      <CodeEditor
+                        value={item.content}
+                        language={item.language ?? undefined}
+                        readOnly
+                      />
+                    ) : (
+                      <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-md bg-muted p-3 text-xs text-foreground">
+                        {item.content}
+                      </pre>
+                    )}
                   </section>
                 )
               )}
