@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CodeEditor } from "@/components/ui/code-editor";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { createItem } from "@/actions/items";
 
 const ITEM_TYPES = [
@@ -192,11 +193,9 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
                   language={form.language || undefined}
                 />
               ) : (
-                <Textarea
+                <MarkdownEditor
                   value={form.content}
-                  onChange={(e) => setField("content", e.target.value)}
-                  placeholder="Item content"
-                  className="min-h-[100px] resize-y text-sm"
+                  onChange={(val) => setField("content", val)}
                 />
               )}
             </div>

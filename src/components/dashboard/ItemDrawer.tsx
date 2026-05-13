@@ -34,6 +34,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { CodeEditor } from "@/components/ui/code-editor";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { iconMap } from "@/lib/icon-map";
 import { updateItem, deleteItem } from "@/actions/items";
 import type { ItemDetail } from "@/lib/db/items";
@@ -357,11 +358,9 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
                       language={editForm.language || undefined}
                     />
                   ) : (
-                    <Textarea
+                    <MarkdownEditor
                       value={editForm.content}
-                      onChange={(e) => setField("content", e.target.value)}
-                      placeholder="Item content"
-                      className="min-h-[120px] resize-y text-sm"
+                      onChange={(val) => setField("content", val)}
                     />
                   )}
                 </section>
@@ -377,9 +376,7 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
                         readOnly
                       />
                     ) : (
-                      <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-md bg-muted p-3 text-xs text-foreground">
-                        {item.content}
-                      </pre>
+                      <MarkdownEditor value={item.content} readOnly />
                     )}
                   </section>
                 )

@@ -57,7 +57,7 @@ export default function SidebarContent({
                         style={{ color: type.color }}
                       />
                     )}
-                    {type.name}
+                    {type.name.charAt(0).toUpperCase() + type.name.slice(1)}s
                     {type.isPro && (
                       <Badge
                         variant="outline"
