@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Menu, PanelLeft, Plus, Search } from "lucide-react";
 import SidebarContent from "./SidebarContent";
+import CreateItemDialog from "./CreateItemDialog";
 import type { SidebarData } from "@/lib/db/sidebar";
 
 export type SessionUser = {
@@ -27,6 +28,7 @@ export default function DashboardShell({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [createItemOpen, setCreateItemOpen] = useState(false);
 
   return (
     <div className="flex h-full flex-col">
@@ -74,7 +76,7 @@ export default function DashboardShell({
             <Plus className="mr-1 h-4 w-4" />
             New Collection
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={() => setCreateItemOpen(true)}>
             <Plus className="mr-1 h-4 w-4" />
             New Item
           </Button>
@@ -104,6 +106,8 @@ export default function DashboardShell({
         {/* Main */}
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
+
+      <CreateItemDialog open={createItemOpen} onOpenChange={setCreateItemOpen} />
     </div>
   );
 }
