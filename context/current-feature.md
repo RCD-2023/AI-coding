@@ -1,25 +1,16 @@
-# Current Feature: File & Image Upload (Cloudflare R2)
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Create upload API route for Cloudflare R2
-- Build FileUpload component with drag-and-drop and progress indicator
-- Update create item modal to use FileUpload for file and image types
-- Display image preview for images, file info (name/size) for files
-- Delete files from R2 when items are deleted
-- Create download proxy API route to avoid CORS issues
-- Add download button in ItemDrawer for file types
+<!-- Add goals here -->
 
 ## Notes
 
-- DB functions stay in `src/lib/db/items.ts` (no new db files)
-- Image constraints: max 5 MB, extensions `.png .jpg .jpeg .gif .webp .svg`
-- File constraints: max 10 MB, extensions `.pdf .txt .md .json .yaml .yml .xml .csv .toml .ini`
-- Accepted MIME types documented in spec (`context/features/file-image-spec.md`)
+<!-- Add notes here -->
 
 ## History
 
@@ -55,3 +46,4 @@ In Progress
 28. Item Create: "New Item" button in top bar opens a shadcn Dialog; shadcn Select type picker (snippet/prompt/command/note/link); dynamic fields per type (all: title/description/tags, snippet/command: content+language, prompt/note: content, link: URL required); createItem server action with Zod validation and superRefine for link URL requirement; createItemInDb query with tag connectOrCreate; success closes dialog, refreshes list, shows toast
 29. Code Editor (Monaco): CodeEditor component with dark theme, macOS window dots, language label, and copy button; fluid height (120–400px) via onDidContentSizeChange; replaces Textarea in ItemDrawer (view+edit) and CreateItemDialog for snippet/command types; AddItemButton on /items/[type] pages pre-selects type in create dialog; drawer widened to 600px on lg screens
 30. Markdown Editor: MarkdownEditor component (react-markdown + remark-gfm) with Write/Preview tabs, macOS chrome header, copy button, fluid height (120–400px); replaces Textarea for note/prompt content in ItemDrawer (view+edit) and CreateItemDialog; custom .markdown-preview CSS for dark theme styling; sidebar type labels updated to capitalized plural form
+31. File & Image Upload (Cloudflare R2): POST /api/upload validates type/size/MIME and stores in R2; GET /api/items/[id]/download proxies R2 stream; FileUpload component with drag-and-drop, XHR progress bar, image preview, file info; CreateItemDialog extended with file and image types; ItemDrawer shows image preview, file info card, and download button; deleteItem removes R2 object before DB row (fail-open); 39 tests across r2 utility, upload route, download route, and deleteItem action
