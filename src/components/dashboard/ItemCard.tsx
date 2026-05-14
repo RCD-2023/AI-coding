@@ -1,10 +1,14 @@
+"use client";
+
+import { useState } from "react";
 import type { ItemForCard } from "@/lib/db/items";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
+import { Star, Copy, Check } from "lucide-react";
 import { iconMap } from "@/lib/icon-map";
 
 export default function ItemCard({ item }: { item: ItemForCard }) {
+  const [copied, setCopied] = useState(false);
   const Icon = iconMap[item.itemType.icon] ?? null;
   const { color } = item.itemType;
   const date = new Date(item.createdAt).toLocaleDateString("en-US", {
@@ -12,9 +16,19 @@ export default function ItemCard({ item }: { item: ItemForCard }) {
     day: "numeric",
   });
 
+  const copyValue = item.content ?? item.url;
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!copyValue) return;
+    navigator.clipboard.writeText(copyValue);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
   return (
     <Card
-      className="cursor-pointer border-l-[3px] transition-colors hover:bg-accent/5"
+      className="group relative cursor-pointer border-l-[3px] transition-colors hover:bg-accent/5"
       style={{ borderLeftColor: color }}
     >
       <CardContent className="flex items-start gap-3 p-4">
@@ -61,6 +75,22 @@ export default function ItemCard({ item }: { item: ItemForCard }) {
 
         {/* Date */}
         <span className="shrink-0 text-xs text-muted-foreground">{date}</span>
+
+        {/* Copy — absolute bottom-right */}
+        {copyValue && (
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="absolute bottom-3 right-3 rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+            aria-label="Copy content"
+          >
+            {copied ? (
+              <Check className="h-3.5 w-3.5 text-green-500" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
+          </button>
+        )}
       </CardContent>
     </Card>
   );
