@@ -20,7 +20,7 @@ export default function ItemsWithDrawer({ items, className, variant = "default" 
   return (
     <>
       {variant === "list" ? (
-        <div className={cn("max-w-3xl overflow-hidden rounded-lg border bg-card divide-y divide-border", className)}>
+        <div className={cn("mx-auto max-w-3xl overflow-hidden rounded-lg border bg-card divide-y divide-border", className)}>
           {items.map((item) => (
             <FileListRow
               key={item.id}
