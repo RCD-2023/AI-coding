@@ -6,7 +6,7 @@ import ItemsWithDrawer from "@/components/dashboard/ItemsWithDrawer";
 import AddItemButton from "@/components/dashboard/AddItemButton";
 import type { TypeSlug } from "@/components/dashboard/CreateItemDialog";
 
-const DIALOG_TYPE_SLUGS = new Set<string>(["snippet", "prompt", "command", "note", "link"]);
+const DIALOG_TYPE_SLUGS = new Set<string>(["snippet", "prompt", "command", "note", "link", "file", "image"]);
 
 export default async function ItemsTypePage({
   params,

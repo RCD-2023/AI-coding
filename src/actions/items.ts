@@ -1,10 +1,14 @@
 "use server";
 
 import { z } from "zod";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { r2, R2_BUCKET, r2KeyFromUrl } from "@/lib/r2";
 import { createItemInDb, updateItemInDb } from "@/lib/db/items";
 import type { ItemDetail } from "@/lib/db/items";
+
+const FILE_TYPES = new Set(["file", "image"]);
 
 const createItemSchema = z
   .object({
@@ -35,6 +39,22 @@ const createItemSchema = z
         .map((t) => t.trim())
         .filter(Boolean)
     ),
+    fileUrl: z
+      .string()
+      .transform((v) => v.trim() || null)
+      .nullable()
+      .optional(),
+    fileName: z
+      .string()
+      .transform((v) => v.trim() || null)
+      .nullable()
+      .optional(),
+    fileSize: z
+      .number()
+      .int()
+      .positive()
+      .nullable()
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.typeSlug === "link" && !data.url) {
@@ -42,6 +62,13 @@ const createItemSchema = z
         code: "custom",
         message: "URL is required for links",
         path: ["url"],
+      });
+    }
+    if (FILE_TYPES.has(data.typeSlug) && !data.fileUrl) {
+      ctx.addIssue({
+        code: "custom",
+        message: "A file must be uploaded",
+        path: ["fileUrl"],
       });
     }
   });
@@ -58,6 +85,9 @@ export async function createItem(raw: {
   url: string;
   language: string;
   tags: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number | null;
 }): Promise<CreateItemResult> {
   const session = await auth();
   if (!session?.user?.id) {
@@ -73,7 +103,8 @@ export async function createItem(raw: {
     };
   }
 
-  const { typeSlug, title, description, content, url, language, tags } = parsed.data;
+  const { typeSlug, title, description, content, url, language, tags, fileUrl, fileName, fileSize } =
+    parsed.data;
 
   const allTypes = await prisma.itemType.findMany({ where: { isSystem: true } });
   const matched = allTypes.find(
@@ -83,13 +114,23 @@ export async function createItem(raw: {
     return { success: false, error: "Invalid item type" };
   }
 
-  const contentType = typeSlug === "link" ? "URL" : "TEXT";
+  let contentType: "TEXT" | "FILE" | "URL";
+  if (typeSlug === "link") {
+    contentType = "URL";
+  } else if (FILE_TYPES.has(typeSlug)) {
+    contentType = "FILE";
+  } else {
+    contentType = "TEXT";
+  }
 
   const created = await createItemInDb(session.user.id, {
     title,
     description: description ?? null,
     content: content ?? null,
     url: url ?? null,
+    fileUrl: fileUrl ?? null,
+    fileName: fileName ?? null,
+    fileSize: fileSize ?? null,
     language: language ?? null,
     tags,
     itemTypeId: matched.id,
@@ -186,9 +227,28 @@ export async function deleteItem(itemId: string): Promise<DeleteItemResult> {
   }
 
   try {
+    const item = await prisma.item.findFirst({
+      where: { id: itemId, userId: session.user.id },
+      select: { fileUrl: true },
+    });
+
+    if (!item) {
+      return { success: false, error: "Item not found" };
+    }
+
+    if (item.fileUrl) {
+      try {
+        const key = r2KeyFromUrl(item.fileUrl);
+        await r2.send(new DeleteObjectCommand({ Bucket: R2_BUCKET, Key: key }));
+      } catch {
+        // Don't block deletion if R2 delete fails
+      }
+    }
+
     await prisma.item.delete({
       where: { id: itemId, userId: session.user.id },
     });
+
     return { success: true };
   } catch {
     return { success: false, error: "Item not found or already deleted" };
