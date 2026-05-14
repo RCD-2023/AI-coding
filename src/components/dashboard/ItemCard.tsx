@@ -14,6 +14,7 @@ export default function ItemCard({ item }: { item: ItemForCard }) {
   const date = new Date(item.createdAt).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
+    timeZone: "UTC",
   });
 
   const copyValue = item.content ?? item.url;

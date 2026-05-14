@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Menu, PanelLeft, Plus, Search } from "lucide-react";
 import SidebarContent from "./SidebarContent";
 import CreateItemDialog from "./CreateItemDialog";
+import CreateCollectionDialog from "./CreateCollectionDialog";
 import type { SidebarData } from "@/lib/db/sidebar";
 
 export type SessionUser = {
@@ -29,6 +30,7 @@ export default function DashboardShell({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [createItemOpen, setCreateItemOpen] = useState(false);
+  const [createCollectionOpen, setCreateCollectionOpen] = useState(false);
 
   return (
     <div className="flex h-full flex-col">
@@ -72,7 +74,7 @@ export default function DashboardShell({
 
         {/* Actions */}
         <div className="flex w-60 shrink-0 items-center justify-end gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={() => setCreateCollectionOpen(true)}>
             <Plus className="mr-1 h-4 w-4" />
             New Collection
           </Button>
@@ -108,6 +110,7 @@ export default function DashboardShell({
       </div>
 
       <CreateItemDialog open={createItemOpen} onOpenChange={setCreateItemOpen} />
+      <CreateCollectionDialog open={createCollectionOpen} onOpenChange={setCreateCollectionOpen} />
     </div>
   );
 }

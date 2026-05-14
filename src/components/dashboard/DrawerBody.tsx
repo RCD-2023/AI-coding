@@ -253,6 +253,7 @@ export function DrawerBody({
                 month: "long",
                 day: "numeric",
                 year: "numeric",
+                timeZone: "UTC",
               })}
             </dd>
           </div>
@@ -263,6 +264,7 @@ export function DrawerBody({
                 month: "long",
                 day: "numeric",
                 year: "numeric",
+                timeZone: "UTC",
               })}
             </dd>
           </div>

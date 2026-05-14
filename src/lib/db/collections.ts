@@ -72,6 +72,15 @@ async function getStatsForUser(userId: string): Promise<DashboardStats> {
   return { totalItems, totalCollections, favoriteItems, favoriteCollections };
 }
 
+export async function createCollectionInDb(
+  userId: string,
+  data: { name: string; description: string | null }
+) {
+  return prisma.collection.create({
+    data: { userId, name: data.name, description: data.description },
+  });
+}
+
 export async function getDashboardData(userId: string) {
   const [collections, stats] = await Promise.all([
     getCollectionsForUser(userId),

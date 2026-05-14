@@ -39,6 +39,7 @@ export default function FileListRow({ item, onSelect }: FileListRowProps) {
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "UTC",
   });
 
   const handleDownload = (e: React.MouseEvent) => {

@@ -32,18 +32,25 @@ export default function ItemsWithDrawer({ items, className, variant = "default" 
       ) : (
         <div className={cn(className)}>
           {items.map((item) => (
-            <button
+            <div
               key={item.id}
-              type="button"
-              className="block h-full w-full text-left"
+              role="button"
+              tabIndex={0}
+              className="block h-full w-full cursor-pointer text-left"
               onClick={() => setSelectedId(item.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setSelectedId(item.id);
+                }
+              }}
             >
               {variant === "gallery" ? (
                 <ImageThumbnailCard item={item} />
               ) : (
                 <ItemCard item={item} />
               )}
-            </button>
+            </div>
           ))}
         </div>
       )}
