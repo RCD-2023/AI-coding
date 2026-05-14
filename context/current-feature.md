@@ -1,27 +1,16 @@
-# Current Feature: Collection Create
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Add a "New Collection" button in the top bar on collection-related pages
-- Button opens a ShadCN Dialog modal with fields: name (required) and description (optional)
-- Create a `createCollection` server action with Zod validation and session userId ownership
-- Add `createCollectionInDb` query to `src/lib/db/collections.ts`
-- User-scoped: collection is tied to the authenticated user's session
-- Show Sonner toast on success or failure
-- On success: close modal, call `router.refresh()` to reflect the new collection in the list
-- Follow existing patterns from CreateItemDialog / createItem server action
+<!-- Add goals here -->
 
 ## Notes
 
-- Follow the same patterns as item create: Dialog component, server action, db query
-- Server component data fetching stays in lib/db; client mutations go through server actions
-- No API route needed — use server actions (same as createItem)
-- The modal needs: name field (required), description field (optional textarea)
-- Top bar button placement should mirror the "New Item" button on items pages
+<!-- Add notes here -->
 
 ## History
 
@@ -64,3 +53,4 @@ In Progress
 35. Code Cleanup: removed dead DEMO_USER_EMAIL constant from constants.ts; consolidated formatBytes into src/lib/utils.ts (removed duplicate formatFileSize from FileListRow and formatBytes from ItemDrawer and file-upload); extracted shared fieldLabel and FieldError helpers from CreateItemDialog and ItemDrawer into src/components/dashboard/form-helpers.tsx
 36. Next.js Image in ItemDrawer: replaced raw <img> with Next.js <Image> for image item view in ItemDrawer; added R2 public domain to images.remotePatterns in next.config.ts; uses width=1200 height=900 with style={{ height: auto }} for responsive display of unknown-dimension uploaded images; removed eslint-disable suppression comment
 37. ItemDrawer Decomposition: extracted useItemDrawer hook (all state + handlers + type sets + EditForm type) into hooks/useItemDrawer.ts; extracted DrawerActionBar (edit/view mode action bar) into DrawerActionBar.tsx; extracted DrawerBody (all body sections) into DrawerBody.tsx; ItemDrawer.tsx reduced from 569 to ~155 lines as thin Sheet shell + header + composition; also fixed equal-height item cards with h-full on button wrapper and ItemCard
+38. Collection Create: "New Collection" button in top bar opens CreateCollectionDialog (name required, description optional); createCollection server action with Zod validation and session userId ownership; createCollectionInDb query in lib/db/collections.ts; toast on success/failure, router.refresh() on success; fixed hydration mismatches: toLocaleDateString with timeZone UTC in ItemCard/FileListRow/DrawerBody, nested button in ItemsWithDrawer replaced with div[role=button]
