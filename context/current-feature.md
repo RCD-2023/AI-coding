@@ -1,36 +1,16 @@
-# ItemDrawer Decomposition
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-Decompose `src/components/dashboard/ItemDrawer.tsx` (currently 569 lines) into smaller, focused units without changing any behaviour.
-
-- **Extract `useItemDrawer` hook** into `src/components/dashboard/hooks/useItemDrawer.ts`
-  - Move all state: `item`, `loading`, `isEditing`, `saving`, `deleting`, `deleteDialogOpen`, `editForm`, `fieldErrors`
-  - Move the `useEffect` that fetches item detail on `itemId` change
-  - Move all handlers: `enterEditMode`, `cancelEdit`, `handleSave`, `handleDelete`, `setField`
-  - Hook receives `({ itemId, onCloseAction })` and returns everything the component needs
-
-- **Extract `DrawerActionBar`** into `src/components/dashboard/DrawerActionBar.tsx`
-  - The two-branch action bar: edit mode (Cancel / Save) vs view mode (Favorite / Pin / Copy / Download / Edit / Delete)
-  - Props: `{ isEditing, saving, editForm, item, itemId, showFile, onCancel, onSave, onEdit, onDelete }`
-
-- **Extract `DrawerBody`** into `src/components/dashboard/DrawerBody.tsx`
-  - All body sections: description, image preview, file info, content editor, language, URL, tags, collections, details
-  - Props: `{ item, isEditing, editForm, fieldErrors, setField, showContent, showLanguage, showUrl, showFile, typeName }`
-
-- **`ItemDrawer.tsx` itself** should be reduced to the Sheet shell, header, and composition of the three above — targeting ~100 lines
+<!-- Add goals here -->
 
 ## Notes
 
-- No behaviour changes — this is pure structural refactoring
-- All state and logic stays identical, just relocated
-- Keep `DrawerSkeleton` in `ItemDrawer.tsx` (it is already a local function, only used there)
-- The `EditForm` type and the `CONTENT_TYPES` / `LANGUAGE_TYPES` / `FILE_TYPES` sets should move to the hook file since they are only referenced there and in the body
-- Build must pass and no TypeScript errors before completing
+<!-- Add notes here -->
 
 ## History
 
@@ -72,3 +52,4 @@ Decompose `src/components/dashboard/ItemDrawer.tsx` (currently 569 lines) into s
 34. Quick Copy Icon on ItemCard: hover-revealed Copy button at bottom-right of ItemCard; copies content for snippet/command/prompt/note types or url for link type; shows green Check icon for 1.5s after copy; stops propagation so drawer does not open; hidden for file/image items (no text to copy); content and url added to ItemForCard type and both fetchItems/getItemsByTypeSlug query mappings
 35. Code Cleanup: removed dead DEMO_USER_EMAIL constant from constants.ts; consolidated formatBytes into src/lib/utils.ts (removed duplicate formatFileSize from FileListRow and formatBytes from ItemDrawer and file-upload); extracted shared fieldLabel and FieldError helpers from CreateItemDialog and ItemDrawer into src/components/dashboard/form-helpers.tsx
 36. Next.js Image in ItemDrawer: replaced raw <img> with Next.js <Image> for image item view in ItemDrawer; added R2 public domain to images.remotePatterns in next.config.ts; uses width=1200 height=900 with style={{ height: auto }} for responsive display of unknown-dimension uploaded images; removed eslint-disable suppression comment
+37. ItemDrawer Decomposition: extracted useItemDrawer hook (all state + handlers + type sets + EditForm type) into hooks/useItemDrawer.ts; extracted DrawerActionBar (edit/view mode action bar) into DrawerActionBar.tsx; extracted DrawerBody (all body sections) into DrawerBody.tsx; ItemDrawer.tsx reduced from 569 to ~155 lines as thin Sheet shell + header + composition; also fixed equal-height item cards with h-full on button wrapper and ItemCard
