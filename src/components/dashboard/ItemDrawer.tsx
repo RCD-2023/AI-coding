@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   Copy,
@@ -38,6 +39,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { CodeEditor } from "@/components/ui/code-editor";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { iconMap } from "@/lib/icon-map";
+import { formatBytes } from "@/lib/utils";
+import { fieldLabel, FieldError } from "@/components/dashboard/form-helpers";
 import { buttonVariants } from "@/components/ui/button";
 import { updateItem, deleteItem } from "@/actions/items";
 import type { ItemDetail } from "@/lib/db/items";
@@ -45,12 +48,6 @@ import type { ItemDetail } from "@/lib/db/items";
 const CONTENT_TYPES  = new Set(["snippet", "prompt", "command", "note"]);
 const LANGUAGE_TYPES = new Set(["snippet", "command"]);
 const FILE_TYPES     = new Set(["file", "image"]);
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 interface ItemDrawerProps {
   itemId: string | null;
@@ -65,19 +62,6 @@ type EditForm = {
   url: string;
   tags: string;
 };
-
-function fieldLabel(text: string) {
-  return (
-    <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-      {text}
-    </p>
-  );
-}
-
-function FieldError({ errors }: { errors?: string[] }) {
-  if (!errors?.length) return null;
-  return <p className="mt-1 text-xs text-destructive">{errors[0]}</p>;
-}
 
 function DrawerSkeleton() {
   return (
@@ -370,11 +354,13 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
               {!isEditing && typeName === "image" && item.fileUrl && (
                 <section>
                   {fieldLabel("Image")}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={item.fileUrl}
                     alt={item.fileName ?? item.title}
+                    width={1200}
+                    height={900}
                     className="w-full rounded-md object-contain"
+                    style={{ height: "auto" }}
                   />
                   {item.fileName && (
                     <p className="mt-1.5 text-xs text-muted-foreground">

@@ -1,16 +1,21 @@
-# Current Feature
+# Next.js Image in ItemDrawer
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+Replace the raw `<img>` tag in `ItemDrawer` (image item view) with Next.js `<Image>` from `next/image`.
+
+- Add `images.remotePatterns` to `next.config.ts` for the Cloudflare R2 public domain (`pub-b88cb498f9404610898e57efe1121f58.r2.dev`)
+- Replace `<img>` with `<Image width={1200} height={900} style={{ height: "auto" }}>` to handle unknown uploaded image dimensions responsively
+- Remove the `eslint-disable-next-line @next/next/no-img-element` suppression comment
 
 ## Notes
 
-<!-- Add notes here -->
+- Image dimensions are unknown at render time (user-uploaded files), so use fixed `width`/`height` with `style={{ height: "auto" }}` rather than `fill`
+- Next.js will proxy/optimize images through Vercel's pipeline in production (WebP conversion, lazy loading)
 
 ## History
 
@@ -49,3 +54,5 @@ Not Started
 31. File & Image Upload (Cloudflare R2): POST /api/upload validates type/size/MIME and stores in R2; GET /api/items/[id]/download proxies R2 stream; FileUpload component with drag-and-drop, XHR progress bar, image preview, file info; CreateItemDialog extended with file and image types; ItemDrawer shows image preview, file info card, and download button; deleteItem removes R2 object before DB row (fail-open); 39 tests across r2 utility, upload route, download route, and deleteItem action
 32. Image Gallery View: ImageThumbnailCard component with aspect-video thumbnails, object-cover, and 5%/300ms hover zoom; /items/images uses 3-column gallery grid via variant="gallery" prop on ItemsWithDrawer; other item type pages unchanged; fileUrl added to ItemForCard type and both query mappings
 33. File List View: FileListRow component with per-extension icons (pdf/archive/image/video/audio/code/generic), file name, size, upload date, and download button (stop propagation); /items/files uses variant="list" on ItemsWithDrawer (divide-y border container, no grid); responsive with stacked meta on mobile; fileName and fileSize added to ItemForCard type and both query mappings
+34. Quick Copy Icon on ItemCard: hover-revealed Copy button at bottom-right of ItemCard; copies content for snippet/command/prompt/note types or url for link type; shows green Check icon for 1.5s after copy; stops propagation so drawer does not open; hidden for file/image items (no text to copy); content and url added to ItemForCard type and both fetchItems/getItemsByTypeSlug query mappings
+35. Code Cleanup: removed dead DEMO_USER_EMAIL constant from constants.ts; consolidated formatBytes into src/lib/utils.ts (removed duplicate formatFileSize from FileListRow and formatBytes from ItemDrawer and file-upload); extracted shared fieldLabel and FieldError helpers from CreateItemDialog and ItemDrawer into src/components/dashboard/form-helpers.tsx
