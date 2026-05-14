@@ -9,6 +9,7 @@ import { CodeEditor } from "@/components/ui/code-editor";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { formatBytes } from "@/lib/utils";
 import { fieldLabel, FieldError } from "@/components/dashboard/form-helpers";
+import { CollectionMultiSelect } from "@/components/dashboard/CollectionMultiSelect";
 import type { ItemDetail } from "@/lib/db/items";
 import type { EditForm } from "@/components/dashboard/hooks/useItemDrawer";
 
@@ -23,6 +24,9 @@ interface DrawerBodyProps {
   showUrl: boolean;
   showFile: boolean;
   typeName: string;
+  userCollections: { id: string; name: string }[];
+  collectionIds: string[];
+  onCollectionIdsChange: (ids: string[]) => void;
 }
 
 export function DrawerBody({
@@ -36,6 +40,9 @@ export function DrawerBody({
   showUrl,
   showFile,
   typeName,
+  userCollections,
+  collectionIds,
+  onCollectionIdsChange,
 }: DrawerBodyProps) {
   return (
     <div className="flex flex-col gap-5 px-5 py-4">
@@ -225,21 +232,35 @@ export function DrawerBody({
         )
       )}
 
-      {/* Collections — display only */}
-      {item.collections.length > 0 && (
+      {/* Collections */}
+      {isEditing ? (
         <section>
           <div className="mb-1.5 flex items-center gap-1.5">
             <FolderOpen className="h-3 w-3 text-muted-foreground" />
             {fieldLabel("Collections")}
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {item.collections.map((col) => (
-              <Badge key={col.id} variant="outline" className="px-2 py-0.5 text-xs">
-                {col.name}
-              </Badge>
-            ))}
-          </div>
+          <CollectionMultiSelect
+            collections={userCollections}
+            selectedIds={collectionIds}
+            onChange={onCollectionIdsChange}
+          />
         </section>
+      ) : (
+        item.collections.length > 0 && (
+          <section>
+            <div className="mb-1.5 flex items-center gap-1.5">
+              <FolderOpen className="h-3 w-3 text-muted-foreground" />
+              {fieldLabel("Collections")}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {item.collections.map((col) => (
+                <Badge key={col.id} variant="outline" className="px-2 py-0.5 text-xs">
+                  {col.name}
+                </Badge>
+              ))}
+            </div>
+          </section>
+        )
       )}
 
       {/* Details — display only */}

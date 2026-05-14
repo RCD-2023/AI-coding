@@ -185,6 +185,7 @@ export type CreateItemData = {
   fileSize: number | null;
   language: string | null;
   tags: string[];
+  collectionIds: string[];
   itemTypeId: string;
   contentType: "TEXT" | "FILE" | "URL";
 };
@@ -211,6 +212,9 @@ export async function createItemInDb(
           where: { name },
           create: { name },
         })),
+      },
+      collections: {
+        create: data.collectionIds.map((collectionId) => ({ collectionId })),
       },
     },
     include: {
@@ -239,7 +243,10 @@ export async function createItemInDb(
       color: item.itemType.color,
     },
     tags: item.tags.map((t) => t.name),
-    collections: [],
+    collections: item.collections.map((ic) => ({
+      id: ic.collection.id,
+      name: ic.collection.name,
+    })),
     createdAt: item.createdAt,
     updatedAt: item.updatedAt,
   };
@@ -252,6 +259,7 @@ export type UpdateItemData = {
   url: string | null;
   language: string | null;
   tags: string[];
+  collectionIds: string[];
 };
 
 export async function updateItemInDb(
@@ -279,6 +287,10 @@ export async function updateItemInDb(
           where: { name },
           create: { name },
         })),
+      },
+      collections: {
+        deleteMany: {},
+        create: data.collectionIds.map((collectionId) => ({ collectionId })),
       },
     },
     include: {

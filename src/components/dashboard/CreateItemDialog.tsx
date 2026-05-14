@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Code, File as FileIcon, Image as ImageIcon, Link as LinkIcon, Sparkles, StickyNote, Tag, Terminal } from "lucide-react";
+import { Code, File as FileIcon, FolderOpen, Image as ImageIcon, Link as LinkIcon, Sparkles, StickyNote, Tag, Terminal } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +25,8 @@ import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { FileUpload } from "@/components/ui/file-upload";
 import type { UploadResult } from "@/components/ui/file-upload";
 import { createItem } from "@/actions/items";
+import { getUserCollectionsForSelector } from "@/actions/collections";
+import { CollectionMultiSelect } from "@/components/dashboard/CollectionMultiSelect";
 import { fieldLabel, FieldError } from "@/components/dashboard/form-helpers";
 
 const ITEM_TYPES = [
@@ -74,13 +76,18 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState(false);
+  const [collectionIds, setCollectionIds] = useState<string[]>([]);
+  const [userCollections, setUserCollections] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      getUserCollectionsForSelector().then(setUserCollections);
+    } else {
       setSelectedType(defaultType ?? "snippet");
       setForm(DEFAULT_FORM);
       setUploadResult(null);
       setFieldErrors({});
+      setCollectionIds([]);
     }
   }, [open, defaultType]);
 
@@ -98,6 +105,7 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
       fileUrl: uploadResult?.url ?? "",
       fileName: uploadResult?.fileName ?? "",
       fileSize: uploadResult?.fileSize ?? null,
+      collectionIds,
     });
 
     setSaving(false);
@@ -265,6 +273,19 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
               className="text-sm"
             />
             <p className="mt-1 text-xs text-muted-foreground">Comma-separated</p>
+          </div>
+
+          {/* Collections */}
+          <div>
+            <div className="mb-1.5 flex items-center gap-1.5">
+              <FolderOpen className="h-3 w-3 text-muted-foreground" />
+              {fieldLabel("Collections")}
+            </div>
+            <CollectionMultiSelect
+              collections={userCollections}
+              selectedIds={collectionIds}
+              onChange={setCollectionIds}
+            />
           </div>
         </div>
 

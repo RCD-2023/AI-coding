@@ -88,6 +88,7 @@ export async function createItem(raw: {
   fileUrl?: string;
   fileName?: string;
   fileSize?: number | null;
+  collectionIds?: string[];
 }): Promise<CreateItemResult> {
   const session = await auth();
   if (!session?.user?.id) {
@@ -133,6 +134,7 @@ export async function createItem(raw: {
     fileSize: fileSize ?? null,
     language: language ?? null,
     tags,
+    collectionIds: raw.collectionIds ?? [],
     itemTypeId: matched.id,
     contentType,
   });
@@ -182,6 +184,7 @@ export async function updateItem(
     url: string;
     language: string;
     tags: string;
+    collectionIds?: string[];
   }
 ): Promise<UpdateItemResult> {
   const session = await auth();
@@ -207,6 +210,7 @@ export async function updateItem(
     url: url ?? null,
     language: language ?? null,
     tags,
+    collectionIds: raw.collectionIds ?? [],
   });
 
   if (!updated) {

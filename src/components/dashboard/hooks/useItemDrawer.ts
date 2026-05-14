@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { updateItem, deleteItem } from "@/actions/items";
+import { getUserCollectionsForSelector } from "@/actions/collections";
 import type { ItemDetail } from "@/lib/db/items";
 
 export const CONTENT_TYPES  = new Set(["snippet", "prompt", "command", "note"]);
@@ -41,6 +42,8 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
     tags: "",
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [collectionIds, setCollectionIds] = useState<string[]>([]);
+  const [userCollections, setUserCollections] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
     if (!itemId) return;
@@ -68,8 +71,10 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
       url: item.url ?? "",
       tags: item.tags.join(", "),
     });
+    setCollectionIds(item.collections.map((c) => c.id));
     setFieldErrors({});
     setIsEditing(true);
+    getUserCollectionsForSelector().then(setUserCollections);
   }
 
   function cancelEdit() {
@@ -82,7 +87,7 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
     setSaving(true);
     setFieldErrors({});
 
-    const result = await updateItem(itemId, editForm);
+    const result = await updateItem(itemId, { ...editForm, collectionIds });
 
     setSaving(false);
 
@@ -128,6 +133,9 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
     setDeleteDialogOpen,
     editForm,
     fieldErrors,
+    collectionIds,
+    setCollectionIds,
+    userCollections,
     enterEditMode,
     cancelEdit,
     handleSave,

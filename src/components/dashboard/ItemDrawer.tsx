@@ -72,6 +72,9 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
     setDeleteDialogOpen,
     editForm,
     fieldErrors,
+    collectionIds,
+    setCollectionIds,
+    userCollections,
     enterEditMode,
     cancelEdit,
     handleSave,
@@ -171,6 +174,9 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
               showUrl={showUrl}
               showFile={showFile}
               typeName={typeName}
+              userCollections={userCollections}
+              collectionIds={collectionIds}
+              onCollectionIdsChange={setCollectionIds}
             />
           </div>
         ) : null}
