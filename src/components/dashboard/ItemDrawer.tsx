@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Copy,
+  Download,
   Edit,
+  File as FileIcon,
   FolderOpen,
   Pin,
   Star,
@@ -36,13 +38,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { CodeEditor } from "@/components/ui/code-editor";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { iconMap } from "@/lib/icon-map";
+import { buttonVariants } from "@/components/ui/button";
 import { updateItem, deleteItem } from "@/actions/items";
 import type { ItemDetail } from "@/lib/db/items";
 
-// Item types that show the Content field
-const CONTENT_TYPES = new Set(["snippet", "prompt", "command", "note"]);
-// Item types that show the Language field
+const CONTENT_TYPES  = new Set(["snippet", "prompt", "command", "note"]);
 const LANGUAGE_TYPES = new Set(["snippet", "command"]);
+const FILE_TYPES     = new Set(["file", "image"]);
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 interface ItemDrawerProps {
   itemId: string | null;
@@ -193,9 +201,10 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
 
   const Icon = item ? (iconMap[item.itemType.icon] ?? null) : null;
   const typeName = item?.itemType.name.toLowerCase() ?? "";
-  const showContent = CONTENT_TYPES.has(typeName);
+  const showContent  = CONTENT_TYPES.has(typeName);
   const showLanguage = LANGUAGE_TYPES.has(typeName);
-  const showUrl = typeName === "link";
+  const showUrl      = typeName === "link";
+  const showFile     = FILE_TYPES.has(typeName);
 
   return (
     <Sheet
@@ -302,6 +311,16 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
                 <Button variant="ghost" size="icon-sm" title="Copy">
                   <Copy className="h-4 w-4" />
                 </Button>
+                {showFile && itemId && (
+                  <a
+                    href={`/api/items/${itemId}/download`}
+                    download
+                    title="Download"
+                    className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+                  >
+                    <Download className="h-4 w-4" />
+                  </a>
+                )}
                 <div className="ml-auto flex items-center gap-1">
                   <Button
                     variant="ghost"
@@ -345,6 +364,43 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
                     <p className="text-sm text-foreground">{item.description}</p>
                   </section>
                 )
+              )}
+
+              {/* Image preview */}
+              {!isEditing && typeName === "image" && item.fileUrl && (
+                <section>
+                  {fieldLabel("Image")}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.fileUrl}
+                    alt={item.fileName ?? item.title}
+                    className="w-full rounded-md object-contain"
+                  />
+                  {item.fileName && (
+                    <p className="mt-1.5 text-xs text-muted-foreground">
+                      {item.fileName}
+                      {item.fileSize ? ` · ${formatBytes(item.fileSize)}` : ""}
+                    </p>
+                  )}
+                </section>
+              )}
+
+              {/* File info */}
+              {!isEditing && typeName === "file" && item.fileUrl && (
+                <section>
+                  {fieldLabel("File")}
+                  <div className="flex items-center gap-2 rounded-md border bg-muted/30 px-3 py-2.5">
+                    <FileIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">
+                        {item.fileName ?? "Unknown file"}
+                      </p>
+                      {item.fileSize && (
+                        <p className="text-xs text-muted-foreground">{formatBytes(item.fileSize)}</p>
+                      )}
+                    </div>
+                  </div>
+                </section>
               )}
 
               {/* Content */}

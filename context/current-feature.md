@@ -1,16 +1,25 @@
-# Current Feature
+# Current Feature: File & Image Upload (Cloudflare R2)
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Create upload API route for Cloudflare R2
+- Build FileUpload component with drag-and-drop and progress indicator
+- Update create item modal to use FileUpload for file and image types
+- Display image preview for images, file info (name/size) for files
+- Delete files from R2 when items are deleted
+- Create download proxy API route to avoid CORS issues
+- Add download button in ItemDrawer for file types
 
 ## Notes
 
-<!-- Add notes here -->
+- DB functions stay in `src/lib/db/items.ts` (no new db files)
+- Image constraints: max 5 MB, extensions `.png .jpg .jpeg .gif .webp .svg`
+- File constraints: max 10 MB, extensions `.pdf .txt .md .json .yaml .yml .xml .csv .toml .ini`
+- Accepted MIME types documented in spec (`context/features/file-image-spec.md`)
 
 ## History
 

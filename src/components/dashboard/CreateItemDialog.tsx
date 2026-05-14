@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Code, Link as LinkIcon, Sparkles, StickyNote, Tag, Terminal } from "lucide-react";
+import { Code, File as FileIcon, Image as ImageIcon, Link as LinkIcon, Sparkles, StickyNote, Tag, Terminal } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,20 +22,25 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { CodeEditor } from "@/components/ui/code-editor";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
+import { FileUpload } from "@/components/ui/file-upload";
+import type { UploadResult } from "@/components/ui/file-upload";
 import { createItem } from "@/actions/items";
 
 const ITEM_TYPES = [
   { slug: "snippet", label: "Snippet", icon: Code },
-  { slug: "prompt", label: "Prompt", icon: Sparkles },
+  { slug: "prompt",  label: "Prompt",  icon: Sparkles },
   { slug: "command", label: "Command", icon: Terminal },
-  { slug: "note", label: "Note", icon: StickyNote },
-  { slug: "link", label: "Link", icon: LinkIcon },
+  { slug: "note",    label: "Note",    icon: StickyNote },
+  { slug: "link",    label: "Link",    icon: LinkIcon },
+  { slug: "file",    label: "File",    icon: FileIcon },
+  { slug: "image",   label: "Image",   icon: ImageIcon },
 ] as const;
 
 export type TypeSlug = (typeof ITEM_TYPES)[number]["slug"];
 
-const CONTENT_TYPES = new Set<TypeSlug>(["snippet", "prompt", "command", "note"]);
+const CONTENT_TYPES  = new Set<TypeSlug>(["snippet", "prompt", "command", "note"]);
 const LANGUAGE_TYPES = new Set<TypeSlug>(["snippet", "command"]);
+const FILE_TYPES     = new Set<TypeSlug>(["file", "image"]);
 
 type CreateForm = {
   title: string;
@@ -78,6 +83,7 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
   const router = useRouter();
   const [selectedType, setSelectedType] = useState<TypeSlug>(defaultType ?? "snippet");
   const [form, setForm] = useState<CreateForm>(DEFAULT_FORM);
+  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState(false);
 
@@ -85,6 +91,7 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
     if (!open) {
       setSelectedType(defaultType ?? "snippet");
       setForm(DEFAULT_FORM);
+      setUploadResult(null);
       setFieldErrors({});
     }
   }, [open, defaultType]);
@@ -97,7 +104,13 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
     setSaving(true);
     setFieldErrors({});
 
-    const result = await createItem({ typeSlug: selectedType, ...form });
+    const result = await createItem({
+      typeSlug: selectedType,
+      ...form,
+      fileUrl: uploadResult?.url ?? "",
+      fileName: uploadResult?.fileName ?? "",
+      fileSize: uploadResult?.fileSize ?? null,
+    });
 
     setSaving(false);
 
@@ -113,12 +126,16 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
     }
   }
 
-  const showContent = CONTENT_TYPES.has(selectedType);
-  const showLanguage = LANGUAGE_TYPES.has(selectedType);
-  const showUrl = selectedType === "link";
+  const isFileType    = FILE_TYPES.has(selectedType);
+  const showContent   = CONTENT_TYPES.has(selectedType);
+  const showLanguage  = LANGUAGE_TYPES.has(selectedType);
+  const showUrl       = selectedType === "link";
 
   const canSubmit =
-    form.title.trim().length > 0 && (!showUrl || form.url.trim().length > 0) && !saving;
+    form.title.trim().length > 0 &&
+    (!showUrl || form.url.trim().length > 0) &&
+    (!isFileType || !!uploadResult) &&
+    !saving;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -133,7 +150,10 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
             {fieldLabel("Type")}
             <Select
               value={selectedType}
-              onValueChange={(val) => setSelectedType(val as TypeSlug)}
+              onValueChange={(val) => {
+                setSelectedType(val as TypeSlug);
+                setUploadResult(null);
+              }}
             >
               <SelectTrigger className="w-full">
                 {(() => {
@@ -181,6 +201,20 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
               className="min-h-[64px] resize-y text-sm"
             />
           </div>
+
+          {/* File / Image upload */}
+          {isFileType && (
+            <div>
+              {fieldLabel(selectedType === "image" ? "Image" : "File")}
+              <FileUpload
+                itemType={selectedType as "file" | "image"}
+                uploadResult={uploadResult}
+                onUpload={setUploadResult}
+                onClear={() => setUploadResult(null)}
+              />
+              <FieldError errors={fieldErrors.fileUrl} />
+            </div>
+          )}
 
           {/* Content */}
           {showContent && (

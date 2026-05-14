@@ -12,6 +12,7 @@ export type ItemDetail = {
   url: string | null;
   fileUrl: string | null;
   fileName: string | null;
+  fileSize: number | null;
   isFavorite: boolean;
   isPinned: boolean;
   itemType: ItemTypeInfo;
@@ -46,6 +47,7 @@ export async function getItemDetail(
     url: item.url,
     fileUrl: item.fileUrl,
     fileName: item.fileName,
+    fileSize: item.fileSize,
     isFavorite: item.isFavorite,
     isPinned: item.isPinned,
     itemType: {
@@ -163,6 +165,9 @@ export type CreateItemData = {
   description: string | null;
   content: string | null;
   url: string | null;
+  fileUrl: string | null;
+  fileName: string | null;
+  fileSize: number | null;
   language: string | null;
   tags: string[];
   itemTypeId: string;
@@ -179,6 +184,9 @@ export async function createItemInDb(
       description: data.description,
       content: data.content,
       url: data.url,
+      fileUrl: data.fileUrl,
+      fileName: data.fileName,
+      fileSize: data.fileSize,
       language: data.language,
       contentType: data.contentType,
       userId,
@@ -207,6 +215,7 @@ export async function createItemInDb(
     url: item.url,
     fileUrl: item.fileUrl,
     fileName: item.fileName,
+    fileSize: item.fileSize,
     isFavorite: item.isFavorite,
     isPinned: item.isPinned,
     itemType: {
@@ -274,6 +283,7 @@ export async function updateItemInDb(
     url: item.url,
     fileUrl: item.fileUrl,
     fileName: item.fileName,
+    fileSize: item.fileSize,
     isFavorite: item.isFavorite,
     isPinned: item.isPinned,
     itemType: {
