@@ -75,6 +75,7 @@ export type ItemForCard = {
   title: string;
   description: string | null;
   isFavorite: boolean;
+  fileUrl: string | null;
   tags: string[];
   createdAt: Date;
   itemType: { name: string; icon: string; color: string };
@@ -102,6 +103,7 @@ async function fetchItems(
     title: item.title,
     description: item.description,
     isFavorite: item.isFavorite,
+    fileUrl: item.fileUrl,
     tags: item.tags.map((t) => t.name),
     createdAt: item.createdAt,
     itemType: {
@@ -135,6 +137,7 @@ export async function getItemsByTypeSlug(
       title: item.title,
       description: item.description,
       isFavorite: item.isFavorite,
+      fileUrl: item.fileUrl,
       tags: item.tags.map((t) => t.name),
       createdAt: item.createdAt,
       itemType: {

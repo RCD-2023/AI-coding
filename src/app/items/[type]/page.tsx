@@ -26,6 +26,7 @@ export default async function ItemsTypePage({
   const Icon = iconMap[itemType.icon] ?? null;
   const typeSlug = itemType.name.toLowerCase();
   const isDialogType = DIALOG_TYPE_SLUGS.has(typeSlug);
+  const isGallery = typeSlug === "image";
 
   return (
     <div className="space-y-6 p-6">
@@ -58,7 +59,8 @@ export default async function ItemsTypePage({
       {items.length > 0 ? (
         <ItemsWithDrawer
           items={items}
-          className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3"
+          variant={isGallery ? "gallery" : "default"}
+          className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
         />
       ) : (
         <p className="text-sm text-muted-foreground">

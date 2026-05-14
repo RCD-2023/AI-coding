@@ -4,14 +4,16 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { ItemForCard } from "@/lib/db/items";
 import ItemCard from "@/components/dashboard/ItemCard";
+import ImageThumbnailCard from "@/components/dashboard/ImageThumbnailCard";
 import ItemDrawer from "@/components/dashboard/ItemDrawer";
 
 interface ItemsWithDrawerProps {
   items: ItemForCard[];
   className?: string;
+  variant?: "default" | "gallery";
 }
 
-export default function ItemsWithDrawer({ items, className }: ItemsWithDrawerProps) {
+export default function ItemsWithDrawer({ items, className, variant = "default" }: ItemsWithDrawerProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   return (
@@ -24,7 +26,11 @@ export default function ItemsWithDrawer({ items, className }: ItemsWithDrawerPro
             className="block w-full text-left"
             onClick={() => setSelectedId(item.id)}
           >
-            <ItemCard item={item} />
+            {variant === "gallery" ? (
+              <ImageThumbnailCard item={item} />
+            ) : (
+              <ItemCard item={item} />
+            )}
           </button>
         ))}
       </div>
