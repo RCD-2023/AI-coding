@@ -27,6 +27,12 @@ export default async function ItemsTypePage({
   const typeSlug = itemType.name.toLowerCase();
   const isDialogType = DIALOG_TYPE_SLUGS.has(typeSlug);
   const isGallery = typeSlug === "image";
+  const isFileList = typeSlug === "file";
+
+  const variant = isGallery ? "gallery" : isFileList ? "list" : "default";
+  const gridClass = isFileList
+    ? undefined
+    : "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3";
 
   return (
     <div className="space-y-6 p-6">
@@ -55,13 +61,9 @@ export default async function ItemsTypePage({
         )}
       </div>
 
-      {/* Grid */}
+      {/* Items */}
       {items.length > 0 ? (
-        <ItemsWithDrawer
-          items={items}
-          variant={isGallery ? "gallery" : "default"}
-          className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
-        />
+        <ItemsWithDrawer items={items} variant={variant} className={gridClass} />
       ) : (
         <p className="text-sm text-muted-foreground">
           No {itemType.name.toLowerCase()}s yet.
