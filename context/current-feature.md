@@ -1,21 +1,16 @@
-# Next.js Image in ItemDrawer
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-Replace the raw `<img>` tag in `ItemDrawer` (image item view) with Next.js `<Image>` from `next/image`.
-
-- Add `images.remotePatterns` to `next.config.ts` for the Cloudflare R2 public domain (`pub-b88cb498f9404610898e57efe1121f58.r2.dev`)
-- Replace `<img>` with `<Image width={1200} height={900} style={{ height: "auto" }}>` to handle unknown uploaded image dimensions responsively
-- Remove the `eslint-disable-next-line @next/next/no-img-element` suppression comment
+<!-- Add goals here -->
 
 ## Notes
 
-- Image dimensions are unknown at render time (user-uploaded files), so use fixed `width`/`height` with `style={{ height: "auto" }}` rather than `fill`
-- Next.js will proxy/optimize images through Vercel's pipeline in production (WebP conversion, lazy loading)
+<!-- Add notes here -->
 
 ## History
 
@@ -56,3 +51,4 @@ Replace the raw `<img>` tag in `ItemDrawer` (image item view) with Next.js `<Ima
 33. File List View: FileListRow component with per-extension icons (pdf/archive/image/video/audio/code/generic), file name, size, upload date, and download button (stop propagation); /items/files uses variant="list" on ItemsWithDrawer (divide-y border container, no grid); responsive with stacked meta on mobile; fileName and fileSize added to ItemForCard type and both query mappings
 34. Quick Copy Icon on ItemCard: hover-revealed Copy button at bottom-right of ItemCard; copies content for snippet/command/prompt/note types or url for link type; shows green Check icon for 1.5s after copy; stops propagation so drawer does not open; hidden for file/image items (no text to copy); content and url added to ItemForCard type and both fetchItems/getItemsByTypeSlug query mappings
 35. Code Cleanup: removed dead DEMO_USER_EMAIL constant from constants.ts; consolidated formatBytes into src/lib/utils.ts (removed duplicate formatFileSize from FileListRow and formatBytes from ItemDrawer and file-upload); extracted shared fieldLabel and FieldError helpers from CreateItemDialog and ItemDrawer into src/components/dashboard/form-helpers.tsx
+36. Next.js Image in ItemDrawer: replaced raw <img> with Next.js <Image> for image item view in ItemDrawer; added R2 public domain to images.remotePatterns in next.config.ts; uses width=1200 height=900 with style={{ height: auto }} for responsive display of unknown-dimension uploaded images; removed eslint-disable suppression comment
