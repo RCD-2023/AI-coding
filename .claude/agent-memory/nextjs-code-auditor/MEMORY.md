@@ -1,1 +1,3 @@
 - [Auth Architecture Patterns](project_auth_patterns.md) — Split auth.config.ts/auth.ts pattern, shared VerificationToken table, known HIGH issues from 2026-05-11 audit
+- [Known Open Issues (2026-05-14)](project_known_issues.md) — Full list of CRITICAL/HIGH/MEDIUM/LOW issues from CODE_SCAN.md — do not re-report without verifying
+- [Architecture Patterns](project_architecture_patterns.md) — Data fetching, auth, ownership, tags, sidebar, file storage patterns as of 2026-05-14

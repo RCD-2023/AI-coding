@@ -25,6 +25,7 @@ import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { FileUpload } from "@/components/ui/file-upload";
 import type { UploadResult } from "@/components/ui/file-upload";
 import { createItem } from "@/actions/items";
+import { fieldLabel, FieldError } from "@/components/dashboard/form-helpers";
 
 const ITEM_TYPES = [
   { slug: "snippet", label: "Snippet", icon: Code },
@@ -59,19 +60,6 @@ const DEFAULT_FORM: CreateForm = {
   url: "",
   tags: "",
 };
-
-function fieldLabel(text: string) {
-  return (
-    <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-      {text}
-    </p>
-  );
-}
-
-function FieldError({ errors }: { errors?: string[] }) {
-  if (!errors?.length) return null;
-  return <p className="mt-1 text-xs text-destructive">{errors[0]}</p>;
-}
 
 interface CreateItemDialogProps {
   open: boolean;

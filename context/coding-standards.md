@@ -67,7 +67,7 @@ Example v4 configuration:
 
 - Tailwind CSS for all styling
 - Use shadcn/ui components where applicable
-- No inline styles
+- No inline styles except for dynamic values not expressible as Tailwind classes (e.g. DB-driven hex colors)
 - Dark mode first, light mode as option
 
 ## Database

@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { File as FileIcon, ImageIcon, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, formatBytes } from "@/lib/utils";
 
 export type UploadResult = {
   url: string;
@@ -16,12 +16,6 @@ interface FileUploadProps {
   uploadResult: UploadResult | null;
   onUpload: (result: UploadResult) => void;
   onClear: () => void;
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export function FileUpload({ itemType, uploadResult, onUpload, onClear }: FileUploadProps) {

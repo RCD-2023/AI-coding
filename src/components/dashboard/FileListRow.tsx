@@ -13,6 +13,7 @@ import {
   Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { formatBytes } from "@/lib/utils";
 
 function getFileIcon(ext: string) {
   if (ext === "pdf") return FileText;
@@ -24,12 +25,6 @@ function getFileIcon(ext: string) {
   return File;
 }
 
-function formatFileSize(bytes: number | null): string {
-  if (bytes === null) return "—";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 interface FileListRowProps {
   item: ItemForCard;
@@ -39,7 +34,7 @@ interface FileListRowProps {
 export default function FileListRow({ item, onSelect }: FileListRowProps) {
   const ext = (item.fileName ?? item.title).split(".").pop()?.toLowerCase() ?? "";
   const FileIcon = getFileIcon(ext);
-  const size = formatFileSize(item.fileSize);
+  const size = formatBytes(item.fileSize);
   const date = new Date(item.createdAt).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
