@@ -1,16 +1,36 @@
-# Current Feature
+# ItemDrawer Decomposition
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+Decompose `src/components/dashboard/ItemDrawer.tsx` (currently 569 lines) into smaller, focused units without changing any behaviour.
+
+- **Extract `useItemDrawer` hook** into `src/components/dashboard/hooks/useItemDrawer.ts`
+  - Move all state: `item`, `loading`, `isEditing`, `saving`, `deleting`, `deleteDialogOpen`, `editForm`, `fieldErrors`
+  - Move the `useEffect` that fetches item detail on `itemId` change
+  - Move all handlers: `enterEditMode`, `cancelEdit`, `handleSave`, `handleDelete`, `setField`
+  - Hook receives `({ itemId, onCloseAction })` and returns everything the component needs
+
+- **Extract `DrawerActionBar`** into `src/components/dashboard/DrawerActionBar.tsx`
+  - The two-branch action bar: edit mode (Cancel / Save) vs view mode (Favorite / Pin / Copy / Download / Edit / Delete)
+  - Props: `{ isEditing, saving, editForm, item, itemId, showFile, onCancel, onSave, onEdit, onDelete }`
+
+- **Extract `DrawerBody`** into `src/components/dashboard/DrawerBody.tsx`
+  - All body sections: description, image preview, file info, content editor, language, URL, tags, collections, details
+  - Props: `{ item, isEditing, editForm, fieldErrors, setField, showContent, showLanguage, showUrl, showFile, typeName }`
+
+- **`ItemDrawer.tsx` itself** should be reduced to the Sheet shell, header, and composition of the three above — targeting ~100 lines
 
 ## Notes
 
-<!-- Add notes here -->
+- No behaviour changes — this is pure structural refactoring
+- All state and logic stays identical, just relocated
+- Keep `DrawerSkeleton` in `ItemDrawer.tsx` (it is already a local function, only used there)
+- The `EditForm` type and the `CONTENT_TYPES` / `LANGUAGE_TYPES` / `FILE_TYPES` sets should move to the hook file since they are only referenced there and in the body
+- Build must pass and no TypeScript errors before completing
 
 ## History
 

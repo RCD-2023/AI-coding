@@ -1,20 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import {
-  Copy,
-  Download,
-  Edit,
-  File as FileIcon,
-  FolderOpen,
-  Pin,
-  Star,
-  Tag,
-  Trash2,
-} from "lucide-react";
-import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,42 +11,29 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
-import { CodeEditor } from "@/components/ui/code-editor";
-import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { iconMap } from "@/lib/icon-map";
-import { formatBytes } from "@/lib/utils";
 import { fieldLabel, FieldError } from "@/components/dashboard/form-helpers";
-import { buttonVariants } from "@/components/ui/button";
-import { updateItem, deleteItem } from "@/actions/items";
-import type { ItemDetail } from "@/lib/db/items";
-
-const CONTENT_TYPES  = new Set(["snippet", "prompt", "command", "note"]);
-const LANGUAGE_TYPES = new Set(["snippet", "command"]);
-const FILE_TYPES     = new Set(["file", "image"]);
+import {
+  useItemDrawer,
+  CONTENT_TYPES,
+  LANGUAGE_TYPES,
+  FILE_TYPES,
+} from "@/components/dashboard/hooks/useItemDrawer";
+import { DrawerActionBar } from "@/components/dashboard/DrawerActionBar";
+import { DrawerBody } from "@/components/dashboard/DrawerBody";
 
 interface ItemDrawerProps {
   itemId: string | null;
   onCloseAction: () => void;
 }
-
-type EditForm = {
-  title: string;
-  description: string;
-  content: string;
-  language: string;
-  url: string;
-  tags: string;
-};
 
 function DrawerSkeleton() {
   return (
@@ -90,101 +62,25 @@ function DrawerSkeleton() {
 }
 
 export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
-  const router = useRouter();
-  const [item, setItem] = useState<ItemDetail | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [editForm, setEditForm] = useState<EditForm>({
-    title: "",
-    description: "",
-    content: "",
-    language: "",
-    url: "",
-    tags: "",
-  });
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
-
-  useEffect(() => {
-    if (!itemId) return;
-
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setLoading(true);
-    setItem(null);
-    setIsEditing(false);
-    setDeleteDialogOpen(false);
-    /* eslint-enable react-hooks/set-state-in-effect */
-
-    fetch(`/api/items/${itemId}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setItem(data))
-      .finally(() => setLoading(false));
-  }, [itemId]);
-
-  function enterEditMode() {
-    if (!item) return;
-    setEditForm({
-      title: item.title,
-      description: item.description ?? "",
-      content: item.content ?? "",
-      language: item.language ?? "",
-      url: item.url ?? "",
-      tags: item.tags.join(", "),
-    });
-    setFieldErrors({});
-    setIsEditing(true);
-  }
-
-  function cancelEdit() {
-    setIsEditing(false);
-    setFieldErrors({});
-  }
-
-  async function handleSave() {
-    if (!item || !itemId) return;
-    setSaving(true);
-    setFieldErrors({});
-
-    const result = await updateItem(itemId, editForm);
-
-    setSaving(false);
-
-    if (result.success) {
-      setItem(result.data);
-      setIsEditing(false);
-      router.refresh();
-      toast.success("Item saved");
-    } else {
-      if (result.fieldErrors) {
-        setFieldErrors(result.fieldErrors);
-      }
-      toast.error(result.error);
-    }
-  }
-
-  async function handleDelete() {
-    if (!itemId) return;
-    setDeleting(true);
-    const result = await deleteItem(itemId);
-    setDeleting(false);
-    if (result.success) {
-      toast.success("Item deleted");
-      setDeleteDialogOpen(false);
-      onCloseAction();
-      router.refresh();
-    } else {
-      toast.error(result.error);
-    }
-  }
-
-  function setField(key: keyof EditForm, value: string) {
-    setEditForm((prev) => ({ ...prev, [key]: value }));
-  }
+  const {
+    item,
+    loading,
+    isEditing,
+    saving,
+    deleting,
+    deleteDialogOpen,
+    setDeleteDialogOpen,
+    editForm,
+    fieldErrors,
+    enterEditMode,
+    cancelEdit,
+    handleSave,
+    handleDelete,
+    setField,
+  } = useItemDrawer({ itemId, onCloseAction });
 
   const Icon = item ? (iconMap[item.itemType.icon] ?? null) : null;
-  const typeName = item?.itemType.name.toLowerCase() ?? "";
+  const typeName     = item?.itemType.name.toLowerCase() ?? "";
   const showContent  = CONTENT_TYPES.has(typeName);
   const showLanguage = LANGUAGE_TYPES.has(typeName);
   const showUrl      = typeName === "link";
@@ -208,7 +104,6 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
           <div className="flex h-full flex-col overflow-y-auto">
             {/* Header */}
             <SheetHeader className="border-b px-5 pb-3 pt-5">
-              {/* Type + language badges */}
               <div className="mb-2 flex flex-wrap items-center gap-1.5">
                 <Badge
                   variant="secondary"
@@ -223,18 +118,13 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
                   </Badge>
                 )}
               </div>
-
-              {/* Title */}
               <div className="flex items-center gap-2 pr-8">
                 {Icon && (
                   <div
                     className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
                     style={{ backgroundColor: `${item.itemType.color}20` }}
                   >
-                    <Icon
-                      className="h-4 w-4"
-                      style={{ color: item.itemType.color }}
-                    />
+                    <Icon className="h-4 w-4" style={{ color: item.itemType.color }} />
                   </div>
                 )}
                 {isEditing ? (
@@ -256,320 +146,32 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
               </div>
             </SheetHeader>
 
-            {/* Action bar */}
-            {isEditing ? (
-              <div className="flex items-center justify-end gap-2 border-b px-4 py-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={cancelEdit}
-                  disabled={saving}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleSave}
-                  disabled={!editForm.title.trim() || saving}
-                >
-                  {saving ? "Saving…" : "Save"}
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1 border-b px-4 py-2">
-                <Button variant="ghost" size="icon-sm" title="Favorite">
-                  <Star
-                    className="h-4 w-4"
-                    style={
-                      item.isFavorite
-                        ? { fill: "#facc15", color: "#facc15" }
-                        : {}
-                    }
-                  />
-                </Button>
-                <Button variant="ghost" size="icon-sm" title="Pin">
-                  <Pin
-                    className={`h-4 w-4 ${item.isPinned ? "fill-foreground" : ""}`}
-                  />
-                </Button>
-                <Button variant="ghost" size="icon-sm" title="Copy">
-                  <Copy className="h-4 w-4" />
-                </Button>
-                {showFile && itemId && (
-                  <a
-                    href={`/api/items/${itemId}/download`}
-                    download
-                    title="Download"
-                    className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-                  >
-                    <Download className="h-4 w-4" />
-                  </a>
-                )}
-                <div className="ml-auto flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    title="Edit"
-                    onClick={enterEditMode}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    title="Delete"
-                    className="text-destructive hover:text-destructive"
-                    onClick={() => setDeleteDialogOpen(true)}
-                    disabled={deleting}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
+            <DrawerActionBar
+              isEditing={isEditing}
+              saving={saving}
+              deleting={deleting}
+              editForm={editForm}
+              item={item}
+              itemId={itemId}
+              showFile={showFile}
+              onCancel={cancelEdit}
+              onSave={handleSave}
+              onEdit={enterEditMode}
+              onDelete={() => setDeleteDialogOpen(true)}
+            />
 
-            {/* Body */}
-            <div className="flex flex-col gap-5 px-5 py-4">
-              {/* Description */}
-              {isEditing ? (
-                <section>
-                  {fieldLabel("Description")}
-                  <Textarea
-                    value={editForm.description}
-                    onChange={(e) => setField("description", e.target.value)}
-                    placeholder="Optional description"
-                    className="min-h-[72px] resize-y text-sm"
-                  />
-                </section>
-              ) : (
-                item.description && (
-                  <section>
-                    {fieldLabel("Description")}
-                    <p className="text-sm text-foreground">{item.description}</p>
-                  </section>
-                )
-              )}
-
-              {/* Image preview */}
-              {!isEditing && typeName === "image" && item.fileUrl && (
-                <section>
-                  {fieldLabel("Image")}
-                  <Image
-                    src={item.fileUrl}
-                    alt={item.fileName ?? item.title}
-                    width={1200}
-                    height={900}
-                    className="w-full rounded-md object-contain"
-                    style={{ height: "auto" }}
-                  />
-                  {item.fileName && (
-                    <p className="mt-1.5 text-xs text-muted-foreground">
-                      {item.fileName}
-                      {item.fileSize ? ` · ${formatBytes(item.fileSize)}` : ""}
-                    </p>
-                  )}
-                </section>
-              )}
-
-              {/* File info */}
-              {!isEditing && typeName === "file" && item.fileUrl && (
-                <section>
-                  {fieldLabel("File")}
-                  <div className="flex items-center gap-2 rounded-md border bg-muted/30 px-3 py-2.5">
-                    <FileIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">
-                        {item.fileName ?? "Unknown file"}
-                      </p>
-                      {item.fileSize && (
-                        <p className="text-xs text-muted-foreground">{formatBytes(item.fileSize)}</p>
-                      )}
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {/* Content */}
-              {isEditing && showContent ? (
-                <section>
-                  {fieldLabel("Content")}
-                  {showLanguage ? (
-                    <CodeEditor
-                      value={editForm.content}
-                      onChange={(val) => setField("content", val)}
-                      language={editForm.language || undefined}
-                    />
-                  ) : (
-                    <MarkdownEditor
-                      value={editForm.content}
-                      onChange={(val) => setField("content", val)}
-                    />
-                  )}
-                </section>
-              ) : (
-                !isEditing &&
-                item.content && (
-                  <section>
-                    {fieldLabel("Content")}
-                    {showLanguage ? (
-                      <CodeEditor
-                        value={item.content}
-                        language={item.language ?? undefined}
-                        readOnly
-                      />
-                    ) : (
-                      <MarkdownEditor value={item.content} readOnly />
-                    )}
-                  </section>
-                )
-              )}
-
-              {/* Language */}
-              {isEditing && showLanguage ? (
-                <section>
-                  {fieldLabel("Language")}
-                  <Input
-                    value={editForm.language}
-                    onChange={(e) => setField("language", e.target.value)}
-                    placeholder="e.g. typescript"
-                    className="text-sm"
-                  />
-                </section>
-              ) : (
-                !isEditing &&
-                item.url && (
-                  <section>
-                    {fieldLabel("URL")}
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="break-all text-sm text-primary underline-offset-4 hover:underline"
-                    >
-                      {item.url}
-                    </a>
-                  </section>
-                )
-              )}
-
-              {/* URL */}
-              {isEditing && showUrl ? (
-                <section>
-                  {fieldLabel("URL")}
-                  <Input
-                    value={editForm.url}
-                    onChange={(e) => setField("url", e.target.value)}
-                    placeholder="https://..."
-                    type="url"
-                    className="text-sm"
-                    aria-invalid={!!fieldErrors.url}
-                  />
-                  <FieldError errors={fieldErrors.url} />
-                </section>
-              ) : (
-                !isEditing &&
-                item.url && (
-                  <section>
-                    {fieldLabel("URL")}
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="break-all text-sm text-primary underline-offset-4 hover:underline"
-                    >
-                      {item.url}
-                    </a>
-                  </section>
-                )
-              )}
-
-              {/* Tags */}
-              {isEditing ? (
-                <section>
-                  <div className="mb-1.5 flex items-center gap-1.5">
-                    <Tag className="h-3 w-3 text-muted-foreground" />
-                    {fieldLabel("Tags")}
-                  </div>
-                  <Input
-                    value={editForm.tags}
-                    onChange={(e) => setField("tags", e.target.value)}
-                    placeholder="react, hooks, typescript"
-                    className="text-sm"
-                  />
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Comma-separated
-                  </p>
-                </section>
-              ) : (
-                item.tags.length > 0 && (
-                  <section>
-                    <div className="mb-1.5 flex items-center gap-1.5">
-                      <Tag className="h-3 w-3 text-muted-foreground" />
-                      {fieldLabel("Tags")}
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {item.tags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="secondary"
-                          className="px-2 py-0.5 text-xs"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </section>
-                )
-              )}
-
-              {/* Collections — display only */}
-              {item.collections.length > 0 && (
-                <section>
-                  <div className="mb-1.5 flex items-center gap-1.5">
-                    <FolderOpen className="h-3 w-3 text-muted-foreground" />
-                    {fieldLabel("Collections")}
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {item.collections.map((col) => (
-                      <Badge
-                        key={col.id}
-                        variant="outline"
-                        className="px-2 py-0.5 text-xs"
-                      >
-                        {col.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Details — display only */}
-              <section className="border-t pt-4">
-                {fieldLabel("Details")}
-                <dl className="space-y-1 text-xs text-muted-foreground">
-                  <div className="flex justify-between">
-                    <dt>Created</dt>
-                    <dd>
-                      {new Date(item.createdAt).toLocaleDateString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt>Updated</dt>
-                    <dd>
-                      {new Date(item.updatedAt).toLocaleDateString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </dd>
-                  </div>
-                </dl>
-              </section>
-            </div>
+            <DrawerBody
+              item={item}
+              isEditing={isEditing}
+              editForm={editForm}
+              fieldErrors={fieldErrors}
+              setField={setField}
+              showContent={showContent}
+              showLanguage={showLanguage}
+              showUrl={showUrl}
+              showFile={showFile}
+              typeName={typeName}
+            />
           </div>
         ) : null}
       </SheetContent>

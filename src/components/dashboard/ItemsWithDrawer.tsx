@@ -35,7 +35,7 @@ export default function ItemsWithDrawer({ items, className, variant = "default" 
             <button
               key={item.id}
               type="button"
-              className="block w-full text-left"
+              className="block h-full w-full text-left"
               onClick={() => setSelectedId(item.id)}
             >
               {variant === "gallery" ? (

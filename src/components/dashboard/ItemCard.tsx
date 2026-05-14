@@ -28,7 +28,7 @@ export default function ItemCard({ item }: { item: ItemForCard }) {
 
   return (
     <Card
-      className="group relative cursor-pointer border-l-[3px] transition-colors hover:bg-accent/5"
+      className="group relative h-full cursor-pointer border-l-[3px] transition-colors hover:bg-accent/5"
       style={{ borderLeftColor: color }}
     >
       <CardContent className="flex items-start gap-3 p-4">
