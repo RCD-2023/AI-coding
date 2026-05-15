@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { getSidebarData } from "@/lib/db/sidebar";
+import { getSearchData } from "@/lib/db/search";
 
 export default async function CollectionsLayout({
   children,
@@ -10,10 +11,12 @@ export default async function CollectionsLayout({
   const session = await auth();
   const userId = session?.user?.id ?? "";
 
-  const sidebarData = userId ? await getSidebarData(userId) : null;
+  const [sidebarData, searchData] = userId
+    ? await Promise.all([getSidebarData(userId), getSearchData(userId)])
+    : [null, null];
 
   return (
-    <DashboardShell sidebarData={sidebarData} user={session?.user ?? null}>
+    <DashboardShell sidebarData={sidebarData} searchData={searchData} user={session?.user ?? null}>
       {children}
     </DashboardShell>
   );
