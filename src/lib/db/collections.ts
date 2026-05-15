@@ -103,6 +103,21 @@ export async function createCollectionInDb(
   });
 }
 
+export async function updateCollectionInDb(
+  collectionId: string,
+  userId: string,
+  data: { name: string; description: string | null }
+) {
+  return prisma.collection.update({
+    where: { id: collectionId, userId },
+    data: { name: data.name, description: data.description },
+  });
+}
+
+export async function deleteCollectionInDb(collectionId: string, userId: string) {
+  return prisma.collection.delete({ where: { id: collectionId, userId } });
+}
+
 export async function getDashboardData(userId: string) {
   const [collections, stats] = await Promise.all([
     getCollectionsForUser(userId),

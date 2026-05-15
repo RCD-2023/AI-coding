@@ -1,8 +1,12 @@
 "use client";
 
 import { ChevronDown, FolderOpen } from "lucide-react";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Collection = { id: string; name: string };
 
@@ -17,8 +21,6 @@ export function CollectionMultiSelect({
   selectedIds,
   onChange,
 }: CollectionMultiSelectProps) {
-  const [open, setOpen] = useState(false);
-
   function toggle(id: string) {
     onChange(
       selectedIds.includes(id)
@@ -29,60 +31,38 @@ export function CollectionMultiSelect({
 
   const label =
     selectedIds.length === 0
-      ? "None"
+      ? "Select collections…"
       : selectedIds.length === 1
         ? (collections.find((c) => c.id === selectedIds[0])?.name ?? "1 collection")
         : `${selectedIds.length} collections`;
 
   if (collections.length === 0) {
-    return (
-      <p className="text-xs text-muted-foreground">No collections yet</p>
-    );
+    return <p className="text-xs text-muted-foreground">No collections yet</p>;
   }
 
   return (
-    <div>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm hover:bg-accent/50"
-      >
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex h-8 w-full items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm whitespace-nowrap outline-none transition-colors hover:bg-accent/50 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 data-placeholder:text-muted-foreground">
         <span className="flex items-center gap-1.5 text-muted-foreground">
-          <FolderOpen className="h-3.5 w-3.5" />
-          <span className={cn(selectedIds.length > 0 && "text-foreground")}>
+          <FolderOpen className="h-3.5 w-3.5 shrink-0" />
+          <span className={selectedIds.length > 0 ? "text-foreground" : ""}>
             {label}
           </span>
         </span>
-        <ChevronDown
-          className={cn(
-            "h-3.5 w-3.5 text-muted-foreground transition-transform",
-            open && "rotate-180"
-          )}
-        />
-      </button>
+        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+      </DropdownMenuTrigger>
 
-      {open && (
-        <div className="mt-1.5 flex flex-wrap gap-1.5">
-          {collections.map((col) => {
-            const selected = selectedIds.includes(col.id);
-            return (
-              <button
-                key={col.id}
-                type="button"
-                onClick={() => toggle(col.id)}
-                className={cn(
-                  "rounded-full border px-2.5 py-0.5 text-xs transition-colors",
-                  selected
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
-                )}
-              >
-                {col.name}
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
+      <DropdownMenuContent align="start" className="w-full min-w-[200px]">
+        {collections.map((col) => (
+          <DropdownMenuCheckboxItem
+            key={col.id}
+            checked={selectedIds.includes(col.id)}
+            onCheckedChange={() => toggle(col.id)}
+          >
+            {col.name}
+          </DropdownMenuCheckboxItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
