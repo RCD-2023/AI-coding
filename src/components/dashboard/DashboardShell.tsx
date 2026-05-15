@@ -1,15 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Menu, PanelLeft, Plus, Search } from "lucide-react";
+import dynamic from "next/dynamic";
 import SidebarContent from "./SidebarContent";
 import CreateItemDialog from "./CreateItemDialog";
 import CreateCollectionDialog from "./CreateCollectionDialog";
 import type { SidebarData } from "@/lib/db/sidebar";
+import type { SearchData } from "@/lib/db/search";
+
+const CommandPalette = dynamic(() => import("./CommandPalette"), { ssr: false });
+const ItemDrawer = dynamic(() => import("./ItemDrawer"), { ssr: false });
 
 export type SessionUser = {
   id: string;
@@ -21,16 +26,31 @@ export type SessionUser = {
 export default function DashboardShell({
   children,
   sidebarData,
+  searchData,
   user,
 }: {
   children: React.ReactNode;
   sidebarData: SidebarData | null;
+  searchData: SearchData | null;
   user: SessionUser | null;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [createItemOpen, setCreateItemOpen] = useState(false);
   const [createCollectionOpen, setCreateCollectionOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [paletteItemId, setPaletteItemId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setPaletteOpen((prev) => !prev);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <div className="flex h-full flex-col">
@@ -66,9 +86,19 @@ export default function DashboardShell({
 
         {/* Search — centered */}
         <div className="flex flex-1 justify-center">
-          <div className="relative w-full max-w-sm">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search items..." className="pl-8" />
+          <div
+            className="relative flex w-full max-w-sm cursor-pointer items-center"
+            onClick={() => setPaletteOpen(true)}
+          >
+            <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              className="cursor-pointer pl-8 pr-16"
+              readOnly
+            />
+            <kbd className="pointer-events-none absolute right-2.5 flex items-center gap-0.5 rounded border border-border bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+              <span className="text-xs">⌘</span>K
+            </kbd>
           </div>
         </div>
 
@@ -111,6 +141,13 @@ export default function DashboardShell({
 
       <CreateItemDialog open={createItemOpen} onOpenChange={setCreateItemOpen} />
       <CreateCollectionDialog open={createCollectionOpen} onOpenChange={setCreateCollectionOpen} />
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        searchData={searchData}
+        onItemSelect={(id) => setPaletteItemId(id)}
+      />
+      <ItemDrawer itemId={paletteItemId} onCloseAction={() => setPaletteItemId(null)} />
     </div>
   );
 }
