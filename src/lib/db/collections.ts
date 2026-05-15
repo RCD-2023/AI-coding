@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { ItemForCard } from "@/lib/db/items";
 
 export type CollectionForCard = {
   id: string;
@@ -10,6 +11,17 @@ export type CollectionForCard = {
   dominantColor: string;
 };
 
+export type CollectionWithItems = {
+  id: string;
+  name: string;
+  description: string | null;
+  isFavorite: boolean;
+  dominantColor: string;
+  itemCount: number;
+  types: { name: string; icon: string; color: string }[];
+  items: ItemForCard[];
+};
+
 export type DashboardStats = {
   totalItems: number;
   totalCollections: number;
@@ -17,7 +29,7 @@ export type DashboardStats = {
   favoriteCollections: number;
 };
 
-async function getCollectionsForUser(userId: string): Promise<CollectionForCard[]> {
+export async function getCollectionsForUser(userId: string): Promise<CollectionForCard[]> {
   const collections = await prisma.collection.findMany({
     where: { userId },
     orderBy: { updatedAt: "desc" },
@@ -98,4 +110,68 @@ export async function getDashboardData(userId: string) {
   ]);
 
   return { collections, stats };
+}
+
+export async function getCollectionWithItems(
+  collectionId: string,
+  userId: string
+): Promise<CollectionWithItems | null> {
+  const col = await prisma.collection.findFirst({
+    where: { id: collectionId, userId },
+    include: {
+      items: {
+        orderBy: { item: { createdAt: "desc" } },
+        include: {
+          item: { include: { itemType: true, tags: true } },
+        },
+      },
+    },
+  });
+
+  if (!col) return null;
+
+  const counts = new Map<
+    string,
+    { type: { name: string; icon: string; color: string }; count: number }
+  >();
+
+  for (const { item } of col.items) {
+    const { name, icon, color } = item.itemType;
+    const entry = counts.get(name);
+    if (entry) {
+      entry.count++;
+    } else {
+      counts.set(name, { type: { name, icon, color }, count: 1 });
+    }
+  }
+
+  const sorted = [...counts.values()].sort((a, b) => b.count - a.count);
+
+  return {
+    id: col.id,
+    name: col.name,
+    description: col.description,
+    isFavorite: col.isFavorite,
+    dominantColor: sorted[0]?.type.color ?? "#6b7280",
+    itemCount: col.items.length,
+    types: sorted.map((e) => e.type),
+    items: col.items.map(({ item }) => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      content: item.content,
+      url: item.url,
+      isFavorite: item.isFavorite,
+      fileUrl: item.fileUrl,
+      fileName: item.fileName,
+      fileSize: item.fileSize,
+      tags: item.tags.map((t) => t.name),
+      createdAt: item.createdAt,
+      itemType: {
+        name: item.itemType.name,
+        icon: item.itemType.icon,
+        color: item.itemType.color,
+      },
+    })),
+  };
 }
