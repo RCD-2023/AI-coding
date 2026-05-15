@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import { Star } from "lucide-react";
 import { auth } from "@/auth";
 import { getCollectionWithItems } from "@/lib/db/collections";
 import ItemsWithDrawer from "@/components/dashboard/ItemsWithDrawer";
+import CollectionDetailActions from "@/components/dashboard/CollectionDetailActions";
 
 export default async function CollectionDetailPage({
   params,
@@ -22,30 +22,29 @@ export default async function CollectionDetailPage({
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md"
-          style={{ backgroundColor: `${collection.dominantColor}20` }}
-        />
-        <div>
-          <div className="flex items-center gap-2">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md"
+            style={{ backgroundColor: `${collection.dominantColor}20` }}
+          />
+          <div>
             <h1 className="text-2xl font-bold text-foreground">
               {collection.name}
             </h1>
-            {collection.isFavorite && (
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            {collection.description && (
+              <p className="text-sm text-muted-foreground">
+                {collection.description}
+              </p>
             )}
-          </div>
-          {collection.description && (
             <p className="text-sm text-muted-foreground">
-              {collection.description}
+              {collection.itemCount}{" "}
+              {collection.itemCount === 1 ? "item" : "items"}
             </p>
-          )}
-          <p className="text-sm text-muted-foreground">
-            {collection.itemCount}{" "}
-            {collection.itemCount === 1 ? "item" : "items"}
-          </p>
+          </div>
         </div>
+
+        <CollectionDetailActions collection={collection} />
       </div>
 
       {collection.items.length > 0 ? (
