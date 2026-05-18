@@ -1,24 +1,16 @@
-# Current Feature: Pinned Items
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Create `toggleItemPin` server action (flip `isPinned` with userId ownership check, return new boolean)
-- Wire Pin button in ItemDrawer with optimistic UI state flip + router.refresh()
-- Toast on success/error
-- Pinned items sort to top of item listings (/items/[type])
-- Dashboard pinned items section reflects real pinned state
-- Pin icon on ItemCard remains a static visual indicator (no click handler)
-- Items only — no collection pinning
+<!-- Add goals here -->
 
 ## Notes
 
-- Follow the Favorite button pattern (DrawerActionBar, useItemDrawer, toggleFavoriteItem)
-- isPinned already exists on the Item model
-- Pin button already exists in DrawerActionBar but has no onClick
+<!-- Add notes here -->
 
 ## History
 
@@ -72,3 +64,4 @@ In Progress
 46. Favorites Page: /favorites route (auth-protected via proxy) with DashboardShell layout; getFavoritesData query fetches favorited items and collections sorted by updatedAt DESC; compact monospace list view with type icon, title, type badge (color-tinted), and date per row; separate sections for Items (N) and Collections (M) with counts; clicking an item opens ItemDrawer via FavoritesItemsList client component; clicking a collection navigates to /collections/[id]; empty state when no favorites; star icon Link added to TopBar actions area
 47. Favorite Toggle: toggleFavoriteItem and toggleFavoriteCollection server actions (flip isFavorite with userId ownership check, return new boolean); Star button in DrawerActionBar wired with optimistic local state flip + router.refresh(); CollectionCard dropdown Favorite item enabled (useTransition, filled/outline star, Favorite/Unfavorite label); CollectionDetailActions Star button enabled (useTransition, router.refresh()); 5 new toggleFavoriteCollection tests + prisma mock added to collections test suite (fixing previously-broken suite import)
 48. Favorites Page Sorting: FavoritesContent client component replaces FavoritesItemsList and inline collection rendering; owns sort state (default: Date) and ItemDrawer state; three sort buttons (Name/Date/Type) in page header with active highlight; items sort by title/updatedAt/itemType.name+title; collections sort by name/updatedAt/name; in-memory Array.sort via useMemo — no DB changes; FavoritesPage simplified to thin data-fetch shell
+49. Pinned Items: togglePinItem server action flips isPinned with userId ownership check; Pin button in DrawerActionBar wired with optimistic state flip + router.refresh() via togglingPin state in useItemDrawer; getItemsByTypeSlug orders by [isPinned desc, createdAt desc] so pinned items float to top; 4 new tests for togglePinItem
