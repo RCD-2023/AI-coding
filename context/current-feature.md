@@ -1,24 +1,16 @@
-# Current Feature: Favorites Page Sorting
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Add a sort control to the /favorites page header: three buttons — Name, Date, Type
-- Sort state is client-side only (no URL params, no server round-trip)
-- Items sorted by: Name → title A-Z, Date → updatedAt DESC (default), Type → itemType.name A-Z then title A-Z
-- Collections sorted by: Name → name A-Z, Date → updatedAt DESC (default), Type → name A-Z (collections have no single type)
-- Convert /favorites page to pass both items and collections to a single `FavoritesContent` client component that owns sort state and renders both sections
-- Active sort button visually highlighted; default is Date
+<!-- Add goals here -->
 
 ## Notes
 
-- Currently `FavoritesPage` is a server component; items go to `FavoritesItemsList` (client) and collections are rendered inline — need to lift both into a shared client wrapper `FavoritesContent`
-- `FavoritesItemsList` logic (row rendering + ItemDrawer state) can be absorbed into `FavoritesContent` or kept as a sub-component
-- Sort is applied in-memory with `Array.sort` on the already-fetched data — no DB changes needed
-- Keep the page itself as a server component for data fetching; only the content area becomes client
+<!-- Add notes here -->
 
 ## History
 
@@ -71,3 +63,4 @@ In Progress
 45. Editor Preferences Settings: Editor Preferences section added to /settings (font size, tab size, word wrap, minimap, theme dropdowns/toggles); editorPreferences JSON column on User via Prisma migration (dev + prod deployed); updateEditorPreferences server action with Zod validation; EditorPreferencesContext distributes persisted prefs to all Monaco editor instances; CodeEditor reads fontSize, tabSize, wordWrap, minimap, theme from context; Monokai and GitHub Dark themes defined via beforeMount using locally-copied theme JSON files
 46. Favorites Page: /favorites route (auth-protected via proxy) with DashboardShell layout; getFavoritesData query fetches favorited items and collections sorted by updatedAt DESC; compact monospace list view with type icon, title, type badge (color-tinted), and date per row; separate sections for Items (N) and Collections (M) with counts; clicking an item opens ItemDrawer via FavoritesItemsList client component; clicking a collection navigates to /collections/[id]; empty state when no favorites; star icon Link added to TopBar actions area
 47. Favorite Toggle: toggleFavoriteItem and toggleFavoriteCollection server actions (flip isFavorite with userId ownership check, return new boolean); Star button in DrawerActionBar wired with optimistic local state flip + router.refresh(); CollectionCard dropdown Favorite item enabled (useTransition, filled/outline star, Favorite/Unfavorite label); CollectionDetailActions Star button enabled (useTransition, router.refresh()); 5 new toggleFavoriteCollection tests + prisma mock added to collections test suite (fixing previously-broken suite import)
+48. Favorites Page Sorting: FavoritesContent client component replaces FavoritesItemsList and inline collection rendering; owns sort state (default: Date) and ItemDrawer state; three sort buttons (Name/Date/Type) in page header with active highlight; items sort by title/updatedAt/itemType.name+title; collections sort by name/updatedAt/name; in-memory Array.sort via useMemo — no DB changes; FavoritesPage simplified to thin data-fetch shell
