@@ -2,20 +2,33 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/auth", () => ({ auth: vi.fn() }));
 
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    collection: {
+      findFirst: vi.fn(),
+      update: vi.fn(),
+    },
+  },
+}));
+
 vi.mock("@/lib/db/collections", () => ({
   createCollectionInDb: vi.fn(),
   updateCollectionInDb: vi.fn(),
   deleteCollectionInDb: vi.fn(),
+  getCollectionsForSelector: vi.fn(),
 }));
 
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { createCollectionInDb, updateCollectionInDb, deleteCollectionInDb } from "@/lib/db/collections";
-import { createCollection, updateCollection, deleteCollection } from "@/actions/collections";
+import { createCollection, updateCollection, deleteCollection, toggleFavoriteCollection } from "@/actions/collections";
 
 const mockAuth = vi.mocked(auth);
 const mockCreate = vi.mocked(createCollectionInDb);
 const mockUpdate = vi.mocked(updateCollectionInDb);
 const mockDelete = vi.mocked(deleteCollectionInDb);
+const mockFindFirst = vi.mocked(prisma.collection.findFirst);
+const mockPrismaUpdate = vi.mocked(prisma.collection.update);
 
 const SESSION = { user: { id: "user-1" } };
 
@@ -186,5 +199,62 @@ describe("deleteCollection — happy path", () => {
 
     expect(result.success).toBe(true);
     expect(mockDelete).toHaveBeenCalledWith("col-1", "user-1");
+  });
+});
+
+// ─── toggleFavoriteCollection ─────────────────────────────────────────────────
+
+describe("toggleFavoriteCollection — auth", () => {
+  it("returns unauthorized when there is no session", async () => {
+    mockAuth.mockResolvedValue(null as never);
+
+    const result = await toggleFavoriteCollection("col-1");
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBe("Unauthorized");
+    expect(mockFindFirst).not.toHaveBeenCalled();
+  });
+});
+
+describe("toggleFavoriteCollection — not found", () => {
+  it("returns error when collection does not belong to user", async () => {
+    mockAuth.mockResolvedValue(SESSION as never);
+    mockFindFirst.mockResolvedValue(null as never);
+
+    const result = await toggleFavoriteCollection("col-1");
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBe("Collection not found");
+    expect(mockPrismaUpdate).not.toHaveBeenCalled();
+  });
+});
+
+describe("toggleFavoriteCollection — happy path", () => {
+  it("flips isFavorite from false to true", async () => {
+    mockAuth.mockResolvedValue(SESSION as never);
+    mockFindFirst.mockResolvedValue({ isFavorite: false } as never);
+    mockPrismaUpdate.mockResolvedValue({ isFavorite: true } as never);
+
+    const result = await toggleFavoriteCollection("col-1");
+
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.isFavorite).toBe(true);
+    expect(mockPrismaUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { isFavorite: true } })
+    );
+  });
+
+  it("flips isFavorite from true to false", async () => {
+    mockAuth.mockResolvedValue(SESSION as never);
+    mockFindFirst.mockResolvedValue({ isFavorite: true } as never);
+    mockPrismaUpdate.mockResolvedValue({ isFavorite: false } as never);
+
+    const result = await toggleFavoriteCollection("col-1");
+
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.isFavorite).toBe(false);
+    expect(mockPrismaUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { isFavorite: false } })
+    );
   });
 });

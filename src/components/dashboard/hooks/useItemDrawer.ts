@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { updateItem, deleteItem } from "@/actions/items";
+import { updateItem, deleteItem, toggleFavoriteItem } from "@/actions/items";
 import { getUserCollectionsForSelector } from "@/actions/collections";
 import type { ItemDetail } from "@/lib/db/items";
 
@@ -31,6 +31,7 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [toggling, setToggling] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [editForm, setEditForm] = useState<EditForm>({
@@ -119,6 +120,21 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
     }
   }
 
+  async function handleFavorite() {
+    if (!itemId || !item) return;
+    const optimistic = !item.isFavorite;
+    setItem((prev) => prev ? { ...prev, isFavorite: optimistic } : prev);
+    setToggling(true);
+    const result = await toggleFavoriteItem(itemId);
+    setToggling(false);
+    if (result.success) {
+      router.refresh();
+    } else {
+      setItem((prev) => prev ? { ...prev, isFavorite: !optimistic } : prev);
+      toast.error(result.error);
+    }
+  }
+
   function setField(key: keyof EditForm, value: string) {
     setEditForm((prev) => ({ ...prev, [key]: value }));
   }
@@ -129,6 +145,7 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
     isEditing,
     saving,
     deleting,
+    toggling,
     deleteDialogOpen,
     setDeleteDialogOpen,
     editForm,
@@ -140,6 +157,7 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
     cancelEdit,
     handleSave,
     handleDelete,
+    handleFavorite,
     setField,
   };
 }

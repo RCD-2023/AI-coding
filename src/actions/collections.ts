@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import {
   createCollectionInDb,
   updateCollectionInDb,
@@ -108,4 +109,30 @@ export async function deleteCollection(
   await deleteCollectionInDb(collectionId, session.user.id);
 
   return { success: true };
+}
+
+export type ToggleFavoriteCollectionResult =
+  | { success: true; isFavorite: boolean }
+  | { success: false; error: string };
+
+export async function toggleFavoriteCollection(
+  collectionId: string
+): Promise<ToggleFavoriteCollectionResult> {
+  const session = await auth();
+  if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+
+  const collection = await prisma.collection.findFirst({
+    where: { id: collectionId, userId: session.user.id },
+    select: { isFavorite: true },
+  });
+
+  if (!collection) return { success: false, error: "Collection not found" };
+
+  const updated = await prisma.collection.update({
+    where: { id: collectionId },
+    data: { isFavorite: !collection.isFavorite },
+    select: { isFavorite: true },
+  });
+
+  return { success: true, isFavorite: updated.isFavorite };
 }

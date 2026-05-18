@@ -258,3 +258,33 @@ export async function deleteItem(itemId: string): Promise<DeleteItemResult> {
     return { success: false, error: "Item not found or already deleted" };
   }
 }
+
+export type ToggleFavoriteItemResult =
+  | { success: true; isFavorite: boolean }
+  | { success: false; error: string };
+
+export async function toggleFavoriteItem(
+  itemId: string
+): Promise<ToggleFavoriteItemResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const item = await prisma.item.findFirst({
+    where: { id: itemId, userId: session.user.id },
+    select: { isFavorite: true },
+  });
+
+  if (!item) {
+    return { success: false, error: "Item not found" };
+  }
+
+  const updated = await prisma.item.update({
+    where: { id: itemId },
+    data: { isFavorite: !item.isFavorite },
+    select: { isFavorite: true },
+  });
+
+  return { success: true, isFavorite: updated.isFavorite };
+}

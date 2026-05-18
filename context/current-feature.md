@@ -1,16 +1,24 @@
-# Current Feature
+# Current Feature: Favorite Toggle
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- `toggleFavoriteItem` server action: flip `isFavorite` on an Item with userId ownership check
+- `toggleFavoriteCollection` server action: flip `isFavorite` on a Collection with userId ownership check
+- Wire Star button in DrawerActionBar: call `toggleFavoriteItem`, optimistic local state flip, router.refresh() after
+- Wire Favorite menu item in CollectionCard dropdown: call `toggleFavoriteCollection`, router.refresh() after, show filled/outline star based on current state
+- Wire Star button in CollectionDetailActions: call `toggleFavoriteCollection`, router.refresh() after
 
 ## Notes
 
-<!-- Add notes here -->
+- DrawerActionBar already renders the star filled/yellow when `item.isFavorite` is true — just needs onClick + state
+- CollectionCard already shows a star indicator on the card body when `isFavorite` — dropdown item just needs onClick wired, remove `disabled`
+- CollectionDetailActions already shows filled/outline star — button just needs onClick wired, remove `disabled`
+- Use `useTransition` in client components to disable button during the server action call
+- `router.refresh()` after each toggle to update sidebar counts and favorites page
 
 ## History
 

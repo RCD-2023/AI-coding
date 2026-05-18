@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EditCollectionDialog from "@/components/dashboard/EditCollectionDialog";
 import DeleteCollectionDialog from "@/components/dashboard/DeleteCollectionDialog";
+import { toggleFavoriteCollection } from "@/actions/collections";
 
 interface Props {
   collection: { id: string; name: string; description: string | null; isFavorite: boolean };
@@ -15,11 +16,25 @@ export default function CollectionDetailActions({ collection }: Props) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  function handleFavorite() {
+    startTransition(async () => {
+      await toggleFavoriteCollection(collection.id);
+      router.refresh();
+    });
+  }
 
   return (
     <>
       <div className="flex shrink-0 items-center gap-1">
-        <Button variant="ghost" size="icon" disabled title="Favorite (coming soon)">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleFavorite}
+          disabled={isPending}
+          title={collection.isFavorite ? "Remove from favorites" : "Add to favorites"}
+        >
           <Star
             className={`h-4 w-4 ${collection.isFavorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`}
           />

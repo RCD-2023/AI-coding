@@ -79,6 +79,8 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
     cancelEdit,
     handleSave,
     handleDelete,
+    handleFavorite,
+    toggling,
     setField,
   } = useItemDrawer({ itemId, onCloseAction });
 
@@ -153,6 +155,7 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
               isEditing={isEditing}
               saving={saving}
               deleting={deleting}
+              toggling={toggling}
               editForm={editForm}
               item={item}
               itemId={itemId}
@@ -161,6 +164,7 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
               onSave={handleSave}
               onEdit={enterEditMode}
               onDelete={() => setDeleteDialogOpen(true)}
+              onFavorite={handleFavorite}
             />
 
             <DrawerBody

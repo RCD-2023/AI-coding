@@ -9,6 +9,7 @@ interface DrawerActionBarProps {
   isEditing: boolean;
   saving: boolean;
   deleting: boolean;
+  toggling: boolean;
   editForm: EditForm;
   item: ItemDetail;
   itemId: string | null;
@@ -17,12 +18,14 @@ interface DrawerActionBarProps {
   onSave: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onFavorite: () => void;
 }
 
 export function DrawerActionBar({
   isEditing,
   saving,
   deleting,
+  toggling,
   editForm,
   item,
   itemId,
@@ -31,6 +34,7 @@ export function DrawerActionBar({
   onSave,
   onEdit,
   onDelete,
+  onFavorite,
 }: DrawerActionBarProps) {
   if (isEditing) {
     return (
@@ -51,7 +55,13 @@ export function DrawerActionBar({
 
   return (
     <div className="flex items-center gap-1 border-b px-4 py-2">
-      <Button variant="ghost" size="icon-sm" title="Favorite">
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        title={item.isFavorite ? "Remove from favorites" : "Add to favorites"}
+        onClick={onFavorite}
+        disabled={toggling}
+      >
         <Star
           className="h-4 w-4"
           style={item.isFavorite ? { fill: "#facc15", color: "#facc15" } : {}}

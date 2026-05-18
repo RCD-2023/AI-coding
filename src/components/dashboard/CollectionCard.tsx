@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MoreHorizontal, Pencil, Star, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -15,14 +16,24 @@ import { iconMap } from "@/lib/icon-map";
 import type { CollectionForCard } from "@/lib/db/collections";
 import EditCollectionDialog from "@/components/dashboard/EditCollectionDialog";
 import DeleteCollectionDialog from "@/components/dashboard/DeleteCollectionDialog";
+import { toggleFavoriteCollection } from "@/actions/collections";
 
 export default function CollectionCard({
   collection,
 }: {
   collection: CollectionForCard;
 }) {
+  const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  function handleFavorite() {
+    startTransition(async () => {
+      await toggleFavoriteCollection(collection.id);
+      router.refresh();
+    });
+  }
 
   return (
     <>
@@ -77,9 +88,12 @@ export default function CollectionCard({
                 <Pencil className="mr-2 h-3.5 w-3.5" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem disabled>
-                <Star className="mr-2 h-3.5 w-3.5" />
-                Favorite
+              <DropdownMenuItem onClick={handleFavorite} disabled={isPending}>
+                <Star
+                  className="mr-2 h-3.5 w-3.5"
+                  style={collection.isFavorite ? { fill: "#facc15", color: "#facc15" } : {}}
+                />
+                {collection.isFavorite ? "Unfavorite" : "Favorite"}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
