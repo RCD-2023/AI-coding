@@ -1,28 +1,16 @@
-# Current Feature: Editor Preferences Settings
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Add font size dropdown to editor preferences settings
-- Add tab size dropdown to editor preferences settings
-- Add word wrap toggle (default: on)
-- Add minimap toggle (default: off)
-- Add theme dropdown: vs-dark, monokai, github-dark (default: vs-dark)
-- Store preferences in JSON column `editorPreferences` on User model via migration
-- Create server action to update preferences with auto-save on change
-- Apply settings to Monaco editor component
-- Show success toast on save
-- Create EditorPreferencesContext for client components
+<!-- Add goals here -->
 
 ## Notes
 
-- Use a Prisma migration (never db push) to add `editorPreferences` JSON column to User
-- Auto-save on change — no explicit save button
-- Settings live in the /settings page under a new "Editor Preferences" section
-- Context provider needed because Monaco is used in multiple client components (ItemDrawer, CreateItemDialog)
+<!-- Add notes here -->
 
 ## History
 
@@ -72,3 +60,4 @@ In Progress
 42. Global Search / Command Palette: Ctrl+K / Cmd+K opens cmdk-based CommandPalette dialog; fuzzy search across all items and collections; grouped results (Items / Collections) with type icons and collection item counts; keyboard navigation (arrows + Enter); item select opens ItemDrawer, collection select navigates to /collections/[id]; TopBar search input click opens palette; ⌘K badge on right side of search bar; getSearchData query in lib/db/search.ts; search data pre-fetched in all four DashboardShell layouts; CommandPalette and palette ItemDrawer loaded with ssr:false to avoid cmdk context crash in Next.js 16
 43. Pagination: PaginationControls component (Prev/Next buttons + numbered pages, grey out at boundaries); paginated DB queries with skip/take on /items/[type], /collections/[id], and /collections; page driven by ?page=N search param; ITEMS_PER_PAGE=21 and COLLECTIONS_PER_PAGE=21 constants; getCollectionsForUserPaginated added alongside existing getCollectionsForUser (dashboard unchanged)
 44. Settings Page: /settings route (auth-protected via proxy) with DashboardShell layout; Account section with Change Password dialog (credentials users only) and Delete Account dialog moved from /profile; "Settings" link added to sidebar user dropdown and gear icon updated to link to /settings; getSettingsData query in lib/db/profile.ts; profile page now focused on user info and usage stats only
+45. Editor Preferences Settings: Editor Preferences section added to /settings (font size, tab size, word wrap, minimap, theme dropdowns/toggles); editorPreferences JSON column on User via Prisma migration (dev + prod deployed); updateEditorPreferences server action with Zod validation; EditorPreferencesContext distributes persisted prefs to all Monaco editor instances; CodeEditor reads fontSize, tabSize, wordWrap, minimap, theme from context; Monokai and GitHub Dark themes defined via beforeMount using locally-copied theme JSON files
