@@ -288,3 +288,33 @@ export async function toggleFavoriteItem(
 
   return { success: true, isFavorite: updated.isFavorite };
 }
+
+export type TogglePinItemResult =
+  | { success: true; isPinned: boolean }
+  | { success: false; error: string };
+
+export async function togglePinItem(
+  itemId: string
+): Promise<TogglePinItemResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const item = await prisma.item.findFirst({
+    where: { id: itemId, userId: session.user.id },
+    select: { isPinned: true },
+  });
+
+  if (!item) {
+    return { success: false, error: "Item not found" };
+  }
+
+  const updated = await prisma.item.update({
+    where: { id: itemId },
+    data: { isPinned: !item.isPinned },
+    select: { isPinned: true },
+  });
+
+  return { success: true, isPinned: updated.isPinned };
+}
