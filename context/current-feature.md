@@ -1,16 +1,24 @@
-# Current Feature
+# Current Feature: Pinned Items
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Create `toggleItemPin` server action (flip `isPinned` with userId ownership check, return new boolean)
+- Wire Pin button in ItemDrawer with optimistic UI state flip + router.refresh()
+- Toast on success/error
+- Pinned items sort to top of item listings (/items/[type])
+- Dashboard pinned items section reflects real pinned state
+- Pin icon on ItemCard remains a static visual indicator (no click handler)
+- Items only — no collection pinning
 
 ## Notes
 
-<!-- Add notes here -->
+- Follow the Favorite button pattern (DrawerActionBar, useItemDrawer, toggleFavoriteItem)
+- isPinned already exists on the Item model
+- Pin button already exists in DrawerActionBar but has no onClick
 
 ## History
 

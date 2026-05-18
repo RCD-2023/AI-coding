@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { updateItem, deleteItem, toggleFavoriteItem } from "@/actions/items";
+import { updateItem, deleteItem, toggleFavoriteItem, togglePinItem } from "@/actions/items";
 import { getUserCollectionsForSelector } from "@/actions/collections";
 import type { ItemDetail } from "@/lib/db/items";
 
@@ -32,6 +32,7 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [togglingPin, setTogglingPin] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [editForm, setEditForm] = useState<EditForm>({
@@ -135,6 +136,21 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
     }
   }
 
+  async function handlePin() {
+    if (!itemId || !item) return;
+    const optimistic = !item.isPinned;
+    setItem((prev) => prev ? { ...prev, isPinned: optimistic } : prev);
+    setTogglingPin(true);
+    const result = await togglePinItem(itemId);
+    setTogglingPin(false);
+    if (result.success) {
+      router.refresh();
+    } else {
+      setItem((prev) => prev ? { ...prev, isPinned: !optimistic } : prev);
+      toast.error(result.error);
+    }
+  }
+
   function setField(key: keyof EditForm, value: string) {
     setEditForm((prev) => ({ ...prev, [key]: value }));
   }
@@ -158,6 +174,8 @@ export function useItemDrawer({ itemId, onCloseAction }: UseItemDrawerOptions) {
     handleSave,
     handleDelete,
     handleFavorite,
+    handlePin,
+    togglingPin,
     setField,
   };
 }

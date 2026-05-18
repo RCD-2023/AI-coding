@@ -142,7 +142,7 @@ export async function getItemsByTypeSlug(
     prisma.item.count({ where }),
     prisma.item.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
       skip: (page - 1) * ITEMS_PER_PAGE,
       take: ITEMS_PER_PAGE,
       include: { itemType: true, tags: true },

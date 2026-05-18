@@ -10,6 +10,7 @@ interface DrawerActionBarProps {
   saving: boolean;
   deleting: boolean;
   toggling: boolean;
+  togglingPin: boolean;
   editForm: EditForm;
   item: ItemDetail;
   itemId: string | null;
@@ -19,6 +20,7 @@ interface DrawerActionBarProps {
   onEdit: () => void;
   onDelete: () => void;
   onFavorite: () => void;
+  onPin: () => void;
 }
 
 export function DrawerActionBar({
@@ -26,6 +28,7 @@ export function DrawerActionBar({
   saving,
   deleting,
   toggling,
+  togglingPin,
   editForm,
   item,
   itemId,
@@ -35,6 +38,7 @@ export function DrawerActionBar({
   onEdit,
   onDelete,
   onFavorite,
+  onPin,
 }: DrawerActionBarProps) {
   if (isEditing) {
     return (
@@ -67,7 +71,13 @@ export function DrawerActionBar({
           style={item.isFavorite ? { fill: "#facc15", color: "#facc15" } : {}}
         />
       </Button>
-      <Button variant="ghost" size="icon-sm" title="Pin">
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        title={item.isPinned ? "Unpin" : "Pin"}
+        onClick={onPin}
+        disabled={togglingPin}
+      >
         <Pin className={`h-4 w-4 ${item.isPinned ? "fill-foreground" : ""}`} />
       </Button>
       <Button variant="ghost" size="icon-sm" title="Copy">

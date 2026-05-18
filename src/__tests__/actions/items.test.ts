@@ -7,6 +7,7 @@ vi.mock("@/lib/prisma", () => ({
     item: {
       findFirst: vi.fn(),
       delete: vi.fn(),
+      update: vi.fn(),
     },
   },
 }));
@@ -24,11 +25,12 @@ vi.mock("@aws-sdk/client-s3", () => ({
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { r2 } from "@/lib/r2";
-import { deleteItem } from "@/actions/items";
+import { deleteItem, togglePinItem } from "@/actions/items";
 
 const mockAuth      = vi.mocked(auth);
 const mockFindFirst = vi.mocked(prisma.item.findFirst);
 const mockDelete    = vi.mocked(prisma.item.delete);
+const mockUpdate    = vi.mocked(prisma.item.update);
 const mockR2Send    = vi.mocked(r2.send);
 
 const SESSION = { user: { id: "user-1" } };
@@ -133,5 +135,64 @@ describe("deleteItem — DB error", () => {
 
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error).toBe("Item not found or already deleted");
+  });
+});
+
+describe("togglePinItem — auth", () => {
+  it("returns unauthorized when there is no session", async () => {
+    mockAuth.mockResolvedValue(null as never);
+
+    const result = await togglePinItem("item-1");
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBe("Unauthorized");
+    expect(mockFindFirst).not.toHaveBeenCalled();
+  });
+});
+
+describe("togglePinItem — item not found", () => {
+  it("returns an error when findFirst returns null", async () => {
+    mockAuth.mockResolvedValue(SESSION as never);
+    mockFindFirst.mockResolvedValue(null);
+
+    const result = await togglePinItem("item-999");
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBe("Item not found");
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+});
+
+describe("togglePinItem — toggle", () => {
+  it("pins an unpinned item", async () => {
+    mockAuth.mockResolvedValue(SESSION as never);
+    mockFindFirst.mockResolvedValue({ isPinned: false } as never);
+    mockUpdate.mockResolvedValue({ isPinned: true } as never);
+
+    const result = await togglePinItem("item-1");
+
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.isPinned).toBe(true);
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { id: "item-1" },
+      data: { isPinned: true },
+      select: { isPinned: true },
+    });
+  });
+
+  it("unpins a pinned item", async () => {
+    mockAuth.mockResolvedValue(SESSION as never);
+    mockFindFirst.mockResolvedValue({ isPinned: true } as never);
+    mockUpdate.mockResolvedValue({ isPinned: false } as never);
+
+    const result = await togglePinItem("item-1");
+
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.isPinned).toBe(false);
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { id: "item-1" },
+      data: { isPinned: false },
+      select: { isPinned: true },
+    });
   });
 });
