@@ -1,24 +1,16 @@
-# Current Feature: Favorite Toggle
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- `toggleFavoriteItem` server action: flip `isFavorite` on an Item with userId ownership check
-- `toggleFavoriteCollection` server action: flip `isFavorite` on a Collection with userId ownership check
-- Wire Star button in DrawerActionBar: call `toggleFavoriteItem`, optimistic local state flip, router.refresh() after
-- Wire Favorite menu item in CollectionCard dropdown: call `toggleFavoriteCollection`, router.refresh() after, show filled/outline star based on current state
-- Wire Star button in CollectionDetailActions: call `toggleFavoriteCollection`, router.refresh() after
+<!-- Add goals here -->
 
 ## Notes
 
-- DrawerActionBar already renders the star filled/yellow when `item.isFavorite` is true — just needs onClick + state
-- CollectionCard already shows a star indicator on the card body when `isFavorite` — dropdown item just needs onClick wired, remove `disabled`
-- CollectionDetailActions already shows filled/outline star — button just needs onClick wired, remove `disabled`
-- Use `useTransition` in client components to disable button during the server action call
-- `router.refresh()` after each toggle to update sidebar counts and favorites page
+<!-- Add notes here -->
 
 ## History
 
@@ -70,3 +62,4 @@ In Progress
 44. Settings Page: /settings route (auth-protected via proxy) with DashboardShell layout; Account section with Change Password dialog (credentials users only) and Delete Account dialog moved from /profile; "Settings" link added to sidebar user dropdown and gear icon updated to link to /settings; getSettingsData query in lib/db/profile.ts; profile page now focused on user info and usage stats only
 45. Editor Preferences Settings: Editor Preferences section added to /settings (font size, tab size, word wrap, minimap, theme dropdowns/toggles); editorPreferences JSON column on User via Prisma migration (dev + prod deployed); updateEditorPreferences server action with Zod validation; EditorPreferencesContext distributes persisted prefs to all Monaco editor instances; CodeEditor reads fontSize, tabSize, wordWrap, minimap, theme from context; Monokai and GitHub Dark themes defined via beforeMount using locally-copied theme JSON files
 46. Favorites Page: /favorites route (auth-protected via proxy) with DashboardShell layout; getFavoritesData query fetches favorited items and collections sorted by updatedAt DESC; compact monospace list view with type icon, title, type badge (color-tinted), and date per row; separate sections for Items (N) and Collections (M) with counts; clicking an item opens ItemDrawer via FavoritesItemsList client component; clicking a collection navigates to /collections/[id]; empty state when no favorites; star icon Link added to TopBar actions area
+47. Favorite Toggle: toggleFavoriteItem and toggleFavoriteCollection server actions (flip isFavorite with userId ownership check, return new boolean); Star button in DrawerActionBar wired with optimistic local state flip + router.refresh(); CollectionCard dropdown Favorite item enabled (useTransition, filled/outline star, Favorite/Unfavorite label); CollectionDetailActions Star button enabled (useTransition, router.refresh()); 5 new toggleFavoriteCollection tests + prisma mock added to collections test suite (fixing previously-broken suite import)
