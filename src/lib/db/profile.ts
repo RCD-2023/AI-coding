@@ -1,4 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import {
+  parseEditorPreferences,
+  type EditorPreferences,
+} from "@/lib/editor-preferences";
 
 export type ProfileStats = {
   totalItems: number;
@@ -22,13 +26,29 @@ export type ProfileData = {
 
 export async function getSettingsData(
   userId: string
-): Promise<{ isOAuth: boolean } | null> {
+): Promise<{ isOAuth: boolean; editorPreferences: EditorPreferences } | null> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { accounts: { select: { id: true }, take: 1 } },
+    select: {
+      accounts: { select: { id: true }, take: 1 },
+      editorPreferences: true,
+    },
   });
   if (!user) return null;
-  return { isOAuth: user.accounts.length > 0 };
+  return {
+    isOAuth: user.accounts.length > 0,
+    editorPreferences: parseEditorPreferences(user.editorPreferences),
+  };
+}
+
+export async function getEditorPreferences(
+  userId: string
+): Promise<EditorPreferences> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { editorPreferences: true },
+  });
+  return parseEditorPreferences(user?.editorPreferences);
 }
 
 export async function getProfileData(userId: string): Promise<ProfileData | null> {

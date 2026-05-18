@@ -4,6 +4,7 @@ import { getSettingsData } from "@/lib/db/profile";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChangePasswordDialog } from "@/components/profile/ChangePasswordDialog";
 import { DeleteAccountDialog } from "@/components/profile/DeleteAccountDialog";
+import { EditorPreferencesForm } from "@/components/settings/EditorPreferencesForm";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -20,6 +21,15 @@ export default async function SettingsPage() {
           Manage your account settings
         </p>
       </div>
+
+      <section>
+        <h2 className="mb-3 text-lg font-semibold text-foreground">Editor Preferences</h2>
+        <Card>
+          <CardContent className="space-y-4 p-6">
+            <EditorPreferencesForm />
+          </CardContent>
+        </Card>
+      </section>
 
       <section>
         <h2 className="mb-3 text-lg font-semibold text-foreground">Account</h2>

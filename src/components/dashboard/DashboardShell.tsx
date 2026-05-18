@@ -12,6 +12,13 @@ import CreateItemDialog from "./CreateItemDialog";
 import CreateCollectionDialog from "./CreateCollectionDialog";
 import type { SidebarData } from "@/lib/db/sidebar";
 import type { SearchData } from "@/lib/db/search";
+import {
+  EditorPreferencesProvider,
+} from "@/context/EditorPreferencesContext";
+import {
+  DEFAULT_EDITOR_PREFERENCES,
+  type EditorPreferences,
+} from "@/lib/editor-preferences";
 
 const CommandPalette = dynamic(() => import("./CommandPalette"), { ssr: false });
 const ItemDrawer = dynamic(() => import("./ItemDrawer"), { ssr: false });
@@ -28,11 +35,13 @@ export default function DashboardShell({
   sidebarData,
   searchData,
   user,
+  initialEditorPrefs = DEFAULT_EDITOR_PREFERENCES,
 }: {
   children: React.ReactNode;
   sidebarData: SidebarData | null;
   searchData: SearchData | null;
   user: SessionUser | null;
+  initialEditorPrefs?: EditorPreferences;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -53,6 +62,7 @@ export default function DashboardShell({
   }, []);
 
   return (
+    <EditorPreferencesProvider initial={initialEditorPrefs}>
     <div className="flex h-full flex-col">
       {/* Header */}
       <header className="flex h-14 shrink-0 items-center border-b border-border bg-card px-4">
@@ -149,5 +159,6 @@ export default function DashboardShell({
       />
       <ItemDrawer itemId={paletteItemId} onCloseAction={() => setPaletteItemId(null)} />
     </div>
+    </EditorPreferencesProvider>
   );
 }

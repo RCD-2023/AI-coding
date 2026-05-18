@@ -2,8 +2,11 @@
 
 import { useCallback, useState } from "react";
 import dynamic from "next/dynamic";
-import type { EditorProps, OnMount } from "@monaco-editor/react";
+import type { EditorProps, OnMount, BeforeMount } from "@monaco-editor/react";
 import { Check, Copy } from "lucide-react";
+import { useEditorPreferences } from "@/context/EditorPreferencesContext";
+import monokai from "@/lib/themes/monokai.json";
+import githubDark from "@/lib/themes/github-dark.json";
 
 const MIN_HEIGHT = 120;
 const MAX_HEIGHT = 400;
@@ -23,8 +26,16 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor({ value, onChange, language, readOnly = false }: CodeEditorProps) {
+  const { prefs } = useEditorPreferences();
   const [copied, setCopied] = useState(false);
   const [height, setHeight] = useState(MIN_HEIGHT);
+
+  const handleBeforeMount = useCallback<BeforeMount>((monaco) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    monaco.editor.defineTheme("monokai", monokai as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    monaco.editor.defineTheme("github-dark", githubDark as any);
+  }, []);
 
   const handleMount = useCallback<OnMount>((editor) => {
     const updateHeight = () => {
@@ -67,17 +78,19 @@ export function CodeEditor({ value, onChange, language, readOnly = false }: Code
         height={height}
         value={value}
         language={language?.toLowerCase() || "plaintext"}
-        theme="vs-dark"
+        theme={prefs.theme}
+        beforeMount={handleBeforeMount}
         onMount={handleMount}
         onChange={readOnly ? undefined : (val) => onChange?.(val ?? "")}
         options={{
           readOnly,
-          minimap: { enabled: false },
+          minimap: { enabled: prefs.minimap },
           scrollBeyondLastLine: false,
-          fontSize: 12,
+          fontSize: prefs.fontSize,
+          tabSize: prefs.tabSize,
           lineNumbers: "off",
           folding: false,
-          wordWrap: "on",
+          wordWrap: prefs.wordWrap ? "on" : "off",
           renderLineHighlight: "none",
           padding: { top: 12, bottom: 12 },
           scrollbar: {
