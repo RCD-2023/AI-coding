@@ -1,23 +1,30 @@
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getCollectionWithItems } from "@/lib/db/collections";
+import { COLLECTIONS_PER_PAGE } from "@/lib/constants";
 import ItemsWithDrawer from "@/components/dashboard/ItemsWithDrawer";
 import CollectionDetailActions from "@/components/dashboard/CollectionDetailActions";
+import PaginationControls from "@/components/dashboard/PaginationControls";
 
 export default async function CollectionDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { id } = await params;
+  const [{ id }, { page: pageParam }] = await Promise.all([params, searchParams]);
+
+  const page = Math.max(1, parseInt((Array.isArray(pageParam) ? pageParam[0] : pageParam) ?? "1", 10) || 1);
 
   const session = await auth();
   const userId = session?.user?.id ?? "";
 
-  const collection = userId ? await getCollectionWithItems(id, userId) : null;
+  const collection = userId ? await getCollectionWithItems(id, userId, page) : null;
 
   if (!collection) notFound();
 
+  const totalPages = Math.ceil(collection.itemCount / COLLECTIONS_PER_PAGE);
   const gridClass = "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3";
 
   return (
@@ -48,11 +55,18 @@ export default async function CollectionDetailPage({
       </div>
 
       {collection.items.length > 0 ? (
-        <ItemsWithDrawer
-          items={collection.items}
-          variant="default"
-          className={gridClass}
-        />
+        <>
+          <ItemsWithDrawer
+            items={collection.items}
+            variant="default"
+            className={gridClass}
+          />
+          <PaginationControls
+            currentPage={page}
+            totalPages={totalPages}
+            basePath={`/collections/${id}`}
+          />
+        </>
       ) : (
         <p className="text-sm text-muted-foreground">
           No items in this collection yet.

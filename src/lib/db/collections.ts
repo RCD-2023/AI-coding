@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { ItemForCard } from "@/lib/db/items";
+import { COLLECTIONS_PER_PAGE } from "@/lib/constants";
 
 export type CollectionForCard = {
   id: string;
@@ -29,47 +30,80 @@ export type DashboardStats = {
   favoriteCollections: number;
 };
 
+function mapCollectionToCard(col: {
+  id: string;
+  name: string;
+  description: string | null;
+  isFavorite: boolean;
+  items: { item: { itemType: { name: string; icon: string; color: string } } }[];
+}): CollectionForCard {
+  const counts = new Map<
+    string,
+    { type: { name: string; icon: string; color: string }; count: number }
+  >();
+
+  for (const { item } of col.items) {
+    const { name, icon, color } = item.itemType;
+    const entry = counts.get(name);
+    if (entry) {
+      entry.count++;
+    } else {
+      counts.set(name, { type: { name, icon, color }, count: 1 });
+    }
+  }
+
+  const sorted = [...counts.values()].sort((a, b) => b.count - a.count);
+
+  return {
+    id: col.id,
+    name: col.name,
+    description: col.description,
+    isFavorite: col.isFavorite,
+    itemCount: col.items.length,
+    types: sorted.map((e) => e.type),
+    dominantColor: sorted[0]?.type.color ?? "#6b7280",
+  };
+}
+
 export async function getCollectionsForUser(userId: string): Promise<CollectionForCard[]> {
   const collections = await prisma.collection.findMany({
     where: { userId },
     orderBy: { updatedAt: "desc" },
     include: {
       items: {
-        include: {
-          item: { include: { itemType: true } },
-        },
+        include: { item: { include: { itemType: true } } },
       },
     },
   });
 
-  return collections.map((col) => {
-    const counts = new Map<
-      string,
-      { type: { name: string; icon: string; color: string }; count: number }
-    >();
+  return collections.map(mapCollectionToCard);
+}
 
-    for (const { item } of col.items) {
-      const { name, icon, color } = item.itemType;
-      const entry = counts.get(name);
-      if (entry) {
-        entry.count++;
-      } else {
-        counts.set(name, { type: { name, icon, color }, count: 1 });
-      }
-    }
+export type CollectionsPageResult = {
+  collections: CollectionForCard[];
+  total: number;
+};
 
-    const sorted = [...counts.values()].sort((a, b) => b.count - a.count);
+export async function getCollectionsForUserPaginated(
+  userId: string,
+  page: number = 1
+): Promise<CollectionsPageResult> {
+  const [total, collections] = await Promise.all([
+    prisma.collection.count({ where: { userId } }),
+    prisma.collection.findMany({
+      where: { userId },
+      orderBy: { updatedAt: "desc" },
+      skip: (page - 1) * COLLECTIONS_PER_PAGE,
+      take: COLLECTIONS_PER_PAGE,
+      include: {
+        items: {
+          include: { item: { include: { itemType: true } } },
+        },
+      },
+    }),
+  ]);
 
-    return {
-      id: col.id,
-      name: col.name,
-      description: col.description,
-      isFavorite: col.isFavorite,
-      itemCount: col.items.length,
-      types: sorted.map((e) => e.type),
-      dominantColor: sorted[0]?.type.color ?? "#6b7280",
-    };
-  });
+  return { total, collections: collections.map(mapCollectionToCard) };
 }
 
 async function getStatsForUser(userId: string): Promise<DashboardStats> {
@@ -129,21 +163,37 @@ export async function getDashboardData(userId: string) {
 
 export async function getCollectionWithItems(
   collectionId: string,
-  userId: string
+  userId: string,
+  page: number = 1
 ): Promise<CollectionWithItems | null> {
+  // Fetch collection + lightweight type data for all items (for dominant color / count)
   const col = await prisma.collection.findFirst({
     where: { id: collectionId, userId },
     include: {
       items: {
-        orderBy: { item: { createdAt: "desc" } },
         include: {
-          item: { include: { itemType: true, tags: true } },
+          item: {
+            select: {
+              itemType: { select: { name: true, icon: true, color: true } },
+            },
+          },
         },
       },
     },
   });
 
   if (!col) return null;
+
+  // Fetch only the current page of items with full card data
+  const paginatedConnections = await prisma.itemCollection.findMany({
+    where: { collectionId },
+    orderBy: { item: { createdAt: "desc" } },
+    skip: (page - 1) * COLLECTIONS_PER_PAGE,
+    take: COLLECTIONS_PER_PAGE,
+    include: {
+      item: { include: { itemType: true, tags: true } },
+    },
+  });
 
   const counts = new Map<
     string,
@@ -170,7 +220,7 @@ export async function getCollectionWithItems(
     dominantColor: sorted[0]?.type.color ?? "#6b7280",
     itemCount: col.items.length,
     types: sorted.map((e) => e.type),
-    items: col.items.map(({ item }) => ({
+    items: paginatedConnections.map(({ item }) => ({
       id: item.id,
       title: item.title,
       description: item.description,

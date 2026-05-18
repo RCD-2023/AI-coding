@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { ITEMS_PER_PAGE } from "@/lib/constants";
 
 export type ItemTypeInfo = { name: string; icon: string; color: string };
 
@@ -68,6 +69,7 @@ export async function getItemDetail(
 export type ItemsByTypeResult = {
   items: ItemForCard[];
   itemType: ItemTypeInfo;
+  total: number;
 };
 
 export type ItemForCard = {
@@ -124,7 +126,8 @@ async function fetchItems(
 
 export async function getItemsByTypeSlug(
   userId: string,
-  typeSlug: string
+  typeSlug: string,
+  page: number = 1
 ): Promise<ItemsByTypeResult | null> {
   const allTypes = await prisma.itemType.findMany({ where: { isSystem: true } });
   const matched = allTypes.find(
@@ -133,11 +136,18 @@ export async function getItemsByTypeSlug(
 
   if (!matched) return null;
 
-  const items = await prisma.item.findMany({
-    where: { userId, itemTypeId: matched.id },
-    orderBy: { createdAt: "desc" },
-    include: { itemType: true, tags: true },
-  });
+  const where = { userId, itemTypeId: matched.id };
+
+  const [total, items] = await Promise.all([
+    prisma.item.count({ where }),
+    prisma.item.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * ITEMS_PER_PAGE,
+      take: ITEMS_PER_PAGE,
+      include: { itemType: true, tags: true },
+    }),
+  ]);
 
   return {
     items: items.map((item) => ({
@@ -163,6 +173,7 @@ export async function getItemsByTypeSlug(
       icon: matched.icon,
       color: matched.color,
     },
+    total,
   };
 }
 

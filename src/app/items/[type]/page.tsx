@@ -1,28 +1,35 @@
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getItemsByTypeSlug } from "@/lib/db/items";
+import { ITEMS_PER_PAGE } from "@/lib/constants";
 import { iconMap } from "@/lib/icon-map";
 import ItemsWithDrawer from "@/components/dashboard/ItemsWithDrawer";
 import AddItemButton from "@/components/dashboard/AddItemButton";
+import PaginationControls from "@/components/dashboard/PaginationControls";
 import type { TypeSlug } from "@/components/dashboard/CreateItemDialog";
 
 const DIALOG_TYPE_SLUGS = new Set<string>(["snippet", "prompt", "command", "note", "link", "file", "image"]);
 
 export default async function ItemsTypePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ type: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { type } = await params;
+  const [{ type }, { page: pageParam }] = await Promise.all([params, searchParams]);
+
+  const page = Math.max(1, parseInt((Array.isArray(pageParam) ? pageParam[0] : pageParam) ?? "1", 10) || 1);
 
   const session = await auth();
   const userId = session?.user?.id ?? "";
 
-  const result = userId ? await getItemsByTypeSlug(userId, type) : null;
+  const result = userId ? await getItemsByTypeSlug(userId, type, page) : null;
 
   if (!result) notFound();
 
-  const { items, itemType } = result;
+  const { items, itemType, total } = result;
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
   const Icon = iconMap[itemType.icon] ?? null;
   const typeSlug = itemType.name.toLowerCase();
   const isDialogType = DIALOG_TYPE_SLUGS.has(typeSlug);
@@ -52,7 +59,7 @@ export default async function ItemsTypePage({
               {itemType.name}s
             </h1>
             <p className="text-sm text-muted-foreground">
-              {items.length} {items.length === 1 ? "item" : "items"}
+              {total} {total === 1 ? "item" : "items"}
             </p>
           </div>
         </div>
@@ -63,7 +70,14 @@ export default async function ItemsTypePage({
 
       {/* Items */}
       {items.length > 0 ? (
-        <ItemsWithDrawer items={items} variant={variant} className={gridClass} />
+        <>
+          <ItemsWithDrawer items={items} variant={variant} className={gridClass} />
+          <PaginationControls
+            currentPage={page}
+            totalPages={totalPages}
+            basePath={`/items/${type}`}
+          />
+        </>
       ) : (
         <p className="text-sm text-muted-foreground">
           No {itemType.name.toLowerCase()}s yet.
