@@ -1,16 +1,24 @@
-# Current Feature
+# Current Feature: Settings Page
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Create a `/settings` route protected by auth (added to proxy matcher)
+- Add a "Settings" link in the user icon dropdown at the bottom of the sidebar
+- Move "Delete Account" action from the Profile page to the Settings page
+- Move "Change Password" (forgot/reset password flow trigger) action from the Profile page to the Settings page
+- Settings page uses the DashboardShell layout and matches existing page patterns
 
 ## Notes
 
-<!-- Add notes here -->
+- The settings page should be at `/settings`
+- Account actions currently live in `/profile` — move them to `/settings`, leaving the profile page focused on user info and usage stats
+- "Change Password" is only shown to credentials users (not OAuth-only users) — preserve this condition
+- "Delete Account" dialog with confirmation should be preserved as-is, just relocated
+- Follow existing patterns: server component page, DashboardShell, shadcn components
 
 ## History
 

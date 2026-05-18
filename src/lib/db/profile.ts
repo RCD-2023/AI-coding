@@ -20,6 +20,17 @@ export type ProfileData = {
   stats: ProfileStats;
 };
 
+export async function getSettingsData(
+  userId: string
+): Promise<{ isOAuth: boolean } | null> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { accounts: { select: { id: true }, take: 1 } },
+  });
+  if (!user) return null;
+  return { isOAuth: user.accounts.length > 0 };
+}
+
 export async function getProfileData(userId: string): Promise<ProfileData | null> {
   const [user, groupedItems, totalItems, totalCollections] = await Promise.all([
     prisma.user.findUnique({

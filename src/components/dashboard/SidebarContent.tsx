@@ -176,6 +176,12 @@ export default function SidebarContent({
                   Profile
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="/settings" className="flex w-full items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOutAction()}>
                 Sign out
@@ -184,7 +190,7 @@ export default function SidebarContent({
           </DropdownMenu>
 
           <Link
-            href="/profile"
+            href="/settings"
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <Settings className="h-4 w-4" />

@@ -3,8 +3,6 @@ import { redirect } from "next/navigation";
 import { getProfileData } from "@/lib/db/profile";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChangePasswordDialog } from "@/components/profile/ChangePasswordDialog";
-import { DeleteAccountDialog } from "@/components/profile/DeleteAccountDialog";
 import { iconMap } from "@/lib/icon-map";
 import { FolderOpen, Layers } from "lucide-react";
 
@@ -109,34 +107,6 @@ export default async function ProfilePage() {
         </section>
       )}
 
-      {/* Account Actions */}
-      <section>
-        <h2 className="mb-3 text-lg font-semibold text-foreground">Account</h2>
-        <Card>
-          <CardContent className="space-y-4 p-6">
-            {!user.isOAuth && (
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Password</p>
-                  <p className="text-xs text-muted-foreground">
-                    Update your account password
-                  </p>
-                </div>
-                <ChangePasswordDialog />
-              </div>
-            )}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-foreground">Delete Account</p>
-                <p className="text-xs text-muted-foreground">
-                  Permanently remove your account and all data
-                </p>
-              </div>
-              <DeleteAccountDialog />
-            </div>
-          </CardContent>
-        </Card>
-      </section>
     </div>
   );
 }
