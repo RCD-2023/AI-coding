@@ -1,24 +1,16 @@
-# Current Feature: Settings Page
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Create a `/settings` route protected by auth (added to proxy matcher)
-- Add a "Settings" link in the user icon dropdown at the bottom of the sidebar
-- Move "Delete Account" action from the Profile page to the Settings page
-- Move "Change Password" (forgot/reset password flow trigger) action from the Profile page to the Settings page
-- Settings page uses the DashboardShell layout and matches existing page patterns
+<!-- Add goals here -->
 
 ## Notes
 
-- The settings page should be at `/settings`
-- Account actions currently live in `/profile` — move them to `/settings`, leaving the profile page focused on user info and usage stats
-- "Change Password" is only shown to credentials users (not OAuth-only users) — preserve this condition
-- "Delete Account" dialog with confirmation should be preserved as-is, just relocated
-- Follow existing patterns: server component page, DashboardShell, shadcn components
+<!-- Add notes here -->
 
 ## History
 
@@ -67,3 +59,4 @@ In Progress
 41. Collection Actions (Edit, Delete, Favorite stub): CollectionCard converted to client component with 3-dot dropdown (Edit, Delete, Favorite stub); card body is a Link to /collections/[id]; EditCollectionDialog and DeleteCollectionDialog shared between card dropdown and /collections/[id] detail page header (CollectionDetailActions); deleteCollection cascades ItemCollection rows via DB, items are not deleted; updateCollection and deleteCollection server actions with ownership checks; CollectionMultiSelect rebuilt as checkbox dropdown; 6 new tests
 42. Global Search / Command Palette: Ctrl+K / Cmd+K opens cmdk-based CommandPalette dialog; fuzzy search across all items and collections; grouped results (Items / Collections) with type icons and collection item counts; keyboard navigation (arrows + Enter); item select opens ItemDrawer, collection select navigates to /collections/[id]; TopBar search input click opens palette; ⌘K badge on right side of search bar; getSearchData query in lib/db/search.ts; search data pre-fetched in all four DashboardShell layouts; CommandPalette and palette ItemDrawer loaded with ssr:false to avoid cmdk context crash in Next.js 16
 43. Pagination: PaginationControls component (Prev/Next buttons + numbered pages, grey out at boundaries); paginated DB queries with skip/take on /items/[type], /collections/[id], and /collections; page driven by ?page=N search param; ITEMS_PER_PAGE=21 and COLLECTIONS_PER_PAGE=21 constants; getCollectionsForUserPaginated added alongside existing getCollectionsForUser (dashboard unchanged)
+44. Settings Page: /settings route (auth-protected via proxy) with DashboardShell layout; Account section with Change Password dialog (credentials users only) and Delete Account dialog moved from /profile; "Settings" link added to sidebar user dropdown and gear icon updated to link to /settings; getSettingsData query in lib/db/profile.ts; profile page now focused on user info and usage stats only
