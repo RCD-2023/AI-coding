@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { Menu, PanelLeft, Plus, Search } from "lucide-react";
+import { Menu, PanelLeft, Plus, Search, Star } from "lucide-react";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import SidebarContent from "./SidebarContent";
 import CreateItemDialog from "./CreateItemDialog";
@@ -114,6 +115,12 @@ export default function DashboardShell({
 
         {/* Actions */}
         <div className="flex w-60 shrink-0 items-center justify-end gap-2">
+          <Link
+            href="/favorites"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
+            <Star className="h-4 w-4" />
+          </Link>
           <Button variant="outline" size="sm" onClick={() => setCreateCollectionOpen(true)}>
             <Plus className="mr-1 h-4 w-4" />
             New Collection
