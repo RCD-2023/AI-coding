@@ -1,16 +1,24 @@
-# Current Feature
+# Current Feature: Favorites Page Sorting
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Add a sort control to the /favorites page header: three buttons — Name, Date, Type
+- Sort state is client-side only (no URL params, no server round-trip)
+- Items sorted by: Name → title A-Z, Date → updatedAt DESC (default), Type → itemType.name A-Z then title A-Z
+- Collections sorted by: Name → name A-Z, Date → updatedAt DESC (default), Type → name A-Z (collections have no single type)
+- Convert /favorites page to pass both items and collections to a single `FavoritesContent` client component that owns sort state and renders both sections
+- Active sort button visually highlighted; default is Date
 
 ## Notes
 
-<!-- Add notes here -->
+- Currently `FavoritesPage` is a server component; items go to `FavoritesItemsList` (client) and collections are rendered inline — need to lift both into a shared client wrapper `FavoritesContent`
+- `FavoritesItemsList` logic (row rendering + ItemDrawer state) can be absorbed into `FavoritesContent` or kept as a sub-component
+- Sort is applied in-memory with `Array.sort` on the already-fetched data — no DB changes needed
+- Keep the page itself as a server component for data fetching; only the content area becomes client
 
 ## History
 
