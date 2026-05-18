@@ -1,25 +1,16 @@
-# Current Feature: Favorites Page
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Add star icon button to TopBar linking to /favorites
-- Create /favorites route with auth protection (proxy matcher)
-- Fetch all user favorited items and collections sorted by most recently favorited (updatedAt)
-- Compact, dev-focused list view (VS Code/terminal style — no cards or heavy borders)
-- Each row: type icon, title, type badge, date added
-- Separate sections for items and collections with counts
-- Click item opens ItemDrawer; click collection navigates to /collections/[id]
-- Empty state when no favorites
+<!-- Add goals here -->
 
 ## Notes
 
-- UI style: monospace or semi-monospace font, minimal padding, high density, subtle hover states, clean lines only
-- Sort order: most recently favorited (updatedAt DESC)
-- Reuse ItemsWithDrawer pattern for drawer integration on the items section
+<!-- Add notes here -->
 
 ## History
 
@@ -70,3 +61,4 @@ In Progress
 43. Pagination: PaginationControls component (Prev/Next buttons + numbered pages, grey out at boundaries); paginated DB queries with skip/take on /items/[type], /collections/[id], and /collections; page driven by ?page=N search param; ITEMS_PER_PAGE=21 and COLLECTIONS_PER_PAGE=21 constants; getCollectionsForUserPaginated added alongside existing getCollectionsForUser (dashboard unchanged)
 44. Settings Page: /settings route (auth-protected via proxy) with DashboardShell layout; Account section with Change Password dialog (credentials users only) and Delete Account dialog moved from /profile; "Settings" link added to sidebar user dropdown and gear icon updated to link to /settings; getSettingsData query in lib/db/profile.ts; profile page now focused on user info and usage stats only
 45. Editor Preferences Settings: Editor Preferences section added to /settings (font size, tab size, word wrap, minimap, theme dropdowns/toggles); editorPreferences JSON column on User via Prisma migration (dev + prod deployed); updateEditorPreferences server action with Zod validation; EditorPreferencesContext distributes persisted prefs to all Monaco editor instances; CodeEditor reads fontSize, tabSize, wordWrap, minimap, theme from context; Monokai and GitHub Dark themes defined via beforeMount using locally-copied theme JSON files
+46. Favorites Page: /favorites route (auth-protected via proxy) with DashboardShell layout; getFavoritesData query fetches favorited items and collections sorted by updatedAt DESC; compact monospace list view with type icon, title, type badge (color-tinted), and date per row; separate sections for Items (N) and Collections (M) with counts; clicking an item opens ItemDrawer via FavoritesItemsList client component; clicking a collection navigates to /collections/[id]; empty state when no favorites; star icon Link added to TopBar actions area
