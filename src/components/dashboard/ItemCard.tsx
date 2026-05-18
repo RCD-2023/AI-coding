@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { ItemForCard } from "@/lib/db/items";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Copy, Check } from "lucide-react";
+import { Star, Pin, Copy, Check } from "lucide-react";
 import { iconMap } from "@/lib/icon-map";
 
 export default function ItemCard({ item }: { item: ItemForCard }) {
@@ -45,9 +45,14 @@ export default function ItemCard({ item }: { item: ItemForCard }) {
         <div className="min-w-0 flex-1">
           <div className="mb-0.5 flex items-center justify-between gap-2">
             <p className="truncate font-medium text-foreground">{item.title}</p>
-            {item.isFavorite && (
-              <Star className="h-3.5 w-3.5 shrink-0 fill-yellow-400 text-yellow-400" />
-            )}
+            <div className="flex shrink-0 items-center gap-1">
+              {item.isPinned && (
+                <Pin className="h-3.5 w-3.5 fill-foreground text-foreground" />
+              )}
+              {item.isFavorite && (
+                <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+              )}
+            </div>
           </div>
           {item.description && (
             <p className="mb-2 text-xs text-muted-foreground line-clamp-1">

@@ -79,6 +79,7 @@ export type ItemForCard = {
   content: string | null;
   url: string | null;
   isFavorite: boolean;
+  isPinned: boolean;
   fileUrl: string | null;
   fileName: string | null;
   fileSize: number | null;
@@ -111,6 +112,7 @@ async function fetchItems(
     content: item.content,
     url: item.url,
     isFavorite: item.isFavorite,
+    isPinned: item.isPinned,
     fileUrl: item.fileUrl,
     fileName: item.fileName,
     fileSize: item.fileSize,
@@ -157,6 +159,7 @@ export async function getItemsByTypeSlug(
       content: item.content,
       url: item.url,
       isFavorite: item.isFavorite,
+      isPinned: item.isPinned,
       fileUrl: item.fileUrl,
       fileName: item.fileName,
       fileSize: item.fileSize,

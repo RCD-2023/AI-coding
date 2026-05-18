@@ -227,6 +227,7 @@ export async function getCollectionWithItems(
       content: item.content,
       url: item.url,
       isFavorite: item.isFavorite,
+      isPinned: item.isPinned,
       fileUrl: item.fileUrl,
       fileName: item.fileName,
       fileSize: item.fileSize,
