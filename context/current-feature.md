@@ -1,16 +1,32 @@
-# Current Feature
+# Current Feature: Homepage
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Replace `app/page.tsx` placeholder with the full marketing homepage from the `prototypes/homepage/` prototype
+- Implement all sections: Navbar, Hero, Features, AI (Pro), Pricing, CTA, Footer
+- `ChaosAnimation` client component with `requestAnimationFrame` particle system and cursor repulsion
+- `PricingToggle` client component with monthly/yearly switch updating displayed price ($8/mo → $6/mo)
+- `FadeIn` client wrapper using `IntersectionObserver` for scroll animations
+- All nav/CTA links wired: `/sign-in`, `/register`, `#features`, `#pricing`
+- Responsive layout: mobile hamburger menu, 2-col → 3-col grids
+- Tailwind v4 utility classes only — no custom CSS files (fade-in CSS goes in `globals.css`)
+- Build passes, no TypeScript errors
 
 ## Notes
 
-<!-- Add notes here -->
+- Route: `/` → `app/page.tsx` (public, no auth required)
+- Component files live in `components/homepage/`
+- Client components: `Navbar`, `ChaosAnimation`, `PricingToggle`, `FadeIn`
+- Server components: `app/page.tsx`, `HeroSection`, `DashboardMockup`, `FeaturesSection`, `AiSection`, `PricingSection`, `CtaSection`, `Footer`
+- Prototype reference: `prototypes/homepage/index.html` + `prototypes/homepage/script.js`
+- Styling: `bg-background`/`bg-card` for alternating sections, gradient text `from-blue-500 to-indigo-500`, ShadCN `Button` and `Card`
+- Pricing: Free ($0) and Pro ($8/mo monthly, $6/mo yearly with "Save 25%" badge)
+- Footer copyright year rendered server-side via `new Date().getFullYear()`
+- Check `context/features/add-pro-badge-to-sidebar.md` for existing ProBadge component
 
 ## History
 
