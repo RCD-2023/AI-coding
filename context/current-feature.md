@@ -1,34 +1,16 @@
-# Current Feature: Homepage Mockup
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Create a standalone marketing homepage at `prototypes/homepage/` (index.html, styles.css, script.js)
-- Fixed top navbar (logo, Features/Pricing links, Sign In/Get Started buttons) that gains opacity on scroll
-- Hero text: "Stop Losing Your Developer Knowledge" with gradient headline, subheadline, and CTA buttons
-- Hero section showing "chaos to order" concept: floating animated chaos icons (left) → pulsing arrow (center) → dashboard preview mockup (right)
-- Chaos icons float, bounce off walls, and repel from mouse cursor via requestAnimationFrame
-- Dashboard preview (right side of hero): sidebar + item card grid with colored top borders
-- Features section: 6 cards (Code Snippets, AI Prompts, Instant Search, Commands, Files & Docs, Collections) using item type accent colors
-- AI Pro section: "Pro Feature" badge + checklist of AI capabilities (left), code editor mockup with "AI Generated Tags" demo (right)
-- Pricing section: Free vs Pro cards with yearly/monthly toggle, Pro highlighted with "Most Popular" badge
-- CTA section: "Ready to Organize Your Knowledge?" with button
-- Footer: logo, link columns, current-year copyright
-- Scroll-triggered fade-in animations for sections
-- Fully responsive: chaos/arrow/dashboard stacked vertically on mobile, arrow rotates 90° to point down
+<!-- Add goals here -->
 
 ## Notes
 
-- Output is a pure HTML/CSS/JS prototype — no Next.js, no build step
-- Dark theme throughout
-- Item type accent colors: Snippet #3b82f6, Prompt #f59e0b, Command #06b6d4, Note #22c55e, File #64748b, Image #ec4899, URL #6366f1
-- Chaos container icons: Notion, GitHub, Slack, VS Code logos + browser tabs, Terminal, Text file, Bookmark
-- Dashboard preview shows sidebar with nav items + grid of item cards with colored top borders
-- Pricing: Free ($0, 50 items, 3 collections) / Pro ($8/mo or $72/yr, unlimited, AI features)
-- Arrow CSS pulse animation; scroll fade-in via IntersectionObserver; navbar opacity via scroll event
+<!-- Add notes here -->
 
 ## History
 
@@ -83,3 +65,4 @@ In Progress
 47. Favorite Toggle: toggleFavoriteItem and toggleFavoriteCollection server actions (flip isFavorite with userId ownership check, return new boolean); Star button in DrawerActionBar wired with optimistic local state flip + router.refresh(); CollectionCard dropdown Favorite item enabled (useTransition, filled/outline star, Favorite/Unfavorite label); CollectionDetailActions Star button enabled (useTransition, router.refresh()); 5 new toggleFavoriteCollection tests + prisma mock added to collections test suite (fixing previously-broken suite import)
 48. Favorites Page Sorting: FavoritesContent client component replaces FavoritesItemsList and inline collection rendering; owns sort state (default: Date) and ItemDrawer state; three sort buttons (Name/Date/Type) in page header with active highlight; items sort by title/updatedAt/itemType.name+title; collections sort by name/updatedAt/name; in-memory Array.sort via useMemo — no DB changes; FavoritesPage simplified to thin data-fetch shell
 49. Pinned Items: togglePinItem server action flips isPinned with userId ownership check; Pin button in DrawerActionBar wired with optimistic state flip + router.refresh() via togglingPin state in useItemDrawer; getItemsByTypeSlug orders by [isPinned desc, createdAt desc] so pinned items float to top; 4 new tests for togglePinItem
+50. Homepage Mockup: pure HTML/CSS/JS marketing page at prototypes/homepage/; chaos-to-order hero with 8 floating app icons (requestAnimationFrame, wall bounce, mouse repulsion) → pulsing SVG arrow → dashboard preview mockup; fixed navbar with scroll opacity; features grid (6 cards with type accent colors); AI Pro section with code editor mockup and AI-generated tags demo; pricing section with monthly/yearly toggle ($8/$6/mo); CTA section and footer with dynamic year; scroll fade-in via IntersectionObserver; fully responsive with vertical stacking and 90° arrow rotation on mobile
