@@ -1,16 +1,34 @@
-# Current Feature
+# Current Feature: Homepage Mockup
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Create a standalone marketing homepage at `prototypes/homepage/` (index.html, styles.css, script.js)
+- Fixed top navbar (logo, Features/Pricing links, Sign In/Get Started buttons) that gains opacity on scroll
+- Hero text: "Stop Losing Your Developer Knowledge" with gradient headline, subheadline, and CTA buttons
+- Hero section showing "chaos to order" concept: floating animated chaos icons (left) → pulsing arrow (center) → dashboard preview mockup (right)
+- Chaos icons float, bounce off walls, and repel from mouse cursor via requestAnimationFrame
+- Dashboard preview (right side of hero): sidebar + item card grid with colored top borders
+- Features section: 6 cards (Code Snippets, AI Prompts, Instant Search, Commands, Files & Docs, Collections) using item type accent colors
+- AI Pro section: "Pro Feature" badge + checklist of AI capabilities (left), code editor mockup with "AI Generated Tags" demo (right)
+- Pricing section: Free vs Pro cards with yearly/monthly toggle, Pro highlighted with "Most Popular" badge
+- CTA section: "Ready to Organize Your Knowledge?" with button
+- Footer: logo, link columns, current-year copyright
+- Scroll-triggered fade-in animations for sections
+- Fully responsive: chaos/arrow/dashboard stacked vertically on mobile, arrow rotates 90° to point down
 
 ## Notes
 
-<!-- Add notes here -->
+- Output is a pure HTML/CSS/JS prototype — no Next.js, no build step
+- Dark theme throughout
+- Item type accent colors: Snippet #3b82f6, Prompt #f59e0b, Command #06b6d4, Note #22c55e, File #64748b, Image #ec4899, URL #6366f1
+- Chaos container icons: Notion, GitHub, Slack, VS Code logos + browser tabs, Terminal, Text file, Bookmark
+- Dashboard preview shows sidebar with nav items + grid of item cards with colored top borders
+- Pricing: Free ($0, 50 items, 3 collections) / Pro ($8/mo or $72/yr, unlimited, AI features)
+- Arrow CSS pulse animation; scroll fade-in via IntersectionObserver; navbar opacity via scroll event
 
 ## History
 
