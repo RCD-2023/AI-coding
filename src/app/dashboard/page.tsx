@@ -17,10 +17,10 @@ export default async function DashboardPage() {
   ]);
 
   const stats = [
-    { label: "Total Items",          value: collections?.stats.totalItems         ?? 0, icon: Layers },
-    { label: "Collections",          value: collections?.stats.totalCollections   ?? 0, icon: FolderOpen },
-    { label: "Favorite Items",       value: collections?.stats.favoriteItems      ?? 0, icon: Star },
-    { label: "Favorite Collections", value: collections?.stats.favoriteCollections ?? 0, icon: Bookmark },
+    { label: "Total Items",          value: collections?.stats.totalItems          ?? 0, icon: Layers,     color: "text-blue-500",   bg: "bg-blue-500/10" },
+    { label: "Collections",          value: collections?.stats.totalCollections    ?? 0, icon: FolderOpen, color: "text-green-500",  bg: "bg-green-500/10" },
+    { label: "Favorite Items",       value: collections?.stats.favoriteItems       ?? 0, icon: Star,       color: "text-yellow-500", bg: "bg-yellow-500/10" },
+    { label: "Favorite Collections", value: collections?.stats.favoriteCollections ?? 0, icon: Bookmark,   color: "text-yellow-500", bg: "bg-yellow-500/10" },
   ];
 
   return (
@@ -35,11 +35,11 @@ export default async function DashboardPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {stats.map(({ label, value, icon: Icon }) => (
+        {stats.map(({ label, value, icon: Icon, color, bg }) => (
           <Card key={label}>
             <CardContent className="flex items-center gap-3 p-4">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted">
-                <Icon className="h-4 w-4 text-muted-foreground" />
+              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${bg}`}>
+                <Icon className={`h-4 w-4 ${color}`} />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{value}</p>

@@ -35,6 +35,7 @@ export default function PricingToggle() {
       {/* Toggle */}
       <div className="flex items-center justify-center gap-3 mb-12">
         <span
+          id="pricing-label-monthly"
           className={`text-sm font-medium transition-colors ${
             !yearly ? "text-foreground" : "text-muted-foreground"
           }`}
@@ -44,6 +45,7 @@ export default function PricingToggle() {
         <div
           role="switch"
           aria-checked={yearly}
+          aria-labelledby="pricing-label-monthly pricing-label-yearly"
           tabIndex={0}
           onClick={() => setYearly(!yearly)}
           onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setYearly(!yearly)}
@@ -58,12 +60,13 @@ export default function PricingToggle() {
           />
         </div>
         <span
+          id="pricing-label-yearly"
           className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${
             yearly ? "text-foreground" : "text-muted-foreground"
           }`}
         >
           Yearly
-          <span className="text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/30 px-1.5 py-0.5 rounded-full">
+          <span className="text-xs font-semibold bg-green-500/20 text-green-300 border border-green-500/50 px-1.5 py-0.5 rounded-full">
             Save 25%
           </span>
         </span>

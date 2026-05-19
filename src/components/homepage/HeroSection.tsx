@@ -9,8 +9,8 @@ export default function HeroSection() {
   return (
     <section className="min-h-screen flex items-center pt-16 px-4">
       <div className="max-w-6xl mx-auto w-full py-16 flex flex-col items-center gap-12">
-        {/* Text */}
-        <FadeIn className="w-full text-center">
+        {/* Text — no FadeIn: above-fold content must be visible on first paint */}
+        <div className="w-full text-center">
           <div className="text-xs font-semibold tracking-widest text-blue-500 uppercase mb-4">
             Developer Knowledge Hub
           </div>
@@ -33,7 +33,7 @@ export default function HeroSection() {
               See Features
             </a>
           </div>
-        </FadeIn>
+        </div>
 
         {/* Visual */}
         <FadeIn className="w-full">

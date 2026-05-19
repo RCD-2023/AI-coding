@@ -79,7 +79,7 @@ export default function CollectionCard({
         {/* 3-dot menu — positioned over card, stops link navigation */}
         <div className="absolute right-2 top-2" onClick={(e) => e.stopPropagation()}>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex h-6 w-6 items-center justify-center rounded-sm transition-colors hover:bg-accent focus-visible:outline-none">
+            <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-sm transition-colors hover:bg-accent focus-visible:outline-none">
               <MoreHorizontal className="h-3.5 w-3.5" />
               <span className="sr-only">Collection options</span>
             </DropdownMenuTrigger>
