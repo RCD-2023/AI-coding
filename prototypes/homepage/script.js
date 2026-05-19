@@ -19,7 +19,7 @@
     link.addEventListener('click', () => mobileMenu.classList.remove('open'));
   });
 })();
-
+ 
 /* ============================================================
    FOOTER YEAR
 ============================================================ */
@@ -140,6 +140,7 @@ document.getElementById('footer-year').textContent = new Date().getFullYear();
   const DAMPING = 0.985;
   const MIN_SPEED = 0.25;
 
+ 
   let containerRect;
   let mouseX = -999;
   let mouseY = -999;

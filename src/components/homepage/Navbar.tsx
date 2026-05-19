@@ -33,7 +33,7 @@ export default function Navbar() {
         <ul className="hidden md:flex items-center gap-8 list-none">
           <li>
             <a
-              href="#features"
+              href="/#features"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Features
@@ -41,7 +41,7 @@ export default function Navbar() {
           </li>
           <li>
             <a
-              href="#pricing"
+              href="/#pricing"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Pricing
@@ -70,14 +70,14 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden bg-background border-b border-border px-4 py-4 flex flex-col gap-4">
           <a
-            href="#features"
+            href="/#features"
             className="text-sm hover:text-foreground transition-colors"
             onClick={() => setMenuOpen(false)}
           >
             Features
           </a>
           <a
-            href="#pricing"
+            href="/#pricing"
             className="text-sm hover:text-foreground transition-colors"
             onClick={() => setMenuOpen(false)}
           >
