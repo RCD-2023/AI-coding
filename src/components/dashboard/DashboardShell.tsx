@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { FolderPlus, Menu, PanelLeft, Plus, Search, Star } from "lucide-react";
+import { Code2, FolderPlus, Menu, PanelLeft, Plus, Search, Star } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import SidebarContent from "./SidebarContent";
@@ -88,9 +88,7 @@ export default function DashboardShell({
             <PanelLeft className="h-4 w-4" />
           </Button>
           <div className="flex items-center gap-2 px-1">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-bold">
-              S
-            </div>
+            <Code2 className="h-5 w-5" />
             <span className="font-semibold text-foreground">DevStash</span>
           </div>
         </div>
