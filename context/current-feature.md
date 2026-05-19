@@ -1,32 +1,16 @@
-# Current Feature: Homepage
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Replace `app/page.tsx` placeholder with the full marketing homepage from the `prototypes/homepage/` prototype
-- Implement all sections: Navbar, Hero, Features, AI (Pro), Pricing, CTA, Footer
-- `ChaosAnimation` client component with `requestAnimationFrame` particle system and cursor repulsion
-- `PricingToggle` client component with monthly/yearly switch updating displayed price ($8/mo → $6/mo)
-- `FadeIn` client wrapper using `IntersectionObserver` for scroll animations
-- All nav/CTA links wired: `/sign-in`, `/register`, `#features`, `#pricing`
-- Responsive layout: mobile hamburger menu, 2-col → 3-col grids
-- Tailwind v4 utility classes only — no custom CSS files (fade-in CSS goes in `globals.css`)
-- Build passes, no TypeScript errors
+<!-- Add goals here -->
 
 ## Notes
 
-- Route: `/` → `app/page.tsx` (public, no auth required)
-- Component files live in `components/homepage/`
-- Client components: `Navbar`, `ChaosAnimation`, `PricingToggle`, `FadeIn`
-- Server components: `app/page.tsx`, `HeroSection`, `DashboardMockup`, `FeaturesSection`, `AiSection`, `PricingSection`, `CtaSection`, `Footer`
-- Prototype reference: `prototypes/homepage/index.html` + `prototypes/homepage/script.js`
-- Styling: `bg-background`/`bg-card` for alternating sections, gradient text `from-blue-500 to-indigo-500`, ShadCN `Button` and `Card`
-- Pricing: Free ($0) and Pro ($8/mo monthly, $6/mo yearly with "Save 25%" badge)
-- Footer copyright year rendered server-side via `new Date().getFullYear()`
-- Check `context/features/add-pro-badge-to-sidebar.md` for existing ProBadge component
+<!-- Add notes here -->
 
 ## History
 
@@ -82,3 +66,4 @@ In Progress
 48. Favorites Page Sorting: FavoritesContent client component replaces FavoritesItemsList and inline collection rendering; owns sort state (default: Date) and ItemDrawer state; three sort buttons (Name/Date/Type) in page header with active highlight; items sort by title/updatedAt/itemType.name+title; collections sort by name/updatedAt/name; in-memory Array.sort via useMemo — no DB changes; FavoritesPage simplified to thin data-fetch shell
 49. Pinned Items: togglePinItem server action flips isPinned with userId ownership check; Pin button in DrawerActionBar wired with optimistic state flip + router.refresh() via togglingPin state in useItemDrawer; getItemsByTypeSlug orders by [isPinned desc, createdAt desc] so pinned items float to top; 4 new tests for togglePinItem
 50. Homepage Mockup: pure HTML/CSS/JS marketing page at prototypes/homepage/; chaos-to-order hero with 8 floating app icons (requestAnimationFrame, wall bounce, mouse repulsion) → pulsing SVG arrow → dashboard preview mockup; fixed navbar with scroll opacity; features grid (6 cards with type accent colors); AI Pro section with code editor mockup and AI-generated tags demo; pricing section with monthly/yearly toggle ($8/$6/mo); CTA section and footer with dynamic year; scroll fade-in via IntersectionObserver; fully responsive with vertical stacking and 90° arrow rotation on mobile
+51. Homepage: replaced app/page.tsx placeholder with full Next.js marketing homepage; 12 components in components/homepage/ — Navbar (scroll opacity + hamburger, buttonVariants pattern), ChaosAnimation (rAF particle system + cursor repulsion, IntersectionObserver pause), DashboardMockup (static server component), HeroSection (column layout, text + visual), FeaturesSection (6-card Lucide icon grid), AiSection (code editor mockup + checklist), PricingToggle (monthly/yearly div toggle + card hover lift effects), PricingSection, CtaSection, Footer (server-side year), FadeIn (IntersectionObserver wrapper); fade-in CSS added to globals.css; all links wired to /sign-in, /register, #features, #pricing
