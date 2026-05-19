@@ -85,7 +85,7 @@ export default function Navbar() {
           </a>
           <Link
             href="/sign-in"
-            className="text-sm hover:text-foreground transition-colors"
+            className="block py-2 text-sm hover:text-foreground transition-colors"
             onClick={() => setMenuOpen(false)}
           >
             Sign In

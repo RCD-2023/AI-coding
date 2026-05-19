@@ -25,7 +25,7 @@ export default function AiSection() {
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16">
         {/* Left */}
         <FadeIn className="flex-1">
-          <span className="inline-block text-xs font-semibold tracking-wider text-indigo-400 border border-indigo-500/40 bg-indigo-500/10 px-3 py-1 rounded-full mb-6">
+          <span className="inline-block text-xs font-semibold tracking-wider text-blue-400 border border-blue-500/40 bg-blue-500/10 px-3 py-1 rounded-full mb-6">
             Pro Feature
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">

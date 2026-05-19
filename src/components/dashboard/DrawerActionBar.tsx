@@ -1,6 +1,7 @@
 "use client";
 
-import { Copy, Download, Edit, Pin, Star, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Check, Copy, Download, Edit, Pin, Star, Trash2 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { ItemDetail } from "@/lib/db/items";
 import type { EditForm } from "@/components/dashboard/hooks/useItemDrawer";
@@ -40,6 +41,15 @@ export function DrawerActionBar({
   onFavorite,
   onPin,
 }: DrawerActionBarProps) {
+  const [copied, setCopied] = useState(false);
+  const copyValue = item.content ?? item.url;
+
+  function handleCopy() {
+    if (!copyValue) return;
+    navigator.clipboard.writeText(copyValue);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
   if (isEditing) {
     return (
       <div className="flex items-center justify-end gap-2 border-b px-4 py-2">
@@ -80,9 +90,15 @@ export function DrawerActionBar({
       >
         <Pin className={`h-4 w-4 ${item.isPinned ? "fill-foreground" : ""}`} />
       </Button>
-      <Button variant="ghost" size="icon-sm" title="Copy">
-        <Copy className="h-4 w-4" />
-      </Button>
+      {copyValue && (
+        <Button variant="ghost" size="icon-sm" title="Copy" onClick={handleCopy}>
+          {copied ? (
+            <Check className="h-4 w-4 text-green-500" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
+        </Button>
+      )}
       {showFile && itemId && (
         <a
           href={`/api/items/${itemId}/download`}

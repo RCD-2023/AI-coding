@@ -66,7 +66,7 @@ export default function FeaturesSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((f) => (
             <FadeIn key={f.title}>
-              <div className="border border-border rounded-xl p-6 bg-card h-full hover:border-border/80 transition-colors">
+              <div className="border border-border rounded-xl p-6 bg-card h-full hover:border-border hover:bg-accent/5 transition-colors">
                 <div
                   className="w-10 h-10 rounded-lg flex items-center justify-center mb-4"
                   style={{ background: f.bgOpacity, color: f.color }}

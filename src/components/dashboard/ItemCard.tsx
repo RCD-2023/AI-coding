@@ -61,9 +61,9 @@ export default function ItemCard({ item }: { item: ItemForCard }) {
           )}
           <div className="flex flex-wrap items-center gap-1">
             <Badge
-              variant="secondary"
+              variant="outline"
               className="px-1.5 py-0 text-xs"
-              style={{ color }}
+              style={{ color, borderColor: `${color}60` }}
             >
               {item.itemType.name}
             </Badge>
@@ -87,7 +87,7 @@ export default function ItemCard({ item }: { item: ItemForCard }) {
           <button
             type="button"
             onClick={handleCopy}
-            className="absolute bottom-3 right-3 rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+            className="absolute bottom-3 right-3 rounded p-0.5 text-muted-foreground transition-opacity hover:text-foreground opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
             aria-label="Copy content"
           >
             {copied ? (

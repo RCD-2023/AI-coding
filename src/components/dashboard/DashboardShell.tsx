@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { Menu, PanelLeft, Plus, Search, Star } from "lucide-react";
+import { FolderPlus, Menu, PanelLeft, Plus, Search, Star } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import SidebarContent from "./SidebarContent";
@@ -66,9 +66,9 @@ export default function DashboardShell({
     <EditorPreferencesProvider initial={initialEditorPrefs}>
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="flex h-14 shrink-0 items-center border-b border-border bg-card px-4">
+      <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border bg-card px-4">
         {/* Logo + toggle */}
-        <div className="flex w-60 shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1 md:w-60">
           {/* Mobile toggle */}
           <Button
             variant="ghost"
@@ -95,8 +95,8 @@ export default function DashboardShell({
           </div>
         </div>
 
-        {/* Search — centered */}
-        <div className="flex flex-1 justify-center">
+        {/* Search — desktop only, centered */}
+        <div className="hidden flex-1 justify-center md:flex">
           <div
             className="relative flex w-full max-w-sm cursor-pointer items-center"
             onClick={() => setPaletteOpen(true)}
@@ -114,20 +114,58 @@ export default function DashboardShell({
         </div>
 
         {/* Actions */}
-        <div className="flex w-60 shrink-0 items-center justify-end gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-2 md:ml-0 md:w-60 md:justify-end">
+          {/* Search icon — mobile only */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 md:hidden"
+            onClick={() => setPaletteOpen(true)}
+          >
+            <Search className="h-4 w-4" />
+          </Button>
           <Link
             href="/favorites"
             className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
           >
             <Star className="h-4 w-4" />
           </Link>
-          <Button variant="outline" size="sm" onClick={() => setCreateCollectionOpen(true)}>
+          {/* New Collection — desktop only */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="hidden md:flex"
+            onClick={() => setCreateCollectionOpen(true)}
+          >
             <Plus className="mr-1 h-4 w-4" />
             New Collection
           </Button>
-          <Button size="sm" onClick={() => setCreateItemOpen(true)}>
+          {/* New Item — full label on desktop, icon-only on mobile */}
+          <Button
+            size="sm"
+            className="hidden md:flex"
+            onClick={() => setCreateItemOpen(true)}
+          >
             <Plus className="mr-1 h-4 w-4" />
             New Item
+          </Button>
+          {/* Mobile icon-only buttons */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 md:hidden"
+            onClick={() => setCreateCollectionOpen(true)}
+            title="New Collection"
+          >
+            <FolderPlus className="h-4 w-4" />
+          </Button>
+          <Button
+            size="icon"
+            className="h-8 w-8 md:hidden"
+            onClick={() => setCreateItemOpen(true)}
+            title="New Item"
+          >
+            <Plus className="h-4 w-4" />
           </Button>
         </div>
       </header>

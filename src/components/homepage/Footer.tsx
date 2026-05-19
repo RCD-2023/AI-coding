@@ -6,26 +6,26 @@ const LINKS = [
     items: [
       { label: "Features", href: "#features" },
       { label: "Pricing", href: "#pricing" },
-      { label: "Changelog", href: "#" },
-      { label: "Roadmap", href: "#" },
+      { label: "Changelog", href: null },
+      { label: "Roadmap", href: null },
     ],
   },
   {
     heading: "Resources",
     items: [
-      { label: "Documentation", href: "#" },
-      { label: "Blog", href: "#" },
-      { label: "API", href: "#" },
-      { label: "Status", href: "#" },
+      { label: "Documentation", href: null },
+      { label: "Blog", href: null },
+      { label: "API", href: null },
+      { label: "Status", href: null },
     ],
   },
   {
     heading: "Company",
     items: [
-      { label: "About", href: "#" },
-      { label: "Privacy", href: "#" },
-      { label: "Terms", href: "#" },
-      { label: "Contact", href: "#" },
+      { label: "About", href: null },
+      { label: "Privacy", href: null },
+      { label: "Terms", href: null },
+      { label: "Contact", href: null },
     ],
   },
 ];
@@ -56,12 +56,18 @@ export default function Footer() {
                 <ul className="flex flex-col gap-2">
                   {col.items.map((item) => (
                     <li key={item.label}>
-                      <a
-                        href={item.href}
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        {item.label}
-                      </a>
+                      {item.href ? (
+                        <a
+                          href={item.href}
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <span className="text-sm text-muted-foreground/50 cursor-default">
+                          {item.label}
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>

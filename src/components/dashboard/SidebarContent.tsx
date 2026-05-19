@@ -84,7 +84,7 @@ export default function SidebarContent({
             <ChevronDown
               className={cn(
                 "h-3 w-3 transition-transform duration-200",
-                collectionsOpen ? "rotate-0" : "-rotate-90"
+                collectionsOpen ? "rotate-0" : "rotate-90"
               )}
             />
           </button>
@@ -189,12 +189,6 @@ export default function SidebarContent({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link
-            href="/settings"
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            <Settings className="h-4 w-4" />
-          </Link>
         </div>
       </div>
     </div>
