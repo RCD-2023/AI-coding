@@ -9,6 +9,7 @@ import {
   deleteCollectionInDb,
   getCollectionsForSelector,
 } from "@/lib/db/collections";
+import { FREE_COLLECTIONS_LIMIT } from "@/lib/constants";
 
 const createCollectionSchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
@@ -30,6 +31,20 @@ export async function createCollection(raw: {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "Unauthorized" };
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { isPro: true },
+  });
+  if (!dbUser?.isPro) {
+    const collectionCount = await prisma.collection.count({ where: { userId: session.user.id } });
+    if (collectionCount >= FREE_COLLECTIONS_LIMIT) {
+      return {
+        success: false,
+        error: `Free plan is limited to ${FREE_COLLECTIONS_LIMIT} collections. Upgrade to Pro for unlimited collections.`,
+      };
+    }
   }
 
   const parsed = createCollectionSchema.safeParse(raw);

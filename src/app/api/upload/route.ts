@@ -3,6 +3,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 import path from "path";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { r2, R2_BUCKET, R2_PUBLIC_URL } from "@/lib/r2";
 
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"]);
@@ -28,6 +29,17 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { isPro: true },
+  });
+  if (!dbUser?.isPro) {
+    return NextResponse.json(
+      { error: "File uploads require a Pro subscription." },
+      { status: 403 }
+    );
   }
 
   let formData: FormData;
