@@ -105,11 +105,17 @@ export function BillingContent({
   const [portalPending, startPortal] = useTransition()
 
   function handleUpgrade(priceId: string) {
-    startCheckout(() => createCheckoutSession(priceId))
+    startCheckout(async () => {
+      const { url } = await createCheckoutSession(priceId)
+      window.location.href = url
+    })
   }
 
   function handleManageBilling() {
-    startPortal(() => createBillingPortalSession())
+    startPortal(async () => {
+      const { url } = await createBillingPortalSession()
+      window.location.href = url
+    })
   }
 
   return (

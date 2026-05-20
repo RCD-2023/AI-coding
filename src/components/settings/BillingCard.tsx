@@ -36,7 +36,10 @@ export function BillingCard({ isPro, hasSubscription, monthlyPriceId, yearlyPric
               variant="outline"
               size="sm"
               disabled={portalPending}
-              onClick={() => startPortal(() => createBillingPortalSession())}
+              onClick={() => startPortal(async () => {
+                const { url } = await createBillingPortalSession()
+                window.location.href = url
+              })}
             >
               {portalPending ? "Opening…" : "Manage"}
             </Button>
@@ -70,7 +73,10 @@ export function BillingCard({ isPro, hasSubscription, monthlyPriceId, yearlyPric
           size="sm"
           className="flex-1"
           disabled={checkoutPending}
-          onClick={() => startCheckout(() => createCheckoutSession(monthlyPriceId))}
+          onClick={() => startCheckout(async () => {
+            const { url } = await createCheckoutSession(monthlyPriceId)
+            window.location.href = url
+          })}
         >
           <Zap className="mr-1.5 h-3.5 w-3.5" />
           {checkoutPending ? "Redirecting…" : "Monthly — $8/mo"}
@@ -80,7 +86,10 @@ export function BillingCard({ isPro, hasSubscription, monthlyPriceId, yearlyPric
           variant="outline"
           className="flex-1"
           disabled={checkoutPending}
-          onClick={() => startCheckout(() => createCheckoutSession(yearlyPriceId))}
+          onClick={() => startCheckout(async () => {
+            const { url } = await createCheckoutSession(yearlyPriceId)
+            window.location.href = url
+          })}
         >
           <Zap className="mr-1.5 h-3.5 w-3.5" />
           {checkoutPending ? "Redirecting…" : "Annual — $72/yr"}

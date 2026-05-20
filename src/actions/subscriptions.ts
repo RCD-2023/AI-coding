@@ -23,7 +23,7 @@ async function getOrCreateStripeCustomer(userId: string, email: string): Promise
   return customer.id
 }
 
-export async function createCheckoutSession(priceId: string): Promise<void> {
+export async function createCheckoutSession(priceId: string): Promise<{ url: string }> {
   const session = await auth()
   if (!session?.user?.id || !session.user.email) redirect("/sign-in")
 
@@ -41,10 +41,10 @@ export async function createCheckoutSession(priceId: string): Promise<void> {
     },
   })
 
-  redirect(checkout.url!)
+  return { url: checkout.url! }
 }
 
-export async function createBillingPortalSession(): Promise<void> {
+export async function createBillingPortalSession(): Promise<{ url: string }> {
   const session = await auth()
   if (!session?.user?.id) redirect("/sign-in")
 
@@ -60,5 +60,5 @@ export async function createBillingPortalSession(): Promise<void> {
     return_url: `${process.env.AUTH_URL}/billing`,
   })
 
-  redirect(portal.url)
+  return { url: portal.url }
 }
