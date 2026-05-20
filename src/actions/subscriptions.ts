@@ -23,42 +23,56 @@ async function getOrCreateStripeCustomer(userId: string, email: string): Promise
   return customer.id
 }
 
-export async function createCheckoutSession(priceId: string): Promise<{ url: string }> {
-  const session = await auth()
-  if (!session?.user?.id || !session.user.email) redirect("/sign-in")
+export async function createCheckoutSession(
+  priceId: string
+): Promise<{ url: string } | { error: string }> {
+  try {
+    const session = await auth()
+    if (!session?.user?.id || !session.user.email) redirect("/sign-in")
 
-  const customerId = await getOrCreateStripeCustomer(session.user.id, session.user.email)
+    const customerId = await getOrCreateStripeCustomer(session.user.id, session.user.email)
 
-  const checkout = await stripe.checkout.sessions.create({
-    customer: customerId,
-    mode: "subscription",
-    line_items: [{ price: priceId, quantity: 1 }],
-    metadata: { userId: session.user.id },
-    success_url: `${process.env.AUTH_URL}/billing?success=true`,
-    cancel_url: `${process.env.AUTH_URL}/billing`,
-    subscription_data: {
+    const checkout = await stripe.checkout.sessions.create({
+      customer: customerId,
+      mode: "subscription",
+      line_items: [{ price: priceId, quantity: 1 }],
       metadata: { userId: session.user.id },
-    },
-  })
+      success_url: `${process.env.AUTH_URL}/billing?success=true`,
+      cancel_url: `${process.env.AUTH_URL}/billing`,
+      subscription_data: {
+        metadata: { userId: session.user.id },
+      },
+    })
 
-  return { url: checkout.url! }
+    return { url: checkout.url! }
+  } catch (err) {
+    console.error("createCheckoutSession error:", err)
+    const message = err instanceof Error ? err.message : "Failed to create checkout session"
+    return { error: message }
+  }
 }
 
-export async function createBillingPortalSession(): Promise<{ url: string }> {
-  const session = await auth()
-  if (!session?.user?.id) redirect("/sign-in")
+export async function createBillingPortalSession(): Promise<{ url: string } | { error: string }> {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) redirect("/sign-in")
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { stripeCustomerId: true },
-  })
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { stripeCustomerId: true },
+    })
 
-  if (!user?.stripeCustomerId) redirect("/billing")
+    if (!user?.stripeCustomerId) redirect("/billing")
 
-  const portal = await stripe.billingPortal.sessions.create({
-    customer: user.stripeCustomerId,
-    return_url: `${process.env.AUTH_URL}/billing`,
-  })
+    const portal = await stripe.billingPortal.sessions.create({
+      customer: user.stripeCustomerId,
+      return_url: `${process.env.AUTH_URL}/billing`,
+    })
 
-  return { url: portal.url }
+    return { url: portal.url }
+  } catch (err) {
+    console.error("createBillingPortalSession error:", err)
+    const message = err instanceof Error ? err.message : "Failed to open billing portal"
+    return { error: message }
+  }
 }

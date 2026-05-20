@@ -1,6 +1,7 @@
 "use client"
 
 import { useTransition } from "react"
+import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { createCheckoutSession, createBillingPortalSession } from "@/actions/subscriptions"
@@ -37,8 +38,9 @@ export function BillingCard({ isPro, hasSubscription, monthlyPriceId, yearlyPric
               size="sm"
               disabled={portalPending}
               onClick={() => startPortal(async () => {
-                const { url } = await createBillingPortalSession()
-                window.location.href = url
+                const result = await createBillingPortalSession()
+                if ("error" in result) { toast.error(result.error); return }
+                window.location.href = result.url
               })}
             >
               {portalPending ? "Opening…" : "Manage"}
@@ -74,8 +76,9 @@ export function BillingCard({ isPro, hasSubscription, monthlyPriceId, yearlyPric
           className="flex-1"
           disabled={checkoutPending}
           onClick={() => startCheckout(async () => {
-            const { url } = await createCheckoutSession(monthlyPriceId)
-            window.location.href = url
+            const result = await createCheckoutSession(monthlyPriceId)
+            if ("error" in result) { toast.error(result.error); return }
+            window.location.href = result.url
           })}
         >
           <Zap className="mr-1.5 h-3.5 w-3.5" />
@@ -87,8 +90,9 @@ export function BillingCard({ isPro, hasSubscription, monthlyPriceId, yearlyPric
           className="flex-1"
           disabled={checkoutPending}
           onClick={() => startCheckout(async () => {
-            const { url } = await createCheckoutSession(yearlyPriceId)
-            window.location.href = url
+            const result = await createCheckoutSession(yearlyPriceId)
+            if ("error" in result) { toast.error(result.error); return }
+            window.location.href = result.url
           })}
         >
           <Zap className="mr-1.5 h-3.5 w-3.5" />

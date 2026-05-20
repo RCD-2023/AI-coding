@@ -1,6 +1,7 @@
 "use client"
 
 import { useTransition } from "react"
+import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -106,15 +107,17 @@ export function BillingContent({
 
   function handleUpgrade(priceId: string) {
     startCheckout(async () => {
-      const { url } = await createCheckoutSession(priceId)
-      window.location.href = url
+      const result = await createCheckoutSession(priceId)
+      if ("error" in result) { toast.error(result.error); return }
+      window.location.href = result.url
     })
   }
 
   function handleManageBilling() {
     startPortal(async () => {
-      const { url } = await createBillingPortalSession()
-      window.location.href = url
+      const result = await createBillingPortalSession()
+      if ("error" in result) { toast.error(result.error); return }
+      window.location.href = result.url
     })
   }
 
