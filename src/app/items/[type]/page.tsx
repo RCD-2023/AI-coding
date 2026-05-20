@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { auth } from "@/auth";
 import { getItemsByTypeSlug } from "@/lib/db/items";
 import { ITEMS_PER_PAGE } from "@/lib/constants";
@@ -6,7 +7,11 @@ import { iconMap } from "@/lib/icon-map";
 import ItemsWithDrawer from "@/components/dashboard/ItemsWithDrawer";
 import AddItemButton from "@/components/dashboard/AddItemButton";
 import PaginationControls from "@/components/dashboard/PaginationControls";
+import { buttonVariants } from "@/components/ui/button";
+import { Lock, Zap } from "lucide-react";
 import type { TypeSlug } from "@/components/dashboard/CreateItemDialog";
+
+const PRO_ONLY_TYPES = new Set(["files", "images"]);
 
 const DIALOG_TYPE_SLUGS = new Set<string>(["snippet", "prompt", "command", "note", "link", "file", "image"]);
 
@@ -23,6 +28,28 @@ export default async function ItemsTypePage({
 
   const session = await auth();
   const userId = session?.user?.id ?? "";
+  const isPro = session?.user?.isPro ?? false;
+
+  if (PRO_ONLY_TYPES.has(type) && !isPro) {
+    const label = type === "images" ? "Images" : "Files";
+    return (
+      <div className="flex flex-col items-center justify-center gap-6 p-6 text-center" style={{ minHeight: "60vh" }}>
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <Lock className="h-8 w-8 text-primary" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-foreground">{label} are a Pro feature</h1>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            Upgrade to Pro to upload and manage {label.toLowerCase()}, plus get unlimited items and collections.
+          </p>
+        </div>
+        <Link href="/billing" className={buttonVariants()}>
+          <Zap className="mr-2 h-4 w-4" />
+          Upgrade to Pro
+        </Link>
+      </div>
+    );
+  }
 
   const result = userId ? await getItemsByTypeSlug(userId, type, page) : null;
 

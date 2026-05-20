@@ -134,7 +134,7 @@ export function BillingContent({
                   </p>
                 </div>
               </div>
-              <Badge variant="outline" className="border-primary text-primary">
+              <Badge variant="outline" className="border-blue-500 text-blue-500">
                 Pro
               </Badge>
             </CardContent>
