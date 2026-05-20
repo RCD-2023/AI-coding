@@ -1,30 +1,16 @@
-# Current Feature: Stripe Phase 2 — Webhooks, Feature Gating & Billing UI
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Webhook handler at `/api/webhooks/stripe` that verifies Stripe signature and handles subscription lifecycle events (`checkout.session.completed`, `customer.subscription.created/updated/deleted`)
-- `createCheckoutSession(priceId)` and `createBillingPortalSession()` server actions in `src/actions/subscriptions.ts`
-- Pro gate on file/image uploads in `src/app/api/upload/route.ts` — free users get 403
-- Free-tier item limit check (50 items) in `createItem` server action
-- Free-tier collection limit check (3 collections) in `createCollection` server action
-- `/billing` page (Server Component) with `BillingContent` (Client Component): usage bars + pricing cards for free users, "Pro Plan Active" + manage billing button for Pro users
-- "Billing" link added to sidebar user dropdown
-- `/billing` added to proxy auth matcher
+<!-- Add goals here -->
 
 ## Notes
 
-- Raw body required for webhooks: use `req.text()` not `req.json()` or Stripe signature validation fails
-- `userId` must be in `subscription_data.metadata` during checkout so the webhook can find the user
-- `checkout.session.completed` is the authoritative first-upgrade event; `subscription.updated` handles subsequent state changes
-- Fallback: if `sub.metadata?.userId` is missing, look up user by `stripeCustomerId`
-- Error strings are user-facing — make them descriptive enough to prompt upgrade
-- One new env var: `STRIPE_WEBHOOK_SECRET` (use CLI-provided `whsec_...` secret for local testing)
-- Full code reference in `docs/stripe-integration-plan.md`
-- Requires Stripe CLI running locally for end-to-end testing: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
+<!-- Add notes here -->
 
 ## History
 
@@ -84,3 +70,4 @@ In Progress
 52. UI/UX Bug Fixes: 18 fixes across 14 files from ui-reviewer audit — DrawerActionBar copy button wired to clipboard; mobile New Collection button (FolderPlus) added to DashboardShell; ItemCard copy button always visible on mobile; hero/CTA headings use blue-500 text; FadeIn removed from above-fold hero text; PricingToggle aria-labelledby + green-300 badge contrast; SignInForm Code2 logo + forgot-password tap target; sidebar chevron rotates right when closed; duplicate gear icon removed; footer dead links rendered as spans; mobile Navbar Sign In tap target; feature card hover tint; AiSection Pro badge blue-400; stat card icons colored per type; CollectionCard 3-dot trigger h-8 w-8; ItemCard type badge variant="outline"
 53. Consistent Navbar & Branding: homepage Navbar added to (auth)/layout.tsx (sign-in, register, forgot-password, reset-password, check-email, verify-email) with pt-20 offset for fixed nav; DashboardShell S placeholder box replaced with Code2 icon matching homepage logo treatment
 54. Stripe Phase 1 — Core Infrastructure: installed Stripe SDK, created stripe singleton (src/lib/stripe.ts), added isPro to JWT/session callbacks (DB-synced on every session read), FREE_ITEMS_LIMIT=50 and FREE_COLLECTIONS_LIMIT=3 constants, checkItemLimit/checkCollectionLimit helpers in src/lib/usage-limits.ts, 8 unit tests
+55. Stripe Phase 2 — Webhooks, Feature Gating & Billing UI: webhook handler at /api/webhooks/stripe (signature verification, checkout.session.completed reads userId from session metadata, subscription.updated/deleted toggles isPro); createCheckoutSession and createBillingPortalSession server actions in src/actions/subscriptions.ts; Pro gate on file/image uploads (403); free-tier limit checks in createItem (50 items) and createCollection (3 collections) with user-facing upgrade prompts; /billing page with DashboardShell layout — free users see usage bars + monthly ($8) and annual ($72) pricing cards, Pro users see status + manage billing button; Billing link added to sidebar dropdown; /billing added to proxy auth matcher; upload and collections tests updated for new prisma mocks
