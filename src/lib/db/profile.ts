@@ -26,18 +26,30 @@ export type ProfileData = {
 
 export async function getSettingsData(
   userId: string
-): Promise<{ isOAuth: boolean; editorPreferences: EditorPreferences } | null> {
+): Promise<{
+  isOAuth: boolean;
+  editorPreferences: EditorPreferences;
+  isPro: boolean;
+  stripeSubscriptionId: string | null;
+  stripeCustomerId: string | null;
+} | null> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
       accounts: { select: { id: true }, take: 1 },
       editorPreferences: true,
+      isPro: true,
+      stripeSubscriptionId: true,
+      stripeCustomerId: true,
     },
   });
   if (!user) return null;
   return {
     isOAuth: user.accounts.length > 0,
     editorPreferences: parseEditorPreferences(user.editorPreferences),
+    isPro: user.isPro,
+    stripeSubscriptionId: user.stripeSubscriptionId,
+    stripeCustomerId: user.stripeCustomerId,
   };
 }
 

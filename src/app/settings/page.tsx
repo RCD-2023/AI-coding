@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ChangePasswordDialog } from "@/components/profile/ChangePasswordDialog";
 import { DeleteAccountDialog } from "@/components/profile/DeleteAccountDialog";
 import { EditorPreferencesForm } from "@/components/settings/EditorPreferencesForm";
+import { BillingCard } from "@/components/settings/BillingCard";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -55,6 +56,20 @@ export default async function SettingsPage() {
               </div>
               <DeleteAccountDialog />
             </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-lg font-semibold text-foreground">Billing</h2>
+        <Card>
+          <CardContent className="p-6">
+            <BillingCard
+              isPro={data.isPro}
+              hasSubscription={!!data.stripeSubscriptionId}
+              monthlyPriceId={process.env.STRIPE_PRICE_ID_MONTHLY ?? ""}
+              yearlyPriceId={process.env.STRIPE_PRICE_ID_YEARLY ?? ""}
+            />
           </CardContent>
         </Card>
       </section>
