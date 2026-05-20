@@ -2,6 +2,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/auth", () => ({ auth: vi.fn() }));
 
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    user: { findUnique: vi.fn() },
+  },
+}));
+
 vi.mock("@/lib/r2", () => ({
   r2: { send: vi.fn() },
   R2_BUCKET: "test-bucket",
@@ -13,10 +19,12 @@ vi.mock("@aws-sdk/client-s3", () => ({
 }));
 
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { r2 } from "@/lib/r2";
 import { POST } from "@/app/api/upload/route";
 
 const mockAuth = vi.mocked(auth);
+const mockUserFindUnique = vi.mocked(prisma.user.findUnique);
 const mockR2Send = vi.mocked(r2.send);
 
 function makeRequest(file: File | null, itemType: string): Request {
@@ -35,6 +43,8 @@ const PNG_BAD_MIME = new File(["bytes"], "photo.png", { type: "application/octet
 beforeEach(() => {
   vi.clearAllMocks();
   mockR2Send.mockResolvedValue({} as never);
+  // Default: Pro user so existing upload tests are unaffected
+  mockUserFindUnique.mockResolvedValue({ isPro: true } as never);
 });
 
 describe("POST /api/upload", () => {
@@ -46,6 +56,16 @@ describe("POST /api/upload", () => {
     expect(res.status).toBe(401);
     const body = await res.json();
     expect(body.error).toBe("Unauthorized");
+  });
+
+  it("returns 403 when user is not Pro", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "user-1" } } as never);
+    mockUserFindUnique.mockResolvedValue({ isPro: false } as never);
+
+    const res = await POST(makeRequest(PNG, "image"));
+
+    expect(res.status).toBe(403);
+    expect((await res.json()).error).toContain("Pro subscription");
   });
 
   it("returns 400 when no file field is present", async () => {

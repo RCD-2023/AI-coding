@@ -4,7 +4,11 @@ vi.mock("@/auth", () => ({ auth: vi.fn() }));
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    user: {
+      findUnique: vi.fn(),
+    },
     collection: {
+      count: vi.fn(),
       findFirst: vi.fn(),
       update: vi.fn(),
     },
@@ -27,6 +31,8 @@ const mockAuth = vi.mocked(auth);
 const mockCreate = vi.mocked(createCollectionInDb);
 const mockUpdate = vi.mocked(updateCollectionInDb);
 const mockDelete = vi.mocked(deleteCollectionInDb);
+const mockUserFindUnique = vi.mocked(prisma.user.findUnique);
+const mockCollectionCount = vi.mocked(prisma.collection.count);
 const mockFindFirst = vi.mocked(prisma.collection.findFirst);
 const mockPrismaUpdate = vi.mocked(prisma.collection.update);
 
@@ -37,6 +43,8 @@ beforeEach(() => {
   mockCreate.mockResolvedValue({} as never);
   mockUpdate.mockResolvedValue({} as never);
   mockDelete.mockResolvedValue({} as never);
+  // Default: Pro user — skips limit check so existing tests are unaffected
+  mockUserFindUnique.mockResolvedValue({ isPro: true } as never);
 });
 
 describe("createCollection — auth", () => {

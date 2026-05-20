@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { r2, R2_BUCKET, r2KeyFromUrl } from "@/lib/r2";
 import { createItemInDb, updateItemInDb } from "@/lib/db/items";
 import type { ItemDetail } from "@/lib/db/items";
+import { FREE_ITEMS_LIMIT } from "@/lib/constants";
 
 const FILE_TYPES = new Set(["file", "image"]);
 
@@ -95,6 +96,21 @@ export async function createItem(raw: {
     return { success: false, error: "Unauthorized" };
   }
 
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { isPro: true },
+  });
+
+  if (!dbUser?.isPro) {
+    const itemCount = await prisma.item.count({ where: { userId: session.user.id } });
+    if (itemCount >= FREE_ITEMS_LIMIT) {
+      return {
+        success: false,
+        error: `Free plan is limited to ${FREE_ITEMS_LIMIT} items. Upgrade to Pro for unlimited items.`,
+      };
+    }
+  }
+
   const parsed = createItemSchema.safeParse(raw);
   if (!parsed.success) {
     return {
@@ -113,6 +129,10 @@ export async function createItem(raw: {
   );
   if (!matched) {
     return { success: false, error: "Invalid item type" };
+  }
+
+  if (!dbUser?.isPro && FILE_TYPES.has(typeSlug)) {
+    return { success: false, error: "File and image uploads require a Pro subscription." };
   }
 
   let contentType: "TEXT" | "FILE" | "URL";

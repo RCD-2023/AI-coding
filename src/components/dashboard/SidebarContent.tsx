@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Settings, Star, User } from "lucide-react";
+import { ChevronDown, CreditCard, Settings, Star, User } from "lucide-react";
 import type { SidebarData } from "@/lib/db/sidebar";
 import type { SessionUser } from "@/components/dashboard/DashboardShell";
 import { iconMap } from "@/lib/icon-map";
@@ -180,6 +180,12 @@ export default function SidebarContent({
                 <Link href="/settings" className="flex w-full items-center gap-2">
                   <Settings className="h-4 w-4" />
                   Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="/billing" className="flex w-full items-center gap-2">
+                  <CreditCard className="h-4 w-4" />
+                  Billing
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

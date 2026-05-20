@@ -1,16 +1,30 @@
-# Current Feature
+# Current Feature: Stripe Phase 2 — Webhooks, Feature Gating & Billing UI
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Webhook handler at `/api/webhooks/stripe` that verifies Stripe signature and handles subscription lifecycle events (`checkout.session.completed`, `customer.subscription.created/updated/deleted`)
+- `createCheckoutSession(priceId)` and `createBillingPortalSession()` server actions in `src/actions/subscriptions.ts`
+- Pro gate on file/image uploads in `src/app/api/upload/route.ts` — free users get 403
+- Free-tier item limit check (50 items) in `createItem` server action
+- Free-tier collection limit check (3 collections) in `createCollection` server action
+- `/billing` page (Server Component) with `BillingContent` (Client Component): usage bars + pricing cards for free users, "Pro Plan Active" + manage billing button for Pro users
+- "Billing" link added to sidebar user dropdown
+- `/billing` added to proxy auth matcher
 
 ## Notes
 
-<!-- Add notes here -->
+- Raw body required for webhooks: use `req.text()` not `req.json()` or Stripe signature validation fails
+- `userId` must be in `subscription_data.metadata` during checkout so the webhook can find the user
+- `checkout.session.completed` is the authoritative first-upgrade event; `subscription.updated` handles subsequent state changes
+- Fallback: if `sub.metadata?.userId` is missing, look up user by `stripeCustomerId`
+- Error strings are user-facing — make them descriptive enough to prompt upgrade
+- One new env var: `STRIPE_WEBHOOK_SECRET` (use CLI-provided `whsec_...` secret for local testing)
+- Full code reference in `docs/stripe-integration-plan.md`
+- Requires Stripe CLI running locally for end-to-end testing: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
 
 ## History
 
