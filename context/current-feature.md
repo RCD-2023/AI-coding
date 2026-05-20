@@ -1,37 +1,16 @@
-# Current Feature: Stripe Integration Phase 1 — Core Infrastructure
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-- Install `stripe` npm package
-- Create `src/lib/stripe.ts` — Stripe client singleton
-- Add `isPro: boolean` to `src/types/next-auth.d.ts` session type
-- Update `src/auth.ts` JWT + session callbacks to always sync and expose `isPro`
-- Add `FREE_ITEMS_LIMIT = 50` and `FREE_COLLECTIONS_LIMIT = 3` to `src/lib/constants.ts`
-- Create `src/lib/usage-limits.ts` with `checkItemLimit` and `checkCollectionLimit` helpers
-- Write unit tests for `src/lib/usage-limits.ts`
-- All tests pass (`npm run test:run`) and build succeeds (`npm run build`)
+<!-- Add goals here -->
 
 ## Notes
 
-- No webhooks, no UI, no Stripe Dashboard work — pure infrastructure for Phase 2
-- JWT callback adds one `SELECT isPro` query per session validation (intentional — picks up webhook-triggered changes on next page load)
-- `usage-limits.ts` is a pure DB layer (no auth logic) — makes mocking easy
-- `STRIPE_SECRET_KEY` is already in `.env` — no new env vars needed
-- Branch: `feature/stripe-phase-1`
-
-### Files to Create
-1. `src/lib/stripe.ts`
-2. `src/lib/usage-limits.ts`
-3. `src/lib/__tests__/usage-limits.test.ts`
-
-### Files to Modify
-1. `src/types/next-auth.d.ts` — add `isPro: boolean` to `Session.user`
-2. `src/auth.ts` — update JWT and session callbacks
-3. `src/lib/constants.ts` — add free tier limits
+<!-- Add notes here -->
 
 ## History
 
@@ -90,3 +69,4 @@ In Progress
 51. Homepage: replaced app/page.tsx placeholder with full Next.js marketing homepage; 12 components in components/homepage/ — Navbar (scroll opacity + hamburger, buttonVariants pattern), ChaosAnimation (rAF particle system + cursor repulsion, IntersectionObserver pause), DashboardMockup (static server component), HeroSection (column layout, text + visual), FeaturesSection (6-card Lucide icon grid), AiSection (code editor mockup + checklist), PricingToggle (monthly/yearly div toggle + card hover lift effects), PricingSection, CtaSection, Footer (server-side year), FadeIn (IntersectionObserver wrapper); fade-in CSS added to globals.css; all links wired to /sign-in, /register, #features, #pricing
 52. UI/UX Bug Fixes: 18 fixes across 14 files from ui-reviewer audit — DrawerActionBar copy button wired to clipboard; mobile New Collection button (FolderPlus) added to DashboardShell; ItemCard copy button always visible on mobile; hero/CTA headings use blue-500 text; FadeIn removed from above-fold hero text; PricingToggle aria-labelledby + green-300 badge contrast; SignInForm Code2 logo + forgot-password tap target; sidebar chevron rotates right when closed; duplicate gear icon removed; footer dead links rendered as spans; mobile Navbar Sign In tap target; feature card hover tint; AiSection Pro badge blue-400; stat card icons colored per type; CollectionCard 3-dot trigger h-8 w-8; ItemCard type badge variant="outline"
 53. Consistent Navbar & Branding: homepage Navbar added to (auth)/layout.tsx (sign-in, register, forgot-password, reset-password, check-email, verify-email) with pt-20 offset for fixed nav; DashboardShell S placeholder box replaced with Code2 icon matching homepage logo treatment
+54. Stripe Phase 1 — Core Infrastructure: installed Stripe SDK, created stripe singleton (src/lib/stripe.ts), added isPro to JWT/session callbacks (DB-synced on every session read), FREE_ITEMS_LIMIT=50 and FREE_COLLECTIONS_LIMIT=3 constants, checkItemLimit/checkCollectionLimit helpers in src/lib/usage-limits.ts, 8 unit tests
