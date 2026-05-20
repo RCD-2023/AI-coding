@@ -1,16 +1,37 @@
-# Current Feature
+# Current Feature: Stripe Integration Phase 1 — Core Infrastructure
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Install `stripe` npm package
+- Create `src/lib/stripe.ts` — Stripe client singleton
+- Add `isPro: boolean` to `src/types/next-auth.d.ts` session type
+- Update `src/auth.ts` JWT + session callbacks to always sync and expose `isPro`
+- Add `FREE_ITEMS_LIMIT = 50` and `FREE_COLLECTIONS_LIMIT = 3` to `src/lib/constants.ts`
+- Create `src/lib/usage-limits.ts` with `checkItemLimit` and `checkCollectionLimit` helpers
+- Write unit tests for `src/lib/usage-limits.ts`
+- All tests pass (`npm run test:run`) and build succeeds (`npm run build`)
 
 ## Notes
 
-<!-- Add notes here -->
+- No webhooks, no UI, no Stripe Dashboard work — pure infrastructure for Phase 2
+- JWT callback adds one `SELECT isPro` query per session validation (intentional — picks up webhook-triggered changes on next page load)
+- `usage-limits.ts` is a pure DB layer (no auth logic) — makes mocking easy
+- `STRIPE_SECRET_KEY` is already in `.env` — no new env vars needed
+- Branch: `feature/stripe-phase-1`
+
+### Files to Create
+1. `src/lib/stripe.ts`
+2. `src/lib/usage-limits.ts`
+3. `src/lib/__tests__/usage-limits.test.ts`
+
+### Files to Modify
+1. `src/types/next-auth.d.ts` — add `isPro: boolean` to `Session.user`
+2. `src/auth.ts` — update JWT and session callbacks
+3. `src/lib/constants.ts` — add free tier limits
 
 ## History
 

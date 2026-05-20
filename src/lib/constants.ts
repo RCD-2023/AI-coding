@@ -1,3 +1,6 @@
+export const FREE_ITEMS_LIMIT = 50;
+export const FREE_COLLECTIONS_LIMIT = 3;
+
 export const ITEMS_PER_PAGE = 21;
 export const COLLECTIONS_PER_PAGE = 21;
 export const DASHBOARD_COLLECTIONS_LIMIT = 6;

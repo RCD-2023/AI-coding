@@ -22,10 +22,20 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     redirect: async ({ baseUrl }) => `${baseUrl}/dashboard`,
     jwt: async ({ token, user }) => {
       if (user) token.id = user.id
+
+      if (token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { isPro: true },
+        })
+        token.isPro = dbUser?.isPro ?? false
+      }
+
       return token
     },
     session: async ({ session, token }) => {
       session.user.id = token.id as string
+      session.user.isPro = token.isPro as boolean
       return session
     },
   },
