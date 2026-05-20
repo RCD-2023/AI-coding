@@ -5,6 +5,12 @@ import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { stripe } from "@/lib/stripe"
 
+function getBaseUrl() {
+  if (process.env.AUTH_URL) return process.env.AUTH_URL.replace(/\/$/, "")
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return "http://localhost:3000"
+}
+
 async function getOrCreateStripeCustomer(userId: string, email: string): Promise<string> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -37,8 +43,8 @@ export async function createCheckoutSession(
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       metadata: { userId: session.user.id },
-      success_url: `${process.env.AUTH_URL}/billing?success=true`,
-      cancel_url: `${process.env.AUTH_URL}/billing`,
+      success_url: `${getBaseUrl()}/billing?success=true`,
+      cancel_url: `${getBaseUrl()}/billing`,
       subscription_data: {
         metadata: { userId: session.user.id },
       },
@@ -66,7 +72,7 @@ export async function createBillingPortalSession(): Promise<{ url: string } | { 
 
     const portal = await stripe.billingPortal.sessions.create({
       customer: user.stripeCustomerId,
-      return_url: `${process.env.AUTH_URL}/billing`,
+      return_url: `${getBaseUrl()}/billing`,
     })
 
     return { url: portal.url }
