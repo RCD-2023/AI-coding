@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Code, File as FileIcon, FolderOpen, Image as ImageIcon, Link as LinkIcon, Sparkles, StickyNote, Tag, Terminal } from "lucide-react";
+import { Check, Code, File as FileIcon, FolderOpen, Image as ImageIcon, Link as LinkIcon, Loader2, Sparkles, StickyNote, Tag, Terminal, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +25,7 @@ import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { FileUpload } from "@/components/ui/file-upload";
 import type { UploadResult } from "@/components/ui/file-upload";
 import { createItem } from "@/actions/items";
+import { generateAutoTags } from "@/actions/ai";
 import { getUserCollectionsForSelector } from "@/actions/collections";
 import { CollectionMultiSelect } from "@/components/dashboard/CollectionMultiSelect";
 import { fieldLabel, FieldError } from "@/components/dashboard/form-helpers";
@@ -67,9 +68,10 @@ interface CreateItemDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultType?: TypeSlug;
+  isPro?: boolean;
 }
 
-export default function CreateItemDialog({ open, onOpenChange, defaultType }: CreateItemDialogProps) {
+export default function CreateItemDialog({ open, onOpenChange, defaultType, isPro = false }: CreateItemDialogProps) {
   const router = useRouter();
   const [selectedType, setSelectedType] = useState<TypeSlug>(defaultType ?? "snippet");
   const [form, setForm] = useState<CreateForm>(DEFAULT_FORM);
@@ -78,6 +80,8 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
   const [saving, setSaving] = useState(false);
   const [collectionIds, setCollectionIds] = useState<string[]>([]);
   const [userCollections, setUserCollections] = useState<{ id: string; name: string }[]>([]);
+  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -88,8 +92,38 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
       setUploadResult(null);
       setFieldErrors({});
       setCollectionIds([]);
+      setAiSuggestions([]);
+      setIsLoadingAI(false);
     }
   }, [open, defaultType]);
+
+  async function handleSuggestTags() {
+    setIsLoadingAI(true);
+    setAiSuggestions([]);
+    const result = await generateAutoTags({ title: form.title, content: form.content });
+    setIsLoadingAI(false);
+    if (result.success) {
+      const existing = form.tags
+        .split(",")
+        .map((t) => t.trim().toLowerCase())
+        .filter(Boolean);
+      const newTags = result.tags.filter((t) => !existing.includes(t));
+      setAiSuggestions(newTags);
+      if (newTags.length === 0) toast.info("No new tags to suggest.");
+    } else {
+      toast.error(result.error);
+    }
+  }
+
+  function acceptSuggestion(tag: string) {
+    const existing = form.tags.trim();
+    setField("tags", existing ? `${existing}, ${tag}` : tag);
+    setAiSuggestions((prev) => prev.filter((t) => t !== tag));
+  }
+
+  function rejectSuggestion(tag: string) {
+    setAiSuggestions((prev) => prev.filter((t) => t !== tag));
+  }
 
   function setField(key: keyof CreateForm, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -262,9 +296,28 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
 
           {/* Tags */}
           <div>
-            <div className="mb-1.5 flex items-center gap-1.5">
-              <Tag className="h-3 w-3 text-muted-foreground" />
-              {fieldLabel("Tags")}
+            <div className="mb-1.5 flex items-center justify-between gap-1.5">
+              <div className="flex items-center gap-1.5">
+                <Tag className="h-3 w-3 text-muted-foreground" />
+                {fieldLabel("Tags")}
+              </div>
+              {isPro && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={handleSuggestTags}
+                  disabled={isLoadingAI || !form.title.trim()}
+                >
+                  {isLoadingAI ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3 w-3" />
+                  )}
+                  {isLoadingAI ? "Suggesting…" : "Suggest Tags"}
+                </Button>
+              )}
             </div>
             <Input
               value={form.tags}
@@ -273,6 +326,34 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType }: Cr
               className="text-sm"
             />
             <p className="mt-1 text-xs text-muted-foreground">Comma-separated</p>
+            {aiSuggestions.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {aiSuggestions.map((tag) => (
+                  <span
+                    key={tag}
+                    className="flex items-center gap-0.5 rounded-full border bg-muted/50 px-2 py-0.5 text-xs"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => acceptSuggestion(tag)}
+                      className="ml-0.5 rounded-full p-0.5 text-green-500 hover:bg-green-500/10"
+                      title="Accept"
+                    >
+                      <Check className="h-3 w-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => rejectSuggestion(tag)}
+                      className="rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      title="Reject"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Collections */}

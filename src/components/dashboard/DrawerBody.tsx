@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { File as FileIcon, FolderOpen, Tag } from "lucide-react";
+import { Check, File as FileIcon, FolderOpen, Loader2, Sparkles, Tag, X } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CodeEditor } from "@/components/ui/code-editor";
@@ -10,6 +13,7 @@ import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { formatBytes } from "@/lib/utils";
 import { fieldLabel, FieldError } from "@/components/dashboard/form-helpers";
 import { CollectionMultiSelect } from "@/components/dashboard/CollectionMultiSelect";
+import { generateAutoTags } from "@/actions/ai";
 import type { ItemDetail } from "@/lib/db/items";
 import type { EditForm } from "@/components/dashboard/hooks/useItemDrawer";
 
@@ -27,6 +31,7 @@ interface DrawerBodyProps {
   userCollections: { id: string; name: string }[];
   collectionIds: string[];
   onCollectionIdsChange: (ids: string[]) => void;
+  isPro?: boolean;
 }
 
 export function DrawerBody({
@@ -43,7 +48,49 @@ export function DrawerBody({
   userCollections,
   collectionIds,
   onCollectionIdsChange,
+  isPro = false,
 }: DrawerBodyProps) {
+  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
+
+  useEffect(() => {
+    if (!isEditing) {
+      setAiSuggestions([]);
+      setIsLoadingAI(false);
+    }
+  }, [isEditing]);
+
+  async function handleSuggestTags() {
+    setIsLoadingAI(true);
+    setAiSuggestions([]);
+    const result = await generateAutoTags({
+      title: editForm.title,
+      content: editForm.content,
+    });
+    setIsLoadingAI(false);
+    if (result.success) {
+      const existing = editForm.tags
+        .split(",")
+        .map((t) => t.trim().toLowerCase())
+        .filter(Boolean);
+      const newTags = result.tags.filter((t) => !existing.includes(t));
+      setAiSuggestions(newTags);
+      if (newTags.length === 0) toast.info("No new tags to suggest.");
+    } else {
+      toast.error(result.error);
+    }
+  }
+
+  function acceptSuggestion(tag: string) {
+    const existing = editForm.tags.trim();
+    setField("tags", existing ? `${existing}, ${tag}` : tag);
+    setAiSuggestions((prev) => prev.filter((t) => t !== tag));
+  }
+
+  function rejectSuggestion(tag: string) {
+    setAiSuggestions((prev) => prev.filter((t) => t !== tag));
+  }
+
   return (
     <div className="flex flex-col gap-5 px-5 py-4">
       {/* Description */}
@@ -202,9 +249,28 @@ export function DrawerBody({
       {/* Tags */}
       {isEditing ? (
         <section>
-          <div className="mb-1.5 flex items-center gap-1.5">
-            <Tag className="h-3 w-3 text-muted-foreground" />
-            {fieldLabel("Tags")}
+          <div className="mb-1.5 flex items-center justify-between gap-1.5">
+            <div className="flex items-center gap-1.5">
+              <Tag className="h-3 w-3 text-muted-foreground" />
+              {fieldLabel("Tags")}
+            </div>
+            {isPro && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+                onClick={handleSuggestTags}
+                disabled={isLoadingAI || !editForm.title.trim()}
+              >
+                {isLoadingAI ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Sparkles className="h-3 w-3" />
+                )}
+                {isLoadingAI ? "Suggesting…" : "Suggest Tags"}
+              </Button>
+            )}
           </div>
           <Input
             value={editForm.tags}
@@ -213,6 +279,34 @@ export function DrawerBody({
             className="text-sm"
           />
           <p className="mt-1 text-xs text-muted-foreground">Comma-separated</p>
+          {aiSuggestions.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {aiSuggestions.map((tag) => (
+                <span
+                  key={tag}
+                  className="flex items-center gap-0.5 rounded-full border bg-muted/50 px-2 py-0.5 text-xs"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => acceptSuggestion(tag)}
+                    className="ml-0.5 rounded-full p-0.5 text-green-500 hover:bg-green-500/10"
+                    title="Accept"
+                  >
+                    <Check className="h-3 w-3" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => rejectSuggestion(tag)}
+                    className="rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    title="Reject"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </section>
       ) : (
         item.tags.length > 0 && (

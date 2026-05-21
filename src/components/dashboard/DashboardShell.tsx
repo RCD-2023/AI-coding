@@ -29,6 +29,7 @@ export type SessionUser = {
   name?: string | null;
   email?: string | null;
   image?: string | null;
+  isPro?: boolean;
 };
 
 export default function DashboardShell({
@@ -192,7 +193,7 @@ export default function DashboardShell({
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
 
-      <CreateItemDialog open={createItemOpen} onOpenChange={setCreateItemOpen} />
+      <CreateItemDialog open={createItemOpen} onOpenChange={setCreateItemOpen} isPro={user?.isPro ?? false} />
       <CreateCollectionDialog open={createCollectionOpen} onOpenChange={setCreateCollectionOpen} />
       <CommandPalette
         open={paletteOpen}
@@ -200,7 +201,7 @@ export default function DashboardShell({
         searchData={searchData}
         onItemSelect={(id) => setPaletteItemId(id)}
       />
-      <ItemDrawer itemId={paletteItemId} onCloseAction={() => setPaletteItemId(null)} />
+      <ItemDrawer itemId={paletteItemId} onCloseAction={() => setPaletteItemId(null)} isPro={user?.isPro ?? false} />
     </div>
     </EditorPreferencesProvider>
   );

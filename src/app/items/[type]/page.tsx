@@ -91,14 +91,14 @@ export default async function ItemsTypePage({
           </div>
         </div>
         {isDialogType && (
-          <AddItemButton typeSlug={typeSlug as TypeSlug} label={itemType.name} />
+          <AddItemButton typeSlug={typeSlug as TypeSlug} label={itemType.name} isPro={isPro} />
         )}
       </div>
 
       {/* Items */}
       {items.length > 0 ? (
         <>
-          <ItemsWithDrawer items={items} variant={variant} className={gridClass} />
+          <ItemsWithDrawer items={items} variant={variant} className={gridClass} isPro={isPro} />
           <PaginationControls
             currentPage={page}
             totalPages={totalPages}

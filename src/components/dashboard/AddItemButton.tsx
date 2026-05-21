@@ -9,9 +9,10 @@ import type { TypeSlug } from "@/components/dashboard/CreateItemDialog";
 interface AddItemButtonProps {
   typeSlug: TypeSlug;
   label: string;
+  isPro?: boolean;
 }
 
-export default function AddItemButton({ typeSlug, label }: AddItemButtonProps) {
+export default function AddItemButton({ typeSlug, label, isPro = false }: AddItemButtonProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -20,7 +21,7 @@ export default function AddItemButton({ typeSlug, label }: AddItemButtonProps) {
         <Plus className="mr-1 h-4 w-4" />
         New {label}
       </Button>
-      <CreateItemDialog open={open} onOpenChange={setOpen} defaultType={typeSlug} />
+      <CreateItemDialog open={open} onOpenChange={setOpen} defaultType={typeSlug} isPro={isPro} />
     </>
   );
 }

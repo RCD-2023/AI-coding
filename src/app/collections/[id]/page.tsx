@@ -19,6 +19,7 @@ export default async function CollectionDetailPage({
 
   const session = await auth();
   const userId = session?.user?.id ?? "";
+  const isPro = session?.user?.isPro ?? false;
 
   const collection = userId ? await getCollectionWithItems(id, userId, page) : null;
 
@@ -60,6 +61,7 @@ export default async function CollectionDetailPage({
             items={collection.items}
             variant="default"
             className={gridClass}
+            isPro={isPro}
           />
           <PaginationControls
             currentPage={page}

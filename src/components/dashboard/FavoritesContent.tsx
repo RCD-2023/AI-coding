@@ -45,9 +45,11 @@ function sortCollections(collections: FavoriteCollection[], sort: SortKey): Favo
 export default function FavoritesContent({
   items,
   collections,
+  isPro = false,
 }: {
   items: FavoriteItem[];
   collections: FavoriteCollection[];
+  isPro?: boolean;
 }) {
   const [sort, setSort] = useState<SortKey>("date");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -190,7 +192,7 @@ export default function FavoritesContent({
         </>
       )}
 
-      <ItemDrawer itemId={selectedId} onCloseAction={() => setSelectedId(null)} />
+      <ItemDrawer itemId={selectedId} onCloseAction={() => setSelectedId(null)} isPro={isPro} />
     </div>
   );
 }

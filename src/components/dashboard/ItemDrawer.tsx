@@ -33,6 +33,7 @@ import { DrawerBody } from "@/components/dashboard/DrawerBody";
 interface ItemDrawerProps {
   itemId: string | null;
   onCloseAction: () => void;
+  isPro?: boolean;
 }
 
 function DrawerSkeleton() {
@@ -61,7 +62,7 @@ function DrawerSkeleton() {
   );
 }
 
-export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
+export default function ItemDrawer({ itemId, onCloseAction, isPro = false }: ItemDrawerProps) {
   const {
     item,
     loading,
@@ -185,6 +186,7 @@ export default function ItemDrawer({ itemId, onCloseAction }: ItemDrawerProps) {
               userCollections={userCollections}
               collectionIds={collectionIds}
               onCollectionIdsChange={setCollectionIds}
+              isPro={isPro}
             />
           </div>
         ) : null}
