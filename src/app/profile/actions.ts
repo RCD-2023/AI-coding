@@ -1,16 +1,18 @@
 "use server";
 
-import { auth, signOut } from "@/auth";
+import { signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/actions/helpers";
 
 export async function changePassword(
   _prev: { error?: string; success?: string } | null,
   formData: FormData
 ): Promise<{ error?: string; success?: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "Not authenticated" };
+  const authResult = await requireAuth();
+  if (!authResult) return { error: "Unauthorized" };
+  const { userId } = authResult;
 
   const currentPassword = formData.get("currentPassword") as string;
   const newPassword = formData.get("newPassword") as string;
@@ -27,7 +29,7 @@ export async function changePassword(
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: userId },
     select: { password: true },
   });
 
@@ -38,7 +40,7 @@ export async function changePassword(
 
   const hashed = await bcrypt.hash(newPassword, 12);
   await prisma.user.update({
-    where: { id: session.user.id },
+    where: { id: userId },
     data: { password: hashed },
   });
 
@@ -46,10 +48,9 @@ export async function changePassword(
 }
 
 export async function deleteAccount(): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/sign-in");
+  const authResult = await requireAuth();
+  if (!authResult) redirect("/sign-in");
 
-  await prisma.user.delete({ where: { id: session.user.id } });
-
+  await prisma.user.delete({ where: { id: authResult.userId } });
   await signOut({ redirectTo: "/" });
 }

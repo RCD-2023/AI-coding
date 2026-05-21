@@ -2,15 +2,25 @@
 
 ## Status
 
-Not Started
+Completed
 
 ## Goals
 
-<!-- Bullet points of what success looks like -->
+- Extract repeated auth guard pattern into `requireAuth()` helper (7 locations, 5 files)
+- Extract repeated `isPro` DB fetch + rate limit block into `requireProWithRateLimit()` for AI actions (2 identical blocks in `ai.ts`)
+- Extract Zod `safeParse` failure boilerplate into `parseOrError()` helper (4 locations across items + collections)
+- Extract repeated nullable string schema fragment into shared schema constants (`nullableString`, `nullableUrl`, `tagsField`) in `src/lib/schemas/common.ts`
+- Merge identical `createCollectionSchema` / `updateCollectionSchema` into a single `collectionSchema`
+- Extract `toggleFavoriteItem` / `togglePinItem` duplicate toggle logic into `toggleItemField()` db helper
 
 ## Notes
 
-<!-- Additional context, constraints, or details -->
+- New helpers file: `src/lib/actions/helpers.ts` (requireAuth, requireProWithRateLimit, parseOrError)
+- New schemas file: `src/lib/schemas/common.ts` (nullableString, nullableUrl, tagsField)
+- `toggleItemField()` added to `src/lib/db/items.ts`
+- Existing `checkItemLimit` / `checkCollectionLimit` from `src/lib/usage-limits.ts` used in place of inline Prisma count queries
+- No changes to public action signatures — existing tests must still pass
+- Items toggle tests assert `select: { isPinned: true }` in update call — `toggleItemField` preserves this via if/else branching
 
 ## History
 

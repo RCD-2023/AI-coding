@@ -276,6 +276,33 @@ export type UpdateItemData = {
   collectionIds: string[];
 };
 
+export async function toggleItemField(
+  itemId: string,
+  userId: string,
+  field: "isFavorite" | "isPinned"
+): Promise<boolean | null> {
+  const item = await prisma.item.findFirst({
+    where: { id: itemId, userId },
+    select: { isFavorite: true, isPinned: true },
+  });
+  if (!item) return null;
+  if (field === "isFavorite") {
+    const updated = await prisma.item.update({
+      where: { id: itemId },
+      data: { isFavorite: !item.isFavorite },
+      select: { isFavorite: true },
+    });
+    return updated.isFavorite;
+  } else {
+    const updated = await prisma.item.update({
+      where: { id: itemId },
+      data: { isPinned: !item.isPinned },
+      select: { isPinned: true },
+    });
+    return updated.isPinned;
+  }
+}
+
 export async function updateItemInDb(
   itemId: string,
   userId: string,

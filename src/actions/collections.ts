@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import {
   createCollectionInDb,
@@ -10,14 +9,13 @@ import {
   getCollectionsForSelector,
 } from "@/lib/db/collections";
 import { FREE_COLLECTIONS_LIMIT } from "@/lib/constants";
+import { checkCollectionLimit } from "@/lib/usage-limits";
+import { requireAuth, parseOrError } from "@/lib/actions/helpers";
+import { nullableString } from "@/lib/schemas/common";
 
-const createCollectionSchema = z.object({
+const collectionSchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
-  description: z
-    .string()
-    .transform((v) => v.trim() || null)
-    .nullable()
-    .optional(),
+  description: nullableString,
 });
 
 export type CreateCollectionResult =
@@ -28,18 +26,14 @@ export async function createCollection(raw: {
   name: string;
   description: string;
 }): Promise<CreateCollectionResult> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { success: false, error: "Unauthorized" };
-  }
+  const authResult = await requireAuth();
+  if (!authResult) return { success: false, error: "Unauthorized" };
+  const { userId } = authResult;
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { isPro: true },
-  });
+  const dbUser = await prisma.user.findUnique({ where: { id: userId }, select: { isPro: true } });
   if (!dbUser?.isPro) {
-    const collectionCount = await prisma.collection.count({ where: { userId: session.user.id } });
-    if (collectionCount >= FREE_COLLECTIONS_LIMIT) {
+    const { allowed } = await checkCollectionLimit(userId);
+    if (!allowed) {
       return {
         success: false,
         error: `Free plan is limited to ${FREE_COLLECTIONS_LIMIT} collections. Upgrade to Pro for unlimited collections.`,
@@ -47,39 +41,19 @@ export async function createCollection(raw: {
     }
   }
 
-  const parsed = createCollectionSchema.safeParse(raw);
-  if (!parsed.success) {
-    return {
-      success: false,
-      error: "Validation failed",
-      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
-    };
-  }
-
+  const parsed = parseOrError(collectionSchema, raw);
+  if (!("data" in parsed)) return parsed;
   const { name, description } = parsed.data;
 
-  await createCollectionInDb(session.user.id, {
-    name,
-    description: description ?? null,
-  });
-
+  await createCollectionInDb(userId, { name, description: description ?? null });
   return { success: true };
 }
 
 export async function getUserCollectionsForSelector(): Promise<{ id: string; name: string }[]> {
-  const session = await auth();
-  if (!session?.user?.id) return [];
-  return getCollectionsForSelector(session.user.id);
+  const authResult = await requireAuth();
+  if (!authResult) return [];
+  return getCollectionsForSelector(authResult.userId);
 }
-
-const updateCollectionSchema = z.object({
-  name: z.string().trim().min(1, "Name is required"),
-  description: z
-    .string()
-    .transform((v) => v.trim() || null)
-    .nullable()
-    .optional(),
-});
 
 export type UpdateCollectionResult =
   | { success: true }
@@ -89,25 +63,15 @@ export async function updateCollection(
   collectionId: string,
   raw: { name: string; description: string }
 ): Promise<UpdateCollectionResult> {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+  const authResult = await requireAuth();
+  if (!authResult) return { success: false, error: "Unauthorized" };
+  const { userId } = authResult;
 
-  const parsed = updateCollectionSchema.safeParse(raw);
-  if (!parsed.success) {
-    return {
-      success: false,
-      error: "Validation failed",
-      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
-    };
-  }
-
+  const parsed = parseOrError(collectionSchema, raw);
+  if (!("data" in parsed)) return parsed;
   const { name, description } = parsed.data;
 
-  await updateCollectionInDb(collectionId, session.user.id, {
-    name,
-    description: description ?? null,
-  });
-
+  await updateCollectionInDb(collectionId, userId, { name, description: description ?? null });
   return { success: true };
 }
 
@@ -118,11 +82,9 @@ export type DeleteCollectionResult =
 export async function deleteCollection(
   collectionId: string
 ): Promise<DeleteCollectionResult> {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "Unauthorized" };
-
-  await deleteCollectionInDb(collectionId, session.user.id);
-
+  const authResult = await requireAuth();
+  if (!authResult) return { success: false, error: "Unauthorized" };
+  await deleteCollectionInDb(collectionId, authResult.userId);
   return { success: true };
 }
 
@@ -133,11 +95,12 @@ export type ToggleFavoriteCollectionResult =
 export async function toggleFavoriteCollection(
   collectionId: string
 ): Promise<ToggleFavoriteCollectionResult> {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+  const authResult = await requireAuth();
+  if (!authResult) return { success: false, error: "Unauthorized" };
+  const { userId } = authResult;
 
   const collection = await prisma.collection.findFirst({
-    where: { id: collectionId, userId: session.user.id },
+    where: { id: collectionId, userId },
     select: { isFavorite: true },
   });
 

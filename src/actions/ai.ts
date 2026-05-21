@@ -2,10 +2,11 @@
 
 import { z } from "zod";
 import OpenAI from "openai";
-import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import { openai, AI_MODEL } from "@/lib/openai";
-import { checkRateLimit, rateLimiters } from "@/lib/rate-limit";
+import { rateLimiters } from "@/lib/rate-limit";
+import { requireAuth, requireProWithRateLimit } from "@/lib/actions/helpers";
+
+const RATE_LIMIT_MESSAGE = "You've used all 20 AI requests for this hour. Try again later.";
 
 const generateDescriptionSchema = z.object({
   title: z.string().trim().min(1).max(500),
@@ -26,32 +27,20 @@ export async function generateDescription(raw: {
   url?: string;
   language?: string;
 }): Promise<GenerateDescriptionResult> {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+  const authResult = await requireAuth();
+  if (!authResult) return { success: false, error: "Unauthorized" };
+  const { userId } = authResult;
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { isPro: true },
-  });
-  if (!dbUser?.isPro) {
-    return { success: false, error: "AI features require a Pro subscription." };
-  }
-
-  const rl = await checkRateLimit(
+  const err = await requireProWithRateLimit(
+    userId,
     rateLimiters.aiDescribe,
-    `ai:describe:${session.user.id}`
+    `ai:describe:${userId}`,
+    RATE_LIMIT_MESSAGE
   );
-  if (!rl.success) {
-    return {
-      success: false,
-      error: "You've used all 20 AI requests for this hour. Try again later.",
-    };
-  }
+  if (err) return err;
 
   const parsed = generateDescriptionSchema.safeParse(raw);
-  if (!parsed.success) {
-    return { success: false, error: "Invalid input" };
-  }
+  if (!parsed.success) return { success: false, error: "Invalid input" };
 
   const { title, itemType, content, url, language } = parsed.data;
 
@@ -76,10 +65,7 @@ export async function generateDescription(raw: {
     return { success: true, description };
   } catch (err) {
     if (err instanceof OpenAI.RateLimitError) {
-      return {
-        success: false,
-        error: "AI service is busy. Please try again shortly.",
-      };
+      return { success: false, error: "AI service is busy. Please try again shortly." };
     }
     if (err instanceof OpenAI.APIError) {
       console.error("OpenAI API error:", err.status, err.message);
@@ -103,32 +89,20 @@ export async function generateAutoTags(raw: {
   title: string;
   content: string;
 }): Promise<GenerateAutoTagsResult> {
-  const session = await auth();
-  if (!session?.user?.id) return { success: false, error: "Unauthorized" };
+  const authResult = await requireAuth();
+  if (!authResult) return { success: false, error: "Unauthorized" };
+  const { userId } = authResult;
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { isPro: true },
-  });
-  if (!dbUser?.isPro) {
-    return { success: false, error: "AI features require a Pro subscription." };
-  }
-
-  const rl = await checkRateLimit(
+  const err = await requireProWithRateLimit(
+    userId,
     rateLimiters.aiAutoTag,
-    `ai:autotag:${session.user.id}`
+    `ai:autotag:${userId}`,
+    RATE_LIMIT_MESSAGE
   );
-  if (!rl.success) {
-    return {
-      success: false,
-      error: "You've used all 20 AI requests for this hour. Try again later.",
-    };
-  }
+  if (err) return err;
 
   const parsed = generateAutoTagsSchema.safeParse(raw);
-  if (!parsed.success) {
-    return { success: false, error: "Invalid input" };
-  }
+  if (!parsed.success) return { success: false, error: "Invalid input" };
 
   const truncatedContent = parsed.data.content.slice(0, 2000);
 
@@ -172,10 +146,7 @@ export async function generateAutoTags(raw: {
     return { success: true, tags };
   } catch (err) {
     if (err instanceof OpenAI.RateLimitError) {
-      return {
-        success: false,
-        error: "AI service is busy. Please try again shortly.",
-      };
+      return { success: false, error: "AI service is busy. Please try again shortly." };
     }
     if (err instanceof OpenAI.APIError) {
       console.error("OpenAI API error:", err.status, err.message);
