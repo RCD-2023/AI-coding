@@ -12,9 +12,10 @@ interface ItemsWithDrawerProps {
   items: ItemForCard[];
   className?: string;
   variant?: "default" | "gallery" | "list";
+  isPro?: boolean;
 }
 
-export default function ItemsWithDrawer({ items, className, variant = "default" }: ItemsWithDrawerProps) {
+export default function ItemsWithDrawer({ items, className, variant = "default", isPro = false }: ItemsWithDrawerProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   return (
@@ -54,7 +55,7 @@ export default function ItemsWithDrawer({ items, className, variant = "default" 
           ))}
         </div>
       )}
-      <ItemDrawer itemId={selectedId} onCloseAction={() => setSelectedId(null)} />
+      <ItemDrawer itemId={selectedId} onCloseAction={() => setSelectedId(null)} isPro={isPro} />
     </>
   );
 }

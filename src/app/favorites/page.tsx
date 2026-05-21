@@ -9,5 +9,5 @@ export default async function FavoritesPage() {
 
   const { items, collections } = await getFavoritesData(session.user.id);
 
-  return <FavoritesContent items={items} collections={collections} />;
+  return <FavoritesContent items={items} collections={collections} isPro={session.user.isPro ?? false} />;
 }

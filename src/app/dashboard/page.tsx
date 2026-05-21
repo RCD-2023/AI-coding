@@ -10,6 +10,7 @@ import ItemsWithDrawer from "@/components/dashboard/ItemsWithDrawer";
 export default async function DashboardPage() {
   const session = await auth();
   const userId = session?.user?.id ?? "";
+  const isPro = session?.user?.isPro ?? false;
 
   const [collections, items] = await Promise.all([
     userId ? getDashboardData(userId) : null,
@@ -79,7 +80,7 @@ export default async function DashboardPage() {
             <Pin className="h-4 w-4 text-muted-foreground" />
             <h2 className="text-lg font-semibold text-foreground">Pinned</h2>
           </div>
-          <ItemsWithDrawer items={items.pinned} className="space-y-3" />
+          <ItemsWithDrawer items={items.pinned} className="space-y-3" isPro={isPro} />
         </section>
       ) : null}
 
@@ -89,7 +90,7 @@ export default async function DashboardPage() {
           <h2 className="mb-3 text-lg font-semibold text-foreground">
             Recent Items
           </h2>
-          <ItemsWithDrawer items={items.recent} className="space-y-3" />
+          <ItemsWithDrawer items={items.recent} className="space-y-3" isPro={isPro} />
         </section>
       ) : null}
     </div>
