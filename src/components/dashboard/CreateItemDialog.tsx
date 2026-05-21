@@ -25,7 +25,7 @@ import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { FileUpload } from "@/components/ui/file-upload";
 import type { UploadResult } from "@/components/ui/file-upload";
 import { createItem } from "@/actions/items";
-import { generateAutoTags } from "@/actions/ai";
+import { generateAutoTags, generateDescription } from "@/actions/ai";
 import { getUserCollectionsForSelector } from "@/actions/collections";
 import { CollectionMultiSelect } from "@/components/dashboard/CollectionMultiSelect";
 import { fieldLabel, FieldError } from "@/components/dashboard/form-helpers";
@@ -82,6 +82,7 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType, isPr
   const [userCollections, setUserCollections] = useState<{ id: string; name: string }[]>([]);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [isLoadingDesc, setIsLoadingDesc] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -94,8 +95,26 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType, isPr
       setCollectionIds([]);
       setAiSuggestions([]);
       setIsLoadingAI(false);
+      setIsLoadingDesc(false);
     }
   }, [open, defaultType]);
+
+  async function handleGenerateDescription() {
+    setIsLoadingDesc(true);
+    const result = await generateDescription({
+      title: form.title,
+      itemType: selectedType,
+      content: form.content || undefined,
+      url: form.url || undefined,
+      language: form.language || undefined,
+    });
+    setIsLoadingDesc(false);
+    if (result.success) {
+      setField("description", result.description);
+    } else {
+      toast.error(result.error);
+    }
+  }
 
   async function handleSuggestTags() {
     setIsLoadingAI(true);
@@ -223,7 +242,26 @@ export default function CreateItemDialog({ open, onOpenChange, defaultType, isPr
 
           {/* Description */}
           <div>
-            {fieldLabel("Description")}
+            <div className="mb-1.5 flex items-center justify-between gap-1.5">
+              {fieldLabel("Description")}
+              {isPro && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={handleGenerateDescription}
+                  disabled={isLoadingDesc || !form.title.trim()}
+                >
+                  {isLoadingDesc ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3 w-3" />
+                  )}
+                  {isLoadingDesc ? "Generating…" : "Generate"}
+                </Button>
+              )}
+            </div>
             <Textarea
               value={form.description}
               onChange={(e) => setField("description", e.target.value)}

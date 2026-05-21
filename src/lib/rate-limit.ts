@@ -27,6 +27,7 @@ export const rateLimiters = {
   forgotPassword: makeLimiter(3, "1 h"),
   resetPassword: makeLimiter(5, "15 m"),
   aiAutoTag: makeLimiter(20, "1 h"),
+  aiDescribe: makeLimiter(20, "1 h"),
 }
 
 export function getIp(req: Request): string {

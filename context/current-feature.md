@@ -1,16 +1,28 @@
-# Current Feature
+# Current Feature: AI Description Generator
 
 ## Status
 
-Not Started
+In Progress
 
 ## Goals
 
-<!-- Add goals here -->
+- Add an icon button (e.g., Sparkles) next to the description field in the Create New Item dialog
+- Clicking the button calls an AI server action that reads the current title, content (or URL/language/other type-specific fields), and item type from the form inputs
+- The AI generates a concise 1-2 sentence description summarizing the item
+- The generated description is inserted into the description textarea (no save required)
+- Works for all item types (snippet, prompt, command, note, link, file, image) using whatever fields are available
+- Pro-only feature (consistent with existing AI features like auto-tagging)
+- Rate-limited via Upstash (consistent with existing AI rate limits)
+- Button shows a loading spinner while generating; shows error toast on failure
 
 ## Notes
 
-<!-- Add notes here -->
+- Only appears in the Create New Item modal (not in the edit drawer for now)
+- Uses gpt-4o-mini via the existing OpenAI singleton (src/lib/openai.ts)
+- Should reuse the isPro threading pattern already established for auto-tagging
+- No need to save the item first — reads directly from current form state
+- Keep the prompt simple: title + item type + available content fields → 1-2 sentence description
+- Follow the generateAutoTags pattern in src/actions/ai.ts for auth, Pro gate, rate limiting
 
 ## History
 
@@ -67,8 +79,8 @@ Not Started
 49. Pinned Items: togglePinItem server action flips isPinned with userId ownership check; Pin button in DrawerActionBar wired with optimistic state flip + router.refresh() via togglingPin state in useItemDrawer; getItemsByTypeSlug orders by [isPinned desc, createdAt desc] so pinned items float to top; 4 new tests for togglePinItem
 50. Homepage Mockup: pure HTML/CSS/JS marketing page at prototypes/homepage/; chaos-to-order hero with 8 floating app icons (requestAnimationFrame, wall bounce, mouse repulsion) → pulsing SVG arrow → dashboard preview mockup; fixed navbar with scroll opacity; features grid (6 cards with type accent colors); AI Pro section with code editor mockup and AI-generated tags demo; pricing section with monthly/yearly toggle ($8/$6/mo); CTA section and footer with dynamic year; scroll fade-in via IntersectionObserver; fully responsive with vertical stacking and 90° arrow rotation on mobile
 51. Homepage: replaced app/page.tsx placeholder with full Next.js marketing homepage; 12 components in components/homepage/ — Navbar (scroll opacity + hamburger, buttonVariants pattern), ChaosAnimation (rAF particle system + cursor repulsion, IntersectionObserver pause), DashboardMockup (static server component), HeroSection (column layout, text + visual), FeaturesSection (6-card Lucide icon grid), AiSection (code editor mockup + checklist), PricingToggle (monthly/yearly div toggle + card hover lift effects), PricingSection, CtaSection, Footer (server-side year), FadeIn (IntersectionObserver wrapper); fade-in CSS added to globals.css; all links wired to /sign-in, /register, #features, #pricing
-52. UI/UX Bug Fixes: 18 fixes across 14 files from ui-reviewer audit — DrawerActionBar copy button wired to clipboard; mobile New Collection button (FolderPlus) added to DashboardShell; ItemCard copy button always visible on mobile; hero/CTA headings use blue-500 text; FadeIn removed from above-fold hero text; PricingToggle aria-labelledby + green-300 badge contrast; SignInForm Code2 logo + forgot-password tap target; sidebar chevron rotates right when closed; duplicate gear icon removed; footer dead links rendered as spans; mobile Navbar Sign In tap target; feature card hover tint; AiSection Pro badge blue-400; stat card icons colored per type; CollectionCard 3-dot trigger h-8 w-8; ItemCard type badge variant="outline"
+52. UI/UX Bug Fixes: 18 fixes across 14 files from ui-reviewer audit -- DrawerActionBar copy button wired to clipboard; mobile New Collection button (FolderPlus) added to DashboardShell; ItemCard copy button always visible on mobile; hero/CTA headings use blue-500 text; FadeIn removed from above-fold hero text; PricingToggle aria-labelledby + green-300 badge contrast; SignInForm Code2 logo + forgot-password tap target; sidebar chevron rotates right when closed; duplicate gear icon removed; footer dead links rendered as spans; mobile Navbar Sign In tap target; feature card hover tint; AiSection Pro badge blue-400; stat card icons colored per type; CollectionCard 3-dot trigger h-8 w-8; ItemCard type badge variant="outline"
 53. Consistent Navbar & Branding: homepage Navbar added to (auth)/layout.tsx (sign-in, register, forgot-password, reset-password, check-email, verify-email) with pt-20 offset for fixed nav; DashboardShell S placeholder box replaced with Code2 icon matching homepage logo treatment
 54. Stripe Phase 1 — Core Infrastructure: installed Stripe SDK, created stripe singleton (src/lib/stripe.ts), added isPro to JWT/session callbacks (DB-synced on every session read), FREE_ITEMS_LIMIT=50 and FREE_COLLECTIONS_LIMIT=3 constants, checkItemLimit/checkCollectionLimit helpers in src/lib/usage-limits.ts, 8 unit tests
-55. Stripe Phase 2 — Webhooks, Feature Gating & Billing UI: webhook handler at /api/webhooks/stripe (signature verification, checkout.session.completed reads userId from session metadata, subscription.updated/deleted toggles isPro); createCheckoutSession and createBillingPortalSession server actions in src/actions/subscriptions.ts; Pro gate on file/image uploads (403); free-tier limit checks in createItem (50 items) and createCollection (3 collections) with user-facing upgrade prompts; /billing page with DashboardShell layout — free users see usage bars + monthly ($8) and annual ($72) pricing cards, Pro users see status + manage billing button; Billing link added to sidebar dropdown; /billing added to proxy auth matcher; upload and collections tests updated for new prisma mocks
-56. AI Auto-Tagging: OpenAI client singleton (src/lib/openai.ts, gpt-4o-mini via Responses API); generateAutoTags server action with auth, Pro gate (DB query), Upstash rate limiting (20/hr per user), Zod validation, and dual response-format handling ({tags:[]} or []); Suggest Tags button (Sparkles, ghost) in CreateItemDialog and ItemDrawer edit mode — Pro only; per-tag Accept/Reject badge UI; isPro threaded through all page → component paths including AddItemButton fix; 11 unit tests
+55. Stripe Phase 2 — Webhooks, Feature Gating & Billing UI: webhook handler at /api/webhooks/stripe (signature verification, checkout.session.completed reads userId from session metadata, subscription.updated/deleted toggles isPro); createCheckoutSession and createBillingPortalSession server actions in src/actions/subscriptions.ts; Pro gate on file/image uploads (403); free-tier limit checks in createItem (50 items) and createCollection (3 collections) with user-facing upgrade prompts; /billing page with DashboardShell layout -- free users see usage bars + monthly ($8) and annual ($72) pricing cards, Pro users see status + manage billing button; Billing link added to sidebar dropdown; /billing added to proxy auth matcher; upload and collections tests updated for new prisma mocks
+56. AI Auto-Tagging: OpenAI client singleton (src/lib/openai.ts, gpt-4o-mini via Responses API); generateAutoTags server action with auth, Pro gate (DB query), Upstash rate limiting (20/hr per user), Zod validation, and dual response-format handling ({tags:[]} or []); Suggest Tags button (Sparkles, ghost) in CreateItemDialog and ItemDrawer edit mode -- Pro only; per-tag Accept/Reject badge UI; isPro threaded through all page → component paths including AddItemButton fix; 11 unit tests
