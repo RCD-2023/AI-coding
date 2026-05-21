@@ -1,24 +1,16 @@
-# Current Feature: UI/UX Fixes
+# Current Feature
 
 ## Status
 
-In Progress
+Not Started
 
 ## Goals
 
-Fixes identified via UI/UX review (code inspection + Playwright):
+<!-- Bullet points of what success looks like -->
 
-1. **Sidebar active link highlighting** — `SidebarContent.tsx`: no `usePathname()` check, no visual indicator of current page on any nav link
-2. **Sidebar missing Dashboard link** — no way to navigate back to `/dashboard` from the sidebar; only the logo wordmark works
-3. **Register page: hardcoded "S" logo** — should use `Code2` icon matching the sign-in page
-4. **Register page: no GitHub OAuth button** — sign-in has it, register does not; inconsistent auth flows
-5. **Favorites star link: no aria-label** — screen readers get nothing; keyboard users can't identify the link
-6. **Mobile icon buttons: no aria-label** — New Item / New Collection icon-only buttons use only `title` (not accessible on touch)
-7. **ItemCard copy button: not keyboard-accessible** — `opacity-0` on desktop until hover; add `focus-visible:opacity-100`
-8. **Dashboard stats: Favorite Items and Favorite Collections share identical yellow color** — indistinguishable at a glance
-9. **Footer dead links: no "Soon" label** — 10 placeholder links silently do nothing, looks broken
-10. **CtaSection bg-card** — same background as AiSection directly above; sections bleed together visually
-11. **PricingToggle "Save 25%" badge** — `text-green-300` on `bg-green-500/20` is low contrast in dark mode
+## Notes
+
+<!-- Additional context, constraints, or details -->
 
 ## History
 
@@ -80,3 +72,5 @@ Fixes identified via UI/UX review (code inspection + Playwright):
 54. Stripe Phase 1 — Core Infrastructure: installed Stripe SDK, created stripe singleton (src/lib/stripe.ts), added isPro to JWT/session callbacks (DB-synced on every session read), FREE_ITEMS_LIMIT=50 and FREE_COLLECTIONS_LIMIT=3 constants, checkItemLimit/checkCollectionLimit helpers in src/lib/usage-limits.ts, 8 unit tests
 55. Stripe Phase 2 — Webhooks, Feature Gating & Billing UI: webhook handler at /api/webhooks/stripe (signature verification, checkout.session.completed reads userId from session metadata, subscription.updated/deleted toggles isPro); createCheckoutSession and createBillingPortalSession server actions in src/actions/subscriptions.ts; Pro gate on file/image uploads (403); free-tier limit checks in createItem (50 items) and createCollection (3 collections) with user-facing upgrade prompts; /billing page with DashboardShell layout -- free users see usage bars + monthly ($8) and annual ($72) pricing cards, Pro users see status + manage billing button; Billing link added to sidebar dropdown; /billing added to proxy auth matcher; upload and collections tests updated for new prisma mocks
 56. AI Auto-Tagging: OpenAI client singleton (src/lib/openai.ts, gpt-4o-mini via Responses API); generateAutoTags server action with auth, Pro gate (DB query), Upstash rate limiting (20/hr per user), Zod validation, and dual response-format handling ({tags:[]} or []); Suggest Tags button (Sparkles, ghost) in CreateItemDialog and ItemDrawer edit mode -- Pro only; per-tag Accept/Reject badge UI; isPro threaded through all page → component paths including AddItemButton fix; 11 unit tests
+57. AI Description Generator: generateDescription server action (auth, Pro gate, 20/hr Upstash rate limit); Sparkles Generate button next to description field in CreateItemDialog; injects 1-2 sentence AI result directly into the textarea; 11 unit tests
+58. UI/UX Fixes + Homepage Dashboard Link: sidebar usePathname active link highlighting on all nav links + Dashboard link added; RegisterForm Code2 logo and GitHub OAuth button; DashboardShell aria-labels on Favorites star and mobile icon buttons; DevStash logo in dashboard links to homepage; ItemCard focus-visible on copy button; dashboard Favorite Collections stat changed to orange; Footer Soon badge on placeholder links; CtaSection bg-background to visually separate from AiSection; PricingToggle Save 25% badge contrast improved; Navbar shows Dashboard button for logged-in users via SessionProvider in root layout
