@@ -66,7 +66,7 @@ export default function PricingToggle() {
           }`}
         >
           Yearly
-          <span className="text-xs font-semibold bg-green-500/20 text-green-300 border border-green-500/50 px-1.5 py-0.5 rounded-full">
+          <span className="text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/40 px-1.5 py-0.5 rounded-full">
             Save 25%
           </span>
         </span>

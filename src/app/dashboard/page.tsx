@@ -21,7 +21,7 @@ export default async function DashboardPage() {
     { label: "Total Items",          value: collections?.stats.totalItems          ?? 0, icon: Layers,     color: "text-blue-500",   bg: "bg-blue-500/10" },
     { label: "Collections",          value: collections?.stats.totalCollections    ?? 0, icon: FolderOpen, color: "text-green-500",  bg: "bg-green-500/10" },
     { label: "Favorite Items",       value: collections?.stats.favoriteItems       ?? 0, icon: Star,       color: "text-yellow-500", bg: "bg-yellow-500/10" },
-    { label: "Favorite Collections", value: collections?.stats.favoriteCollections ?? 0, icon: Bookmark,   color: "text-yellow-500", bg: "bg-yellow-500/10" },
+    { label: "Favorite Collections", value: collections?.stats.favoriteCollections ?? 0, icon: Bookmark,   color: "text-orange-500", bg: "bg-orange-500/10" },
   ];
 
   return (

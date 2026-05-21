@@ -87,7 +87,7 @@ export default function ItemCard({ item }: { item: ItemForCard }) {
           <button
             type="button"
             onClick={handleCopy}
-            className="absolute bottom-3 right-3 rounded p-0.5 text-muted-foreground transition-opacity hover:text-foreground opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+            className="absolute bottom-3 right-3 rounded p-0.5 text-muted-foreground transition-opacity hover:text-foreground opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100"
             aria-label="Copy content"
           >
             {copied ? (

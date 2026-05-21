@@ -10,7 +10,7 @@ vi.mock("@/lib/prisma", () => ({
 
 vi.mock("@/lib/rate-limit", () => ({
   checkRateLimit: vi.fn(),
-  rateLimiters: { aiAutoTag: null },
+  rateLimiters: { aiAutoTag: null, aiDescribe: null },
 }));
 
 vi.mock("@/lib/openai", () => ({
@@ -37,7 +37,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { openai } from "@/lib/openai";
-import { generateAutoTags } from "@/actions/ai";
+import { generateAutoTags, generateDescription } from "@/actions/ai";
 
 const mockAuth          = vi.mocked(auth);
 const mockFindUnique    = vi.mocked(prisma.user.findUnique);
@@ -173,6 +173,112 @@ describe("generateAutoTags — success", () => {
 
     expect(result.success).toBe(true);
     if (result.success) expect(result.tags).toEqual([]);
+  });
+});
+
+// ===========================================================================
+// generateDescription
+// ===========================================================================
+
+describe("generateDescription — auth", () => {
+  it("returns unauthorized when there is no session", async () => {
+    mockAuth.mockResolvedValue(null as never);
+
+    const result = await generateDescription({ title: "test", itemType: "snippet" });
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBe("Unauthorized");
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+});
+
+describe("generateDescription — Pro gating", () => {
+  it("returns error for free users", async () => {
+    mockFindUnique.mockResolvedValue({ isPro: false } as never);
+
+    const result = await generateDescription({ title: "test", itemType: "note" });
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/Pro/i);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+});
+
+describe("generateDescription — rate limiting", () => {
+  it("returns error when rate limit is exceeded", async () => {
+    mockCheckRL.mockResolvedValue(RL_EXCEEDED);
+
+    const result = await generateDescription({ title: "test", itemType: "snippet" });
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/hour/i);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+});
+
+describe("generateDescription — input validation", () => {
+  it("returns error when title is empty", async () => {
+    const result = await generateDescription({ title: "   ", itemType: "snippet" });
+
+    expect(result.success).toBe(false);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+});
+
+describe("generateDescription — success", () => {
+  it("returns description from model output", async () => {
+    mockCreate.mockResolvedValue({
+      output_text: "A React hook that manages local state. Use it to store component-level data that should trigger re-renders on change.",
+    } as never);
+
+    const result = await generateDescription({
+      title: "useState example",
+      itemType: "snippet",
+      content: "const [count, setCount] = useState(0);",
+      language: "typescript",
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.description).toBe(
+        "A React hook that manages local state. Use it to store component-level data that should trigger re-renders on change."
+      );
+    }
+  });
+
+  it("trims whitespace from description", async () => {
+    mockCreate.mockResolvedValue({
+      output_text: "   A useful snippet.   ",
+    } as never);
+
+    const result = await generateDescription({ title: "test", itemType: "snippet" });
+
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.description).toBe("A useful snippet.");
+  });
+
+  it("returns error when model output is empty", async () => {
+    mockCreate.mockResolvedValue({ output_text: "" } as never);
+
+    const result = await generateDescription({ title: "test", itemType: "note" });
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/empty/i);
+  });
+
+  it("works for link type with url field", async () => {
+    mockCreate.mockResolvedValue({
+      output_text: "The official React documentation site for learning hooks and components.",
+    } as never);
+
+    const result = await generateDescription({
+      title: "React Docs",
+      itemType: "link",
+      url: "https://react.dev",
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.description).toContain("React");
   });
 });
 

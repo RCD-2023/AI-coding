@@ -64,8 +64,11 @@ export default function Footer() {
                           {item.label}
                         </a>
                       ) : (
-                        <span className="text-sm text-muted-foreground/50 cursor-default">
+                        <span className="flex items-center gap-1.5 text-sm text-muted-foreground/50 cursor-default">
                           {item.label}
+                          <span className="text-[10px] font-medium bg-muted px-1.5 py-0.5 rounded text-muted-foreground/60">
+                            Soon
+                          </span>
                         </span>
                       )}
                     </li>
