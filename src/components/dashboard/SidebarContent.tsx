@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, CreditCard, Settings, Star, User } from "lucide-react";
+import { ChevronDown, CreditCard, LayoutDashboard, Settings, Star, User } from "lucide-react";
 import type { SidebarData } from "@/lib/db/sidebar";
 import type { SessionUser } from "@/components/dashboard/DashboardShell";
 import { iconMap } from "@/lib/icon-map";
@@ -27,14 +28,35 @@ export default function SidebarContent({
   user: SessionUser | null;
 }) {
   const [collectionsOpen, setCollectionsOpen] = useState(true);
+  const pathname = usePathname();
 
   const itemTypes = sidebarData?.itemTypes ?? [];
   const favorites = sidebarData?.favorites ?? [];
   const recents = sidebarData?.recents ?? [];
 
+  const linkClass = (href: string, exact = false) =>
+    cn(
+      "flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors",
+      (exact ? pathname === href : pathname === href || pathname.startsWith(href + "/"))
+        ? "bg-accent text-accent-foreground font-medium"
+        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+    );
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto p-3">
+        {/* Dashboard */}
+        <div className="mb-4">
+          <nav className="space-y-0.5">
+            <Link href="/dashboard" className={linkClass("/dashboard", true)}>
+              <span className="flex items-center gap-2">
+                <LayoutDashboard className="h-4 w-4 shrink-0" />
+                Dashboard
+              </span>
+            </Link>
+          </nav>
+        </div>
+
         {/* Types */}
         <div className="mb-4">
           <p className="mb-1 px-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -48,7 +70,7 @@ export default function SidebarContent({
                 <Link
                   key={type.id}
                   href={href}
-                  className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  className={linkClass(href)}
                 >
                   <span className="flex items-center gap-2">
                     {Icon && (
@@ -102,7 +124,7 @@ export default function SidebarContent({
                       <Link
                         key={col.id}
                         href={`/collections/${col.id}`}
-                        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                        className={cn(linkClass(`/collections/${col.id}`, true), "justify-start gap-2")}
                       >
                         <Star
                           className="h-3 w-3 shrink-0"
@@ -127,7 +149,7 @@ export default function SidebarContent({
                       <Link
                         key={col.id}
                         href={`/collections/${col.id}`}
-                        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                        className={cn(linkClass(`/collections/${col.id}`, true), "justify-start gap-2")}
                       >
                         <span
                           className="h-2.5 w-2.5 shrink-0 rounded-full"

@@ -88,10 +88,10 @@ export default function DashboardShell({
           >
             <PanelLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-2 px-1">
+          <Link href="/" className="flex items-center gap-2 px-1 hover:opacity-80 transition-opacity">
             <Code2 className="h-5 w-5" />
             <span className="font-semibold text-foreground">DevStash</span>
-          </div>
+          </Link>
         </div>
 
         {/* Search — desktop only, centered */}
@@ -125,6 +125,7 @@ export default function DashboardShell({
           </Button>
           <Link
             href="/favorites"
+            aria-label="Favorites"
             className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
           >
             <Star className="h-4 w-4" />
@@ -155,6 +156,7 @@ export default function DashboardShell({
             className="h-8 w-8 md:hidden"
             onClick={() => setCreateCollectionOpen(true)}
             title="New Collection"
+            aria-label="New Collection"
           >
             <FolderPlus className="h-4 w-4" />
           </Button>
@@ -163,6 +165,7 @@ export default function DashboardShell({
             className="h-8 w-8 md:hidden"
             onClick={() => setCreateItemOpen(true)}
             title="New Item"
+            aria-label="New Item"
           >
             <Plus className="h-4 w-4" />
           </Button>

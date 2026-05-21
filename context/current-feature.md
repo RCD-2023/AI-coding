@@ -1,4 +1,4 @@
-# Current Feature: AI Description Generator
+# Current Feature: UI/UX Fixes
 
 ## Status
 
@@ -6,23 +6,19 @@ In Progress
 
 ## Goals
 
-- Add an icon button (e.g., Sparkles) next to the description field in the Create New Item dialog
-- Clicking the button calls an AI server action that reads the current title, content (or URL/language/other type-specific fields), and item type from the form inputs
-- The AI generates a concise 1-2 sentence description summarizing the item
-- The generated description is inserted into the description textarea (no save required)
-- Works for all item types (snippet, prompt, command, note, link, file, image) using whatever fields are available
-- Pro-only feature (consistent with existing AI features like auto-tagging)
-- Rate-limited via Upstash (consistent with existing AI rate limits)
-- Button shows a loading spinner while generating; shows error toast on failure
+Fixes identified via UI/UX review (code inspection + Playwright):
 
-## Notes
-
-- Only appears in the Create New Item modal (not in the edit drawer for now)
-- Uses gpt-4o-mini via the existing OpenAI singleton (src/lib/openai.ts)
-- Should reuse the isPro threading pattern already established for auto-tagging
-- No need to save the item first — reads directly from current form state
-- Keep the prompt simple: title + item type + available content fields → 1-2 sentence description
-- Follow the generateAutoTags pattern in src/actions/ai.ts for auth, Pro gate, rate limiting
+1. **Sidebar active link highlighting** — `SidebarContent.tsx`: no `usePathname()` check, no visual indicator of current page on any nav link
+2. **Sidebar missing Dashboard link** — no way to navigate back to `/dashboard` from the sidebar; only the logo wordmark works
+3. **Register page: hardcoded "S" logo** — should use `Code2` icon matching the sign-in page
+4. **Register page: no GitHub OAuth button** — sign-in has it, register does not; inconsistent auth flows
+5. **Favorites star link: no aria-label** — screen readers get nothing; keyboard users can't identify the link
+6. **Mobile icon buttons: no aria-label** — New Item / New Collection icon-only buttons use only `title` (not accessible on touch)
+7. **ItemCard copy button: not keyboard-accessible** — `opacity-0` on desktop until hover; add `focus-visible:opacity-100`
+8. **Dashboard stats: Favorite Items and Favorite Collections share identical yellow color** — indistinguishable at a glance
+9. **Footer dead links: no "Soon" label** — 10 placeholder links silently do nothing, looks broken
+10. **CtaSection bg-card** — same background as AiSection directly above; sections bleed together visually
+11. **PricingToggle "Save 25%" badge** — `text-green-300` on `bg-green-500/20` is low contrast in dark mode
 
 ## History
 

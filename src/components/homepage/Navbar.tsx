@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Code2, Menu, X } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -9,6 +10,8 @@ import { cn } from "@/lib/utils";
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { status } = useSession();
+  const loggedIn = status === "authenticated";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -50,12 +53,20 @@ export default function Navbar() {
         </ul>
 
         <div className="hidden md:flex items-center gap-2">
-          <Link href="/sign-in" className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}>
-            Sign In
-          </Link>
-          <Link href="/register" className={cn(buttonVariants({ size: "sm" }))}>
-            Get Started
-          </Link>
+          {loggedIn ? (
+            <Link href="/dashboard" className={cn(buttonVariants({ size: "sm" }))}>
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link href="/sign-in" className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}>
+                Sign In
+              </Link>
+              <Link href="/register" className={cn(buttonVariants({ size: "sm" }))}>
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -83,20 +94,32 @@ export default function Navbar() {
           >
             Pricing
           </a>
-          <Link
-            href="/sign-in"
-            className="block py-2 text-sm hover:text-foreground transition-colors"
-            onClick={() => setMenuOpen(false)}
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/register"
-            className={cn(buttonVariants({ size: "sm" }), "w-full text-center")}
-            onClick={() => setMenuOpen(false)}
-          >
-            Get Started
-          </Link>
+          {loggedIn ? (
+            <Link
+              href="/dashboard"
+              className={cn(buttonVariants({ size: "sm" }), "w-full text-center")}
+              onClick={() => setMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/sign-in"
+                className="block py-2 text-sm hover:text-foreground transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className={cn(buttonVariants({ size: "sm" }), "w-full text-center")}
+                onClick={() => setMenuOpen(false)}
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>
