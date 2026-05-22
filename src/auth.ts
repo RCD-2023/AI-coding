@@ -19,7 +19,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   callbacks: {
-    redirect: async ({ baseUrl }) => `${baseUrl}/dashboard`,
+    redirect: async ({ url, baseUrl }) => {
+      if (url.startsWith(baseUrl)) return url
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      return `${baseUrl}/dashboard`
+    },
     jwt: async ({ token, user }) => {
       if (user) token.id = user.id
 
